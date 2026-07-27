@@ -38,9 +38,9 @@ forecast:
   continuity_correction: 0.5
 
 backtest:
-  lookback_days: 21
-  # Max settled markets to score per city (API pages)
-  max_markets_per_city: 48
+  lookback_days: 220
+  # Max settled markets to score per city (API pages) — ~6 brackets/day * ~70 days ≈ 420
+  max_markets_per_city: 500
   # Use candle mid this many hours before market close as entry proxy
   entry_hours_before_close: 18
   contracts_per_trade: 1.0

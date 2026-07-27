@@ -41,19 +41,26 @@ def collect_backtest_universe(
     settings: Settings | None = None,
     *,
     lookback_days: int | None = None,
+    start_date: str | date | None = None,
+    end_date: str | date | None = None,
     cities: list[City] | None = None,
 ) -> dict[str, Any]:
     """
     Pull settled Kalshi weather markets + historical forecasts + candle entry quotes.
     Returns candidates (pre-decision) for scoring / fine-tuning.
+
+    If start_date is set (e.g. '2026-01-01'), it overrides lookback_days.
     """
     settings = settings or load_settings()
-    lookback_days = lookback_days or settings.backtest_lookback_days
     cities = cities or settings.cities
     client = KalshiMarketData(settings.kalshi_base_url)
 
-    end = date.today()
-    start = end - timedelta(days=lookback_days)
+    end = date.fromisoformat(end_date) if isinstance(end_date, str) else (end_date or date.today())
+    if start_date is not None:
+        start = date.fromisoformat(start_date) if isinstance(start_date, str) else start_date
+    else:
+        lookback_days = lookback_days or settings.backtest_lookback_days
+        start = end - timedelta(days=lookback_days)
     start_s, end_s = start.isoformat(), end.isoformat()
 
     candidates: list[dict[str, Any]] = []
@@ -140,7 +147,7 @@ def collect_backtest_universe(
                 "city": city,
             }
 
-        with ThreadPoolExecutor(max_workers=8) as pool:
+        with ThreadPoolExecutor(max_workers=4) as pool:
             futures = [pool.submit(_quote_one, item) for item in eligible]
             for fut in as_completed(futures):
                 try:
@@ -151,9 +158,15 @@ def collect_backtest_universe(
                 if row:
                     candidates.append(row)
 
+        client.flush_cache()
+
+    # Actual data coverage may be shorter than requested window
+    dated = [c["target_date"] for c in candidates]
     return {
         "start_date": start_s,
         "end_date": end_s,
+        "data_start": min(dated) if dated else start_s,
+        "data_end": max(dated) if dated else end_s,
         "candidates": candidates,
         "n_candidates": len(candidates),
         "errors": errors,
@@ -273,14 +286,26 @@ def score_universe(
     }
 
 
-def run_backtest(settings: Settings | None = None, lookback_days: int | None = None) -> dict[str, Any]:
+def run_backtest(
+    settings: Settings | None = None,
+    lookback_days: int | None = None,
+    start_date: str | date | None = None,
+    end_date: str | date | None = None,
+) -> dict[str, Any]:
     settings = settings or load_settings()
-    universe = collect_backtest_universe(settings, lookback_days=lookback_days)
+    universe = collect_backtest_universe(
+        settings,
+        lookback_days=lookback_days,
+        start_date=start_date,
+        end_date=end_date,
+    )
     scored = score_universe(universe["candidates"], settings)
     return {
         **scored,
         "start_date": universe["start_date"],
         "end_date": universe["end_date"],
+        "data_start": universe.get("data_start"),
+        "data_end": universe.get("data_end"),
         "errors": universe["errors"],
         "candidates": universe["candidates"],
     }

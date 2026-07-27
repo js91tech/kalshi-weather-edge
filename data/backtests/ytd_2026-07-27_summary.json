@@ -1,0 +1,134 @@
+{
+  "start_date": "2026-01-01",
+  "end_date": "2026-07-27",
+  "data_start": "2026-05-21",
+  "data_end": "2026-07-26",
+  "n_candidates": 2407,
+  "n_trades": 791,
+  "wins": 269,
+  "losses": 522,
+  "win_rate": 0.34007585335018964,
+  "pnl": 24.409999999999993,
+  "avg_pnl_per_trade": 0.03085967130214917,
+  "params": {
+    "min_edge": 0.04,
+    "min_edge_taker": 0.08,
+    "market_shrinkage": 0.35,
+    "longshot_overprice_min": 0.03,
+    "longshot_market_max": 0.12,
+    "max_trades_per_event": 2
+  },
+  "errors": [],
+  "by_city": {
+    "nyc": {
+      "wins": 56,
+      "losses": 68,
+      "pnl": 15.880000000000008,
+      "n": 124,
+      "win_rate": 0.45161290322580644
+    },
+    "chi": {
+      "wins": 49,
+      "losses": 85,
+      "pnl": 1.2600000000000007,
+      "n": 134,
+      "win_rate": 0.3656716417910448
+    },
+    "mia": {
+      "wins": 31,
+      "losses": 102,
+      "pnl": -0.7200000000000006,
+      "n": 133,
+      "win_rate": 0.23308270676691728
+    },
+    "la": {
+      "wins": 33,
+      "losses": 101,
+      "pnl": -4.349999999999997,
+      "n": 134,
+      "win_rate": 0.2462686567164179
+    },
+    "den": {
+      "wins": 50,
+      "losses": 82,
+      "pnl": 6.410000000000004,
+      "n": 132,
+      "win_rate": 0.3787878787878788
+    },
+    "austin": {
+      "wins": 50,
+      "losses": 84,
+      "pnl": 5.930000000000001,
+      "n": 134,
+      "win_rate": 0.373134328358209
+    }
+  },
+  "fine_tune_best": {
+    "min_edge": 0.02,
+    "market_shrinkage": 0.65,
+    "longshot_overprice_min": 0.02,
+    "n_trades": 797,
+    "wins": 276,
+    "losses": 521,
+    "win_rate": 0.3462986198243413,
+    "pnl": 27.799999999999933,
+    "avg_pnl_per_trade": 0.03488080301129226
+  },
+  "fine_tune_top5": [
+    {
+      "min_edge": 0.02,
+      "market_shrinkage": 0.65,
+      "longshot_overprice_min": 0.02,
+      "n_trades": 797,
+      "wins": 276,
+      "losses": 521,
+      "win_rate": 0.3462986198243413,
+      "pnl": 27.799999999999933,
+      "avg_pnl_per_trade": 0.03488080301129226
+    },
+    {
+      "min_edge": 0.02,
+      "market_shrinkage": 0.65,
+      "longshot_overprice_min": 0.03,
+      "n_trades": 797,
+      "wins": 276,
+      "losses": 521,
+      "win_rate": 0.3462986198243413,
+      "pnl": 27.799999999999933,
+      "avg_pnl_per_trade": 0.03488080301129226
+    },
+    {
+      "min_edge": 0.02,
+      "market_shrinkage": 0.65,
+      "longshot_overprice_min": 0.05,
+      "n_trades": 797,
+      "wins": 276,
+      "losses": 521,
+      "win_rate": 0.3462986198243413,
+      "pnl": 27.799999999999933,
+      "avg_pnl_per_trade": 0.03488080301129226
+    },
+    {
+      "min_edge": 0.02,
+      "market_shrinkage": 0.2,
+      "longshot_overprice_min": 0.02,
+      "n_trades": 803,
+      "wins": 277,
+      "losses": 526,
+      "win_rate": 0.3449564134495641,
+      "pnl": 25.939999999999955,
+      "avg_pnl_per_trade": 0.03230386052303855
+    },
+    {
+      "min_edge": 0.02,
+      "market_shrinkage": 0.2,
+      "longshot_overprice_min": 0.03,
+      "n_trades": 803,
+      "wins": 277,
+      "losses": 526,
+      "win_rate": 0.3449564134495641,
+      "pnl": 25.939999999999955,
+      "avg_pnl_per_trade": 0.03230386052303855
+    }
+  ]
+}

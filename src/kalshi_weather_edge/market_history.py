@@ -1,14 +1,32 @@
 from __future__ import annotations
 
-from typing import Any
+import json
+import threading
 from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any
 
-import requests
-
-from .kalshi_client import KalshiClient  # re-export pattern avoided; extend below
+from .config import ROOT
+from .kalshi_client import KalshiClient
 
 
 class KalshiMarketData(KalshiClient):
+    def __init__(self, base_url: str, timeout: float = 30.0, cache_path: Path | None = None) -> None:
+        super().__init__(base_url, timeout=timeout)
+        self.cache_path = cache_path or (ROOT / "data" / "cache" / "entry_quotes.json")
+        self.cache_path.parent.mkdir(parents=True, exist_ok=True)
+        self._cache: dict[str, Any] = {}
+        self._lock = threading.Lock()
+        if self.cache_path.exists():
+            try:
+                self._cache = json.loads(self.cache_path.read_text(encoding="utf-8"))
+            except Exception:
+                self._cache = {}
+
+    def _save_cache(self) -> None:
+        with self._lock:
+            self.cache_path.write_text(json.dumps(self._cache), encoding="utf-8")
+
     def get_candlesticks(
         self,
         series_ticker: str,
@@ -39,6 +57,11 @@ class KalshiMarketData(KalshiClient):
         Approximate tradable bid/ask using candle closes ~hours_before_close before market close.
         Falls back to earliest candle with a sane mid if exact window missing.
         """
+        cache_key = f"{ticker}|{hours_before_close}|{close_time_iso}"
+        with self._lock:
+            if cache_key in self._cache:
+                return dict(self._cache[cache_key])
+
         if not close_time_iso:
             return {"yes_bid": None, "yes_ask": None, "mid": None, "source": None}
 
@@ -55,7 +78,10 @@ class KalshiMarketData(KalshiClient):
             return {"yes_bid": None, "yes_ask": None, "mid": None, "source": None}
 
         if not candles:
-            return {"yes_bid": None, "yes_ask": None, "mid": None, "source": None}
+            out = {"yes_bid": None, "yes_ask": None, "mid": None, "source": None}
+            with self._lock:
+                self._cache[cache_key] = out
+            return dict(out)
 
         def _parse(c: dict[str, Any]) -> tuple[float, float | None, float | None, float | None]:
             ts = float(c.get("end_period_ts") or 0)
@@ -65,42 +91,71 @@ class KalshiMarketData(KalshiClient):
             return ts, bid, ask, px
 
         parsed = [_parse(c) for c in candles]
-        # Prefer candle closest to target with mid in (0.02, 0.98)
+        # Prefer candles near the target entry time with a usable mid.
         ranked = sorted(parsed, key=lambda x: abs(x[0] - target_ts))
+
+        def _mid(bid: float | None, ask: float | None, px: float | None) -> float | None:
+            if bid is not None and ask is not None and ask >= bid:
+                return (float(bid) + float(ask)) / 2.0
+            if px is not None:
+                return float(px)
+            if bid is not None:
+                return float(bid)
+            if ask is not None:
+                return float(ask)
+            return None
+
+        result: dict[str, Any] | None = None
+        # Pass 1: near target, mid in (0.01, 0.99)
         for ts, bid, ask, px in ranked:
-            mid = None
-            if bid is not None and ask is not None and 0 < bid <= ask < 1:
-                mid = (bid + ask) / 2.0
-            elif px is not None:
-                mid = px
-            if mid is None or mid <= 0.02 or mid >= 0.98:
+            mid = _mid(bid, ask, px)
+            if mid is None or mid < 0.01 or mid > 0.99:
                 continue
-            # If only mid, synthesize tight spread
-            if bid is None or ask is None:
+            # Normalize quotes for maker simulation
+            if bid is None or bid <= 0:
                 bid = max(0.01, mid - 0.01)
+            if ask is None or ask >= 1:
                 ask = min(0.99, mid + 0.01)
-            return {
-                "yes_bid": bid,
-                "yes_ask": ask,
-                "mid": mid,
+            if ask < bid:
+                ask = min(0.99, bid + 0.01)
+            result = {
+                "yes_bid": float(bid),
+                "yes_ask": float(ask),
+                "mid": float(mid),
                 "source": f"candle@{int(ts)}",
             }
+            break
 
-        # Last resort: any candle with a price
-        for ts, bid, ask, px in ranked:
-            mid = px
-            if bid is not None and ask is not None:
-                mid = (bid + ask) / 2.0
-            if mid is None:
-                continue
-            return {
-                "yes_bid": bid if bid is not None else max(0.01, mid - 0.01),
-                "yes_ask": ask if ask is not None else min(0.99, mid + 0.01),
-                "mid": mid,
-                "source": f"candle_fallback@{int(ts)}",
-            }
+        # Pass 2: any candle with any price
+        if result is None:
+            for ts, bid, ask, px in ranked:
+                mid = _mid(bid, ask, px)
+                if mid is None or mid <= 0 or mid >= 1:
+                    continue
+                bid_n = bid if bid is not None and bid > 0 else max(0.01, mid - 0.01)
+                ask_n = ask if ask is not None and ask < 1 else min(0.99, mid + 0.01)
+                if ask_n < bid_n:
+                    ask_n = min(0.99, bid_n + 0.01)
+                result = {
+                    "yes_bid": float(bid_n),
+                    "yes_ask": float(ask_n),
+                    "mid": float(mid),
+                    "source": f"candle_fallback@{int(ts)}",
+                }
+                break
 
-        return {"yes_bid": None, "yes_ask": None, "mid": None, "source": None}
+        if result is None:
+            result = {"yes_bid": None, "yes_ask": None, "mid": None, "source": None}
+
+        with self._lock:
+            self._cache[cache_key] = result
+            # Persist periodically (every ~25 inserts)
+            if len(self._cache) % 25 == 0:
+                self.cache_path.write_text(json.dumps(self._cache), encoding="utf-8")
+        return dict(result)
+
+    def flush_cache(self) -> None:
+        self._save_cache()
 
 
 def _dollar(v: Any) -> float | None:
