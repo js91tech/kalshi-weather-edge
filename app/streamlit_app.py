@@ -35,8 +35,8 @@ st.set_page_config(
     layout="wide",
 )
 
-st.title("Kalshi Weather Edge")
-st.caption("Ensemble forecast vs Kalshi temperature brackets. Not financial advice.")
+st.title("Kalshi Edge")
+st.caption("Paper/live scanner + backtests. Favorites strategy targets high hit rates. Not financial advice.")
 
 base_settings = load_settings()
 creds = live_credentials_configured()
@@ -163,8 +163,8 @@ c3.metric("Trade suggestions", stats["trade_signals"])
 c4.metric("Settled (ledger)", stats["settled"])
 c5.metric("Paper PnL ($)", f"{stats['paper_pnl']:.2f}")
 
-tab_board, tab_trades, tab_backtest, tab_tune, tab_help = st.tabs(
-    ["Edge board", "Trade suggestions", "Backtest W/L", "Fine-tune", "Help"]
+tab_board, tab_trades, tab_backtest, tab_tune, tab_hunt, tab_help = st.tabs(
+    ["Edge board", "Trade suggestions", "Backtest W/L", "Fine-tune", "Hit-rate hunt", "Help"]
 )
 
 result = st.session_state.get("last_result")
@@ -327,6 +327,32 @@ with tab_tune:
                     )
                     st.rerun()
 
+with tab_hunt:
+    hunt_path = ROOT / "data" / "backtests" / "hit_rate_hunt_2026-07-27.json"
+    if not hunt_path.exists():
+        st.info("Run `python scripts/hunt_hit_rates.py --fast` to generate hit-rate results.")
+    else:
+        hunt = json.loads(hunt_path.read_text(encoding="utf-8"))
+        st.write(
+            f"Data window **{hunt.get('data_start')} → {hunt.get('data_end')}** · "
+            f"{hunt.get('n_candidates')} candidates"
+        )
+        h = hunt.get("hunt") or {}
+        best = h.get("best_pnl_among_hit_rate_ge_70") or h.get("best")
+        if best:
+            st.success(
+                f"Best ≥70% hit-rate by PnL: **{best['name']}** — "
+                f"{best['wins']}W/{best['losses']}L "
+                f"({best['win_rate']:.1%}), PnL ${best['pnl']:.2f}"
+            )
+        hdf = pd.DataFrame(h.get("all_high_hit") or h.get("ranked_top20") or [])
+        if not hdf.empty:
+            st.dataframe(hdf, use_container_width=True, hide_index=True)
+        st.caption(
+            "Favorites = trade with extreme market prices (YES when mid≥0.90, NO when mid≤0.10). "
+            "High hit rate, small $ per contract — not the same as beating a sharp mid."
+        )
+
 with tab_help:
     st.markdown(
         f"""
@@ -340,6 +366,16 @@ Uses settled Kalshi markets, Open-Meteo historical forecasts, and candle mids
 
 ### Fine-tune
 Grid-searches `min_edge`, `market_shrinkage`, and `longshot_overprice_min` for best win rate then PnL.
+
+### Hit-rate hunt
+Across gas (`KXAAAGASD`), EUR/USD, Nasdaq, weather, CPI, and NFP, the strategies that
+cleared **~95%+ hit rates** were **favorites**:
+- Buy **YES** when market mid ≥ 0.90–0.95
+- Buy **NO** when market mid ≤ 0.05–0.10
+
+Example (ALL markets, mid≤0.30 NO): **1393W / 68L (95.3%)**, +$73.69 on 1-contract paper sizes.
+
+Re-run: `python scripts/hunt_hit_rates.py --fast`
 
 ### Caveats
 Historical forecasts are point estimates (wider σ), not full archived ensembles.

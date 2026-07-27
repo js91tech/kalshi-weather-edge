@@ -1,6 +1,25 @@
 # Default mode: paper | live (UI can override; live still needs API keys + confirm)
 mode: paper
 
+# Signal style: model_edge (weather ensemble) | favorites (high hit-rate consensus)
+strategy: favorites
+
+favorites:
+  yes_threshold: 0.90
+  no_threshold: 0.10
+  contracts: 1.0
+  # Series to scan for favorite signals
+  series:
+    - KXAAAGASD
+    - KXEURUSD
+    - KXNASDAQDUD
+    - KXHIGHNY
+    - KXHIGHCHI
+    - KXHIGHLAX
+    - KXHIGHMIA
+    - KXHIGHDEN
+    - KXHIGHAUS
+
 kalshi:
   base_url: https://external-api.kalshi.com/trade-api/v2
   demo_base_url: https://external-api.demo.kalshi.co/trade-api/v2

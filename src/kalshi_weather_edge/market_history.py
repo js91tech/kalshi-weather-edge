@@ -35,16 +35,28 @@ class KalshiMarketData(KalshiClient):
         end_ts: int,
         period_interval: int = 60,
     ) -> list[dict[str, Any]]:
-        path = f"/series/{series_ticker}/markets/{ticker}/candlesticks"
-        data = self._get(
-            path,
-            {
-                "start_ts": int(start_ts),
-                "end_ts": int(end_ts),
-                "period_interval": int(period_interval),
-            },
-        )
-        return list(data.get("candlesticks") or [])
+        params = {
+            "start_ts": int(start_ts),
+            "end_ts": int(end_ts),
+            "period_interval": int(period_interval),
+        }
+        # Live path first
+        try:
+            path = f"/series/{series_ticker}/markets/{ticker}/candlesticks"
+            data = self._get(path, params)
+            candles = list(data.get("candlesticks") or [])
+            if candles:
+                return candles
+        except Exception:
+            candles = []
+
+        # Historical fallback (pre-cutoff markets)
+        try:
+            path = f"/historical/markets/{ticker}/candlesticks"
+            data = self._get(path, params)
+            return list(data.get("candlesticks") or [])
+        except Exception:
+            return candles
 
     def entry_quote_from_candles(
         self,
@@ -85,9 +97,12 @@ class KalshiMarketData(KalshiClient):
 
         def _parse(c: dict[str, Any]) -> tuple[float, float | None, float | None, float | None]:
             ts = float(c.get("end_period_ts") or 0)
-            bid = _dollar((c.get("yes_bid") or {}).get("close_dollars"))
-            ask = _dollar((c.get("yes_ask") or {}).get("close_dollars"))
-            px = _dollar((c.get("price") or {}).get("close_dollars"))
+            bid_block = c.get("yes_bid") or {}
+            ask_block = c.get("yes_ask") or {}
+            px_block = c.get("price") or {}
+            bid = _candle_field(bid_block, "close_dollars", "close")
+            ask = _candle_field(ask_block, "close_dollars", "close")
+            px = _candle_field(px_block, "close_dollars", "close")
             return ts, bid, ask, px
 
         parsed = [_parse(c) for c in candles]
@@ -162,3 +177,13 @@ def _dollar(v: Any) -> float | None:
     if v is None or v == "":
         return None
     return float(v)
+
+
+def _candle_field(block: dict[str, Any] | None, *keys: str) -> float | None:
+    """Support both live (*_dollars) and historical (bare) candle schemas."""
+    if not block:
+        return None
+    for k in keys:
+        if k in block and block[k] is not None and block[k] != "":
+            return float(block[k])
+    return None
