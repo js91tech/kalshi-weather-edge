@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import re
-from datetime import datetime
 from typing import Any
 
 from .brackets import market_bracket_prob
@@ -10,43 +8,8 @@ from .db import Ledger, utc_now
 from .edge import evaluate_market
 from .fees import dollar
 from .kalshi_client import KalshiClient
+from .tickers import cap_trades_per_event as _cap_trades_per_event, parse_event_date
 from .weather import fetch_ensemble_highs
-
-
-EVENT_DATE_RE = re.compile(r"-(\d{2})([A-Z]{3})(\d{2})$")
-
-
-MONTHS = {
-    "JAN": 1,
-    "FEB": 2,
-    "MAR": 3,
-    "APR": 4,
-    "MAY": 5,
-    "JUN": 6,
-    "JUL": 7,
-    "AUG": 8,
-    "SEP": 9,
-    "OCT": 10,
-    "NOV": 11,
-    "DEC": 12,
-}
-
-
-def parse_event_date(event_ticker: str) -> str | None:
-    """KXHIGHNY-26JUL28 → 2026-07-28"""
-    m = EVENT_DATE_RE.search(event_ticker or "")
-    if not m:
-        return None
-    yy, mon, dd = m.group(1), m.group(2), m.group(3)
-    month = MONTHS.get(mon)
-    if not month:
-        return None
-    year = 2000 + int(yy)
-    try:
-        return datetime(year, month, int(dd)).date().isoformat()
-    except ValueError:
-        return None
-
 
 def run_pipeline(settings: Settings | None = None, notes: str = "manual") -> dict[str, Any]:
     settings = settings or load_settings()
@@ -188,42 +151,6 @@ def run_pipeline(settings: Settings | None = None, notes: str = "manual") -> dic
         "rows": rows,
         "stats": ledger.signal_stats(),
     }
-
-
-def _cap_trades_per_event(signals: list[dict[str, Any]], max_trades: int) -> list[dict[str, Any]]:
-    if max_trades <= 0:
-        return signals
-    from collections import defaultdict
-
-    by_key: dict[tuple[str, str], list[dict[str, Any]]] = defaultdict(list)
-    for s in signals:
-        key = (s.get("city_id") or "", s.get("target_date") or "")
-        by_key[key].append(s)
-
-    out: list[dict[str, Any]] = []
-    for group in by_key.values():
-        trades = [s for s in group if s["action"] != "PASS"]
-        passes = [s for s in group if s["action"] == "PASS"]
-        trades_sorted = sorted(trades, key=lambda x: abs(float(x.get("edge") or 0)), reverse=True)
-        keep = trades_sorted[:max_trades]
-        drop = trades_sorted[max_trades:]
-        for s in drop:
-            s = dict(s)
-            s["action"] = "PASS"
-            s["side"] = None
-            s["execution"] = "none"
-            s["suggested_contracts"] = 0.0
-            s["reason"] = (
-                f"Capped: kept top {max_trades} |edge| for this city/date — "
-                f"was {s.get('reason')}"
-            )
-            meta = dict(s.get("meta") or {})
-            meta["capped"] = True
-            s["meta"] = meta
-            passes.append(s)
-        out.extend(keep)
-        out.extend(passes)
-    return out
 
 
 def rows_to_dataframe_records(result: dict[str, Any]) -> list[dict[str, Any]]:

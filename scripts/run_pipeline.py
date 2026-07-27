@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Run one paper pipeline cycle from the CLI."""
+"""Run one favorites scan from the CLI."""
 from __future__ import annotations
 
 import json
@@ -9,20 +9,20 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from kalshi_weather_edge.pipeline import run_pipeline
+from kalshi_weather_edge.favorites_pipeline import run_favorites_scan
 
 
 def main() -> None:
-    result = run_pipeline(notes="cli")
+    result = run_favorites_scan(notes="cli")
     summary = {k: v for k, v in result.items() if k != "rows"}
     print(json.dumps(summary, indent=2))
     trades = [r for r in result["rows"] if r["action"] != "PASS"]
-    print(f"\nTrade signals ({len(trades)}):")
+    print(f"\nFavorites signals ({len(trades)}):")
     for t in trades:
         print(
-            f"  {t['action']:8} {t['ticker']:28} "
-            f"model={t['model_p']:.3f} mid={t['market_mid']:.3f} "
-            f"edge={t['edge']:.3f} x{t['suggested_contracts']:.1f}"
+            f"  {t['action']:8} {t['ticker']:32} "
+            f"mid={t['market_mid']:.3f} x{t['suggested_contracts']:.0f}  "
+            f"{t['reason']}"
         )
 
 

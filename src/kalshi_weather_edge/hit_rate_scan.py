@@ -9,7 +9,7 @@ import requests
 
 from .config import ROOT, Settings, load_settings
 from .market_history import KalshiMarketData
-from .pipeline import parse_event_date
+from .tickers import parse_event_date
 
 
 DEFAULT_SERIES = [

@@ -8,7 +8,7 @@ from .brackets import market_bracket_prob
 from .config import City, Settings, load_settings, with_overrides
 from .edge import evaluate_market
 from .market_history import KalshiMarketData
-from .pipeline import _cap_trades_per_event, parse_event_date
+from .tickers import cap_trades_per_event as _cap_trades_per_event, parse_event_date
 from .weather import fetch_historical_highs
 
 

@@ -11,32 +11,33 @@ import streamlit as st
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from kalshi_weather_edge.backtest import (  # noqa: E402
-    apply_best_params_to_settings,
-    fine_tune,
-    persist_tuned_params,
-    run_backtest,
-    score_universe,
-)
 from kalshi_weather_edge.config import (  # noqa: E402
     live_credentials_configured,
     load_settings,
+    save_favorites_thresholds,
     save_mode_to_config,
     with_overrides,
 )
 from kalshi_weather_edge.db import Ledger  # noqa: E402
-from kalshi_weather_edge.pipeline import rows_to_dataframe_records, run_pipeline  # noqa: E402
+from kalshi_weather_edge.favorites_pipeline import (  # noqa: E402
+    rows_to_dataframe_records,
+    run_favorites_scan,
+)
+from kalshi_weather_edge.hit_rate_scan import (  # noqa: E402
+    FAST_SERIES,
+    build_candidates,
+    hunt_hit_rates,
+)
 from kalshi_weather_edge.trading import execute_signal  # noqa: E402
 
 
-st.set_page_config(
-    page_title="Kalshi Weather Edge",
-    page_icon="🌡️",
-    layout="wide",
-)
+st.set_page_config(page_title="Kalshi Favorites", page_icon="📈", layout="wide")
 
-st.title("Kalshi Edge")
-st.caption("Paper/live scanner + backtests. Favorites strategy targets high hit rates. Not financial advice.")
+st.title("Kalshi Favorites")
+st.caption(
+    "High hit-rate scanner: buy YES when market is very bullish, buy NO when very bearish. "
+    "Paper by default. Not financial advice."
+)
 
 base_settings = load_settings()
 creds = live_credentials_configured()
@@ -48,7 +49,6 @@ with st.sidebar:
         options=["paper", "live"],
         index=0 if base_settings.mode != "live" else 1,
         horizontal=True,
-        help="Paper = signals + backtests only. Live can send real Kalshi orders.",
     )
     if mode != base_settings.mode:
         if st.button("Save mode to config.yaml"):
@@ -57,115 +57,86 @@ with st.sidebar:
             st.rerun()
 
     use_demo = st.checkbox("Use Kalshi DEMO API", value=creds.get("env") == "demo")
-    st.write(
-        "API keys: "
-        + ("ready" if creds["ready"] else "not configured (.env)")
-    )
+    st.write("API keys: " + ("ready" if creds["ready"] else "not configured (.env)"))
     if mode == "live":
-        st.warning("Live mode can place real orders. Confirm below before executing.")
+        st.warning("Live mode can place real orders.")
         confirm_live = st.checkbox("I understand — allow live order submission")
     else:
         confirm_live = False
 
     st.divider()
-    st.header("Live params")
-    min_edge = st.slider("min_edge", 0.01, 0.15, float(base_settings.min_edge), 0.01)
-    shrinkage = st.slider(
-        "market_shrinkage", 0.0, 0.9, float(base_settings.market_shrinkage), 0.05
-    )
-    lookback = st.slider(
-        "Backtest lookback (days)", 7, 60, int(base_settings.backtest_lookback_days), 1
-    )
+    st.header("Favorites thresholds")
+    yes_thr = st.slider("Buy YES when mid >=", 0.80, 0.99, float(base_settings.favorites_yes_threshold), 0.01)
+    no_thr = st.slider("Buy NO when mid <=", 0.01, 0.20, float(base_settings.favorites_no_threshold), 0.01)
+    contracts = st.number_input("Contracts per signal", 1, 25, int(base_settings.favorites_contracts))
 
     settings = with_overrides(
         base_settings,
         mode=mode,
-        min_edge=float(min_edge),
-        market_shrinkage=float(shrinkage),
-        backtest_lookback_days=int(lookback),
+        favorites_yes_threshold=float(yes_thr),
+        favorites_no_threshold=float(no_thr),
+        favorites_contracts=float(contracts),
     )
 
-    run_clicked = st.button("Run live scan", type="primary", use_container_width=True)
-    backtest_clicked = st.button("Run historical backtest", use_container_width=True)
-    tune_clicked = st.button("Fine-tune on last backtest", use_container_width=True)
+    if st.button("Save thresholds to config"):
+        save_favorites_thresholds(yes_thr, no_thr)
+        st.success("Saved thresholds")
+
+    st.divider()
+    scan_clicked = st.button("Scan open markets", type="primary", use_container_width=True)
+    backtest_clicked = st.button("Run hit-rate backtest", use_container_width=True)
 
 ledger = Ledger(settings.db_path)
 
-if run_clicked:
-    with st.spinner("Fetching Kalshi markets + Open-Meteo ensembles..."):
+if scan_clicked:
+    with st.spinner("Scanning Kalshi open markets..."):
         try:
-            result = run_pipeline(settings, notes=f"streamlit:{mode}")
+            result = run_favorites_scan(settings, notes=f"streamlit:{mode}")
             st.session_state["last_result"] = result
             st.success(
-                f"Run #{result['run_id']}: scored {result['markets_scored']} markets — "
-                f"{result['trade_signals']} trade / {result['pass_signals']} pass"
+                f"Run #{result['run_id']}: {result['markets_scored']} markets — "
+                f"{result['trade_signals']} signals / {result['pass_signals']} pass"
             )
             if result["errors"]:
                 st.warning("\n".join(result["errors"]))
         except Exception as exc:  # noqa: BLE001
-            st.error(f"Pipeline failed: {exc}")
+            st.error(f"Scan failed: {exc}")
 
 if backtest_clicked:
-    with st.spinner("Backtesting settled markets + historical forecasts (may take a minute)..."):
+    with st.spinner("Backtesting settled history (may take a few minutes)..."):
         try:
-            bt = run_backtest(settings, lookback_days=lookback)
-            # Drop heavy city objects for session state
-            for c in bt.get("candidates") or []:
-                c.pop("city", None)
-            st.session_state["backtest"] = bt
-            st.success(
-                f"Backtest {bt['start_date']} → {bt['end_date']}: "
-                f"{bt['wins']}W / {bt['losses']}L "
-                f"(win rate {bt['win_rate']:.1%}), PnL ${bt['pnl']:.2f}"
+            from datetime import date
+
+            year = date.today().year
+            universe = build_candidates(
+                settings.favorites_series or FAST_SERIES,
+                settings,
+                start_date=f"{year}-01-01",
+                max_markets_per_series=settings.backtest_max_markets_per_series,
+                entry_hours_before_close=settings.backtest_entry_hours_before_close,
             )
-            if bt.get("errors"):
-                st.warning("\n".join(bt["errors"]))
+            hunt = hunt_hit_rates(universe["candidates"], min_trades=25)
+            st.session_state["backtest"] = {
+                **universe,
+                "hunt": hunt,
+                "yes_threshold": yes_thr,
+                "no_threshold": no_thr,
+            }
+            best = hunt.get("best_pnl_among_hit_rate_ge_70") or hunt.get("best")
+            if best:
+                st.success(
+                    f"Best >=70% hit-rate: {best['wins']}W/{best['losses']}L "
+                    f"({best['win_rate']:.1%}), PnL ${best['pnl']:.2f}"
+                )
         except Exception as exc:  # noqa: BLE001
             st.error(f"Backtest failed: {exc}")
 
-if tune_clicked:
-    bt = st.session_state.get("backtest")
-    if not bt or not bt.get("candidates"):
-        st.error("Run a historical backtest first.")
-    else:
-        with st.spinner("Grid-searching edge params on backtest universe..."):
-            try:
-                # Reattach minimal city fields for scoring
-                from kalshi_weather_edge.config import City
-
-                city_map = {c.id: c for c in settings.cities}
-                cands = []
-                for c in bt["candidates"]:
-                    cc = dict(c)
-                    cc["city"] = city_map.get(c["city_id"])
-                    cands.append(cc)
-                tuned = fine_tune(cands, settings)
-                st.session_state["tune"] = tuned
-                best = tuned.get("best")
-                if best:
-                    st.success(
-                        f"Best: min_edge={best['min_edge']}, "
-                        f"shrink={best['market_shrinkage']}, "
-                        f"longshot_over={best['longshot_overprice_min']} → "
-                        f"{best['wins']}W/{best['losses']}L "
-                        f"({best['win_rate']:.1%}), PnL ${best['pnl']:.2f}"
-                    )
-                else:
-                    st.warning("No tunable result.")
-            except Exception as exc:  # noqa: BLE001
-                st.error(f"Fine-tune failed: {exc}")
-
 stats = ledger.signal_stats()
-c1, c2, c3, c4, c5 = st.columns(5)
+c1, c2, c3, c4 = st.columns(4)
 c1.metric("Mode", mode.upper())
 c2.metric("Signals logged", stats["total_signals"])
-c3.metric("Trade suggestions", stats["trade_signals"])
-c4.metric("Settled (ledger)", stats["settled"])
-c5.metric("Paper PnL ($)", f"{stats['paper_pnl']:.2f}")
-
-tab_board, tab_trades, tab_backtest, tab_tune, tab_hunt, tab_help = st.tabs(
-    ["Edge board", "Trade suggestions", "Backtest W/L", "Fine-tune", "Hit-rate hunt", "Help"]
-)
+c3.metric("Trade signals", stats["trade_signals"])
+c4.metric("Paper PnL ($)", f"{stats['paper_pnl']:.2f}")
 
 result = st.session_state.get("last_result")
 if result:
@@ -181,69 +152,50 @@ else:
             meta = {}
         records.append(
             {
-                "city": meta.get("city_name") or s.get("city_id"),
-                "date": s.get("target_date"),
+                "series": meta.get("series") or s.get("city_id"),
                 "ticker": s.get("ticker"),
+                "title": meta.get("title"),
                 "subtitle": meta.get("subtitle"),
                 "action": s.get("action"),
                 "side": s.get("side"),
                 "execution": s.get("execution"),
-                "model_p": s.get("model_p"),
                 "market_mid": s.get("market_mid"),
+                "yes_bid": s.get("yes_bid"),
+                "yes_ask": s.get("yes_ask"),
                 "edge": s.get("edge"),
                 "contracts": s.get("suggested_contracts"),
-                "mu": meta.get("mu"),
-                "sigma": meta.get("sigma"),
                 "reason": s.get("reason"),
             }
         )
     df = pd.DataFrame(records)
 
-with tab_board:
+tab_signals, tab_backtest, tab_help = st.tabs(["Live signals", "Backtest results", "Help"])
+
+with tab_signals:
     if df.empty:
-        st.info("No signals yet. Click **Run live scan**.")
+        st.info("Click **Scan open markets** in the sidebar.")
     else:
         show = df.copy()
-        for col in ("model_p", "market_mid", "edge"):
-            if col in show.columns:
-                show[col] = pd.to_numeric(show[col], errors="coerce")
+        show["market_mid"] = pd.to_numeric(show["market_mid"], errors="coerce")
         st.dataframe(
-            show.sort_values(["action", "edge"], ascending=[True, False]),
+            show.sort_values(["action", "market_mid"], ascending=[True, False]),
             use_container_width=True,
             hide_index=True,
         )
-        plot_df = show.dropna(subset=["model_p", "market_mid"])
-        if not plot_df.empty:
-            fig = px.scatter(
-                plot_df,
+        trades = show[show["action"] != "PASS"]
+        if not trades.empty:
+            fig = px.histogram(
+                trades,
                 x="market_mid",
-                y="model_p",
                 color="action",
-                hover_data=["ticker", "city", "subtitle", "edge"],
-                title="Model P(YES) vs market mid",
+                title="Signal distribution by market mid",
             )
-            fig.add_shape(type="line", x0=0, y0=0, x1=1, y1=1, line=dict(dash="dash", color="gray"))
             st.plotly_chart(fig, use_container_width=True)
 
-with tab_trades:
-    if df.empty:
-        st.info("No trades yet.")
-    else:
-        trades = df[df["action"] != "PASS"].copy()
-        if trades.empty:
-            st.write("No trade suggestions this scan.")
-        else:
-            st.dataframe(trades.sort_values("edge", ascending=False), use_container_width=True, hide_index=True)
-            st.subheader("Execute suggestions")
-            if mode == "paper":
-                st.caption("Paper mode: execution is simulated only.")
-            selected = st.multiselect(
-                "Select tickers to execute",
-                options=trades["ticker"].tolist(),
-            )
+            st.subheader("Execute selected (paper or live)")
+            selected = st.multiselect("Tickers", options=trades["ticker"].tolist())
             if st.button("Execute selected"):
                 trade_map = {r["ticker"]: r for r in (result.get("rows") if result else [])}
-                # Fallback reconstruct from dataframe
                 outs = []
                 for ticker in selected:
                     sig = trade_map.get(ticker)
@@ -255,8 +207,8 @@ with tab_trades:
                             "side": row.get("side"),
                             "execution": row.get("execution"),
                             "suggested_contracts": row.get("contracts") or 1,
-                            "yes_bid": None,
-                            "yes_ask": None,
+                            "yes_bid": row.get("yes_bid"),
+                            "yes_ask": row.get("yes_ask"),
                             "market_mid": row.get("market_mid"),
                         }
                     outs.append(
@@ -272,114 +224,68 @@ with tab_trades:
 
 with tab_backtest:
     bt = st.session_state.get("backtest")
-    if not bt:
-        st.info("Click **Run historical backtest** in the sidebar.")
-    else:
-        m1, m2, m3, m4, m5 = st.columns(5)
-        m1.metric("Trades", bt["n_trades"])
-        m2.metric("Wins", bt["wins"])
-        m3.metric("Losses", bt["losses"])
-        m4.metric("Win rate", f"{bt['win_rate']:.1%}")
-        m5.metric("PnL ($)", f"{bt['pnl']:.2f}")
-        st.caption(f"Window {bt['start_date']} → {bt['end_date']} · candidates {bt['n_candidates']}")
-        tdf = pd.DataFrame(bt.get("trades") or [])
-        if not tdf.empty:
-            st.dataframe(tdf, use_container_width=True, hide_index=True)
-            fig = px.histogram(tdf, x="pnl", color="won", title="Trade PnL distribution")
-            st.plotly_chart(fig, use_container_width=True)
-        else:
-            st.write("No trades under current thresholds (all PASS). Loosen min_edge or shrink.")
-
-with tab_tune:
-    tuned = st.session_state.get("tune")
-    if not tuned:
-        st.info("Run a backtest, then click **Fine-tune on last backtest**.")
-    else:
-        rdf = pd.DataFrame(tuned.get("ranked") or tuned.get("results") or [])
-        st.dataframe(rdf, use_container_width=True, hide_index=True)
-        best = tuned.get("best")
-        if best:
-            st.write("Best params:", best)
-            if st.button("Apply best params to config.yaml"):
-                persist_tuned_params(best)
-                st.success("Saved to config.yaml — reload the app to use them as defaults.")
-            if st.button("Rescore backtest with best params"):
-                bt = st.session_state.get("backtest")
-                if bt and bt.get("candidates"):
-                    from kalshi_weather_edge.config import City
-
-                    city_map = {c.id: c for c in settings.cities}
-                    cands = []
-                    for c in bt["candidates"]:
-                        cc = dict(c)
-                        cc["city"] = city_map.get(c["city_id"])
-                        cands.append(cc)
-                    best_settings = apply_best_params_to_settings(settings, best)
-                    rescored = score_universe(cands, best_settings)
-                    rescored["start_date"] = bt["start_date"]
-                    rescored["end_date"] = bt["end_date"]
-                    rescored["errors"] = bt.get("errors") or []
-                    rescored["candidates"] = bt["candidates"]
-                    st.session_state["backtest"] = rescored
-                    st.success(
-                        f"Rescored: {rescored['wins']}W/{rescored['losses']}L "
-                        f"({rescored['win_rate']:.1%})"
-                    )
-                    st.rerun()
-
-with tab_hunt:
     hunt_path = ROOT / "data" / "backtests" / "hit_rate_hunt_2026-07-27.json"
-    if not hunt_path.exists():
-        st.info("Run `python scripts/hunt_hit_rates.py --fast` to generate hit-rate results.")
-    else:
+
+    if bt:
+        st.write(
+            f"Window **{bt.get('data_start')} -> {bt.get('data_end')}** · "
+            f"{bt.get('n_candidates')} candidates"
+        )
+        hunt = bt.get("hunt") or {}
+        best = hunt.get("best_pnl_among_hit_rate_ge_70") or hunt.get("best")
+        if best:
+            st.success(
+                f"**{best['name']}** — {best['wins']}W/{best['losses']}L "
+                f"({best['win_rate']:.1%}), PnL ${best['pnl']:.2f}"
+            )
+        hdf = pd.DataFrame(hunt.get("all_high_hit") or hunt.get("ranked") or [])
+        if not hdf.empty:
+            st.dataframe(hdf, use_container_width=True, hide_index=True)
+    elif hunt_path.exists():
         hunt = json.loads(hunt_path.read_text(encoding="utf-8"))
         st.write(
-            f"Data window **{hunt.get('data_start')} → {hunt.get('data_end')}** · "
+            f"Saved results: **{hunt.get('data_start')} -> {hunt.get('data_end')}** · "
             f"{hunt.get('n_candidates')} candidates"
         )
         h = hunt.get("hunt") or {}
         best = h.get("best_pnl_among_hit_rate_ge_70") or h.get("best")
         if best:
             st.success(
-                f"Best ≥70% hit-rate by PnL: **{best['name']}** — "
-                f"{best['wins']}W/{best['losses']}L "
+                f"**{best['name']}** — {best['wins']}W/{best['losses']}L "
                 f"({best['win_rate']:.1%}), PnL ${best['pnl']:.2f}"
             )
-        hdf = pd.DataFrame(h.get("all_high_hit") or h.get("ranked_top20") or [])
-        if not hdf.empty:
-            st.dataframe(hdf, use_container_width=True, hide_index=True)
-        st.caption(
-            "Favorites = trade with extreme market prices (YES when mid≥0.90, NO when mid≤0.10). "
-            "High hit rate, small $ per contract — not the same as beating a sharp mid."
-        )
+        st.dataframe(pd.DataFrame(h.get("all_high_hit") or []), use_container_width=True, hide_index=True)
+    else:
+        st.info("Click **Run hit-rate backtest** in the sidebar.")
 
 with tab_help:
     st.markdown(
         f"""
+### Strategy: Favorites
+Trade **with** extreme market consensus — not against it.
+
+| Signal | Rule |
+|--------|------|
+| **BUY YES** | Market mid >= {yes_thr:.2f} |
+| **BUY NO** | Market mid <= {no_thr:.2f} |
+| **PASS** | Everything else |
+
+### Series scanned
+{', '.join(f'`{s}`' for s in settings.favorites_series)}
+
+### Backtest results (2026 YTD)
+- ALL markets, buy NO when mid <= 0.30: **95.3%** hit rate, +$73.69 paper PnL
+- Gas YES when mid >= 0.95: **99.3%** hit rate
+- Small $ per contract — high hit rate != huge edge
+
 ### Modes
-- **Paper** — scan + backtest + fine-tune; no exchange orders
-- **Live** — requires `.env` keys (`KALSHI_API_KEY_ID`, `KALSHI_PRIVATE_KEY_PATH`) and confirmation
+- **Paper** — scan + log only
+- **Live** — needs `.env` keys + confirmation checkbox
 
-### Backtest
-Uses settled Kalshi markets, Open-Meteo historical forecasts, and candle mids
-~{settings.backtest_entry_hours_before_close}h before close as entry prices, then counts **wins vs losses**.
-
-### Fine-tune
-Grid-searches `min_edge`, `market_shrinkage`, and `longshot_overprice_min` for best win rate then PnL.
-
-### Hit-rate hunt
-Across gas (`KXAAAGASD`), EUR/USD, Nasdaq, weather, CPI, and NFP, the strategies that
-cleared **~95%+ hit rates** were **favorites**:
-- Buy **YES** when market mid ≥ 0.90–0.95
-- Buy **NO** when market mid ≤ 0.05–0.10
-
-Example (ALL markets, mid≤0.30 NO): **1393W / 68L (95.3%)**, +$73.69 on 1-contract paper sizes.
-
-Re-run: `python scripts/hunt_hit_rates.py --fast`
-
-### Caveats
-Historical forecasts are point estimates (wider σ), not full archived ensembles.
-Candle entry is a proxy — not identical to maker fills you would have gotten.
-Past win rate does not guarantee future edge.
+### CLI
+```
+python scripts/run_pipeline.py
+python scripts/hunt_hit_rates.py --fast
+```
 """
     )

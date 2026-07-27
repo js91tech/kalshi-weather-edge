@@ -81,6 +81,10 @@ def execute_signal(
     )
 
     side = (signal.get("side") or "YES").upper()
+    if action == "BUY_NO":
+        side = "NO"
+    elif action == "BUY_YES":
+        side = "YES"
     yes_bid = signal.get("yes_bid")
     yes_ask = signal.get("yes_ask")
 
