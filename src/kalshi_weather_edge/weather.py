@@ -90,3 +90,51 @@ def fetch_ensemble_highs(
             )
         )
     return out
+
+
+def fetch_historical_highs(
+    lat: float,
+    lon: float,
+    timezone: str,
+    start_date: str,
+    end_date: str,
+    sigma_floor: float = 1.5,
+    sigma_scale: float = 1.35,
+    timeout: float = 30.0,
+) -> dict[str, TempForecast]:
+    """
+    Open-Meteo historical forecast daily max (°F) for backtests.
+    Uses point forecast as μ; σ from configured floor/scale (no archived ensemble members).
+    """
+    url = "https://historical-forecast-api.open-meteo.com/v1/forecast"
+    params = {
+        "latitude": lat,
+        "longitude": lon,
+        "start_date": start_date,
+        "end_date": end_date,
+        "daily": "temperature_2m_max",
+        "temperature_unit": "fahrenheit",
+        "timezone": timezone,
+    }
+    resp = requests.get(url, params=params, timeout=timeout)
+    resp.raise_for_status()
+    daily = resp.json().get("daily") or {}
+    times = daily.get("time") or []
+    vals = daily.get("temperature_2m_max") or []
+    sigma = max(float(sigma_floor) * float(sigma_scale), 0.5)
+    out: dict[str, TempForecast] = {}
+    for i, day in enumerate(times):
+        if i >= len(vals) or vals[i] is None:
+            continue
+        mu = float(vals[i])
+        out[day] = TempForecast(
+            target_date=day,
+            mu=mu,
+            sigma=sigma,
+            p10=mu - 1.28 * sigma,
+            p50=mu,
+            p90=mu + 1.28 * sigma,
+            source="open_meteo_historical_forecast",
+            members=[mu],
+        )
+    return out

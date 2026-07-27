@@ -13,6 +13,34 @@ This is **not** a live trading bot and **not** financial advice. Default mode is
 5. Writes forecasts + signals to SQLite (`data/ledger.db`)
 6. Shows an edge board in Streamlit
 
+## Modes: paper vs live
+
+Sidebar toggle switches **paper** / **live**.
+
+- **Paper** — scans, backtests, fine-tunes; never sends orders
+- **Live** — can place small maker limit orders after you confirm
+
+Create `.env` from `.env.example`:
+
+```
+KALSHI_API_KEY_ID=...
+KALSHI_PRIVATE_KEY_PATH=C:\path\to\kalshi-key.key
+KALSHI_ENV=production
+```
+
+Live still requires the confirmation checkbox before any order is sent. Caps: `live_max_contracts_per_order` in `config.yaml`.
+
+## Backtest & fine-tune
+
+```powershell
+$env:PYTHONPATH="src"
+python scripts\run_backtest.py
+```
+
+Or in Streamlit: **Run historical backtest** → **Fine-tune on last backtest** → optionally **Apply best params to config.yaml**.
+
+Backtest uses settled Kalshi markets + Open-Meteo historical forecasts + candle mids as entry proxies, then reports **wins / losses / win rate / PnL**.
+
 ## Deploy online (recommended: Streamlit Community Cloud)
 
 Best free host for this app: **[Streamlit Community Cloud](https://share.streamlit.io/)**.

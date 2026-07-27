@@ -1,9 +1,9 @@
+.env
+.venv/
+venv/
 __pycache__/
 *.py[cod]
 *.egg-info/
-.venv/
-venv/
-.env
 .DS_Store
 data/*.db
 data/*.sqlite
@@ -14,3 +14,4 @@ data/cache/
 dist/
 build/
 *.log
+*.key

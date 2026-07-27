@@ -1,11 +1,15 @@
-# Paper-only Kalshi weather edge monitor
+# Default mode: paper | live (UI can override; live still needs API keys + confirm)
 mode: paper
 
 kalshi:
   base_url: https://external-api.kalshi.com/trade-api/v2
+  demo_base_url: https://external-api.demo.kalshi.co/trade-api/v2
   # Taker fee ≈ 0.07 * p * (1-p) dollars per contract (peak at p=0.5)
   taker_fee_rate: 0.07
   maker_fee_rate: 0.0
+  # Live safety caps
+  live_max_contracts_per_order: 5
+  live_require_maker: true
 
 edge:
   # Minimum edge after fees (probability points, e.g. 0.04 = 4pp)
@@ -33,6 +37,18 @@ forecast:
   # Continuity correction for integer CLI settlement (°F)
   continuity_correction: 0.5
 
+backtest:
+  lookback_days: 21
+  # Max settled markets to score per city (API pages)
+  max_markets_per_city: 48
+  # Use candle mid this many hours before market close as entry proxy
+  entry_hours_before_close: 18
+  contracts_per_trade: 1.0
+  # Fine-tune grids
+  tune_min_edge: [0.02, 0.04, 0.06, 0.08]
+  tune_shrinkage: [0.2, 0.35, 0.5, 0.65]
+  tune_longshot_overprice: [0.02, 0.03, 0.05]
+
 cities:
   - id: nyc
     name: New York City
@@ -40,7 +56,6 @@ cities:
     lat: 40.7829
     lon: -73.9654
     timezone: America/New_York
-    # Prior longshot overprice estimate (probability points); refined from ledger later
     longshot_bias: 0.03
   - id: chi
     name: Chicago
