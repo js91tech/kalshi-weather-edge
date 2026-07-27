@@ -1,0 +1,83 @@
+# Paper-only Kalshi weather edge monitor
+mode: paper
+
+kalshi:
+  base_url: https://external-api.kalshi.com/trade-api/v2
+  # Taker fee ≈ 0.07 * p * (1-p) dollars per contract (peak at p=0.5)
+  taker_fee_rate: 0.07
+  maker_fee_rate: 0.0
+
+edge:
+  # Minimum edge after fees (probability points, e.g. 0.04 = 4pp)
+  min_edge: 0.04
+  # Prefer posting as maker; taker only if edge clears this higher bar
+  min_edge_taker: 0.08
+  # Longshot fade: market YES below this and model much lower → fade YES (sell/buy NO)
+  longshot_market_max: 0.12
+  longshot_overprice_min: 0.03
+  # Shrink raw model_p toward market mid until CLI calibration exists (0=trust model, 1=trust market)
+  market_shrinkage: 0.35
+  # Keep at most this many non-PASS signals per city+date (by |edge|)
+  max_trades_per_event: 2
+  # Fractional Kelly for paper size suggestion (bankroll units)
+  kelly_fraction: 0.25
+  max_contracts_per_signal: 25
+  paper_bankroll: 1000.0
+
+forecast:
+  # Open-Meteo: free, no key; ensemble quantiles for μ/σ
+  provider: open_meteo
+  # Wider floors: grid/ensemble ≠ NWS CLI settlement station
+  sigma_floor: 1.5
+  sigma_scale: 1.35
+  # Continuity correction for integer CLI settlement (°F)
+  continuity_correction: 0.5
+
+cities:
+  - id: nyc
+    name: New York City
+    series_ticker: KXHIGHNY
+    lat: 40.7829
+    lon: -73.9654
+    timezone: America/New_York
+    # Prior longshot overprice estimate (probability points); refined from ledger later
+    longshot_bias: 0.03
+  - id: chi
+    name: Chicago
+    series_ticker: KXHIGHCHI
+    lat: 41.8781
+    lon: -87.6298
+    timezone: America/Chicago
+    longshot_bias: 0.03
+  - id: mia
+    name: Miami
+    series_ticker: KXHIGHMIA
+    lat: 25.7617
+    lon: -80.1918
+    timezone: America/New_York
+    longshot_bias: 0.025
+  - id: la
+    name: Los Angeles
+    series_ticker: KXHIGHLAX
+    lat: 34.0522
+    lon: -118.2437
+    timezone: America/Los_Angeles
+    longshot_bias: 0.025
+  - id: den
+    name: Denver
+    series_ticker: KXHIGHDEN
+    lat: 39.7392
+    lon: -104.9903
+    timezone: America/Denver
+    longshot_bias: 0.03
+  - id: austin
+    name: Austin
+    series_ticker: KXHIGHAUS
+    lat: 30.2672
+    lon: -97.7431
+    timezone: America/Chicago
+    longshot_bias: 0.03
+
+paths:
+  data_dir: data
+  db_path: data/ledger.db
