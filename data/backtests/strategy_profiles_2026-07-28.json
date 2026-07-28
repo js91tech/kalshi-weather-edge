@@ -1,0 +1,269 @@
+{
+  "run_date": "2026-07-28",
+  "universe": {
+    "cache_source": "C:\\Users\\shipping.SHIPPING\\Projects\\kalshi-weather-edge\\data\\backtests\\hit_rate_candidates_2026-07-27.json",
+    "n_candidates": 2072,
+    "data_start": "2026-04-03",
+    "data_end": "2026-07-27"
+  },
+  "profiles_config": [
+    {
+      "name": "favorites",
+      "yes_threshold": 0.9,
+      "no_threshold": 0.1,
+      "series": [
+        "KXAAAGASD",
+        "KXEURUSD",
+        "KXNASDAQDUD",
+        "KXCPINDEX",
+        "KXUSNFP"
+      ]
+    },
+    {
+      "name": "high_profit",
+      "yes_threshold": 0.9,
+      "no_threshold": 0.3,
+      "series": [
+        "KXEURUSD",
+        "KXAAAGASD",
+        "KXNASDAQDUD",
+        "KXCPINDEX",
+        "KXUSNFP"
+      ]
+    }
+  ],
+  "results": {
+    "profiles": [
+      {
+        "name": "favorites",
+        "yes_threshold": 0.9,
+        "no_threshold": 0.1,
+        "n_trades": 530,
+        "yes_trades": 190,
+        "no_trades": 340,
+        "wins": 513,
+        "losses": 17,
+        "win_rate": 0.9679245283018868,
+        "pnl": 16.899999999999995,
+        "avg_pnl": 0.03188679245283018,
+        "avg_win_pnl": 0.0631384015594542,
+        "avg_loss_pnl": -0.9111764705882353,
+        "series": [
+          "KXAAAGASD",
+          "KXEURUSD",
+          "KXNASDAQDUD",
+          "KXCPINDEX",
+          "KXUSNFP"
+        ]
+      },
+      {
+        "name": "high_profit",
+        "yes_threshold": 0.9,
+        "no_threshold": 0.3,
+        "n_trades": 741,
+        "yes_trades": 190,
+        "no_trades": 551,
+        "wins": 698,
+        "losses": 43,
+        "win_rate": 0.941970310391363,
+        "pnl": 55.789999999999964,
+        "avg_pnl": 0.07529014844804313,
+        "avg_win_pnl": 0.12876790830945561,
+        "avg_loss_pnl": -0.7927906976744187,
+        "series": [
+          "KXEURUSD",
+          "KXAAAGASD",
+          "KXNASDAQDUD",
+          "KXCPINDEX",
+          "KXUSNFP"
+        ]
+      }
+    ],
+    "per_series": {
+      "favorites": [
+        {
+          "name": "favorites|KXAAAGASD",
+          "yes_threshold": 0.9,
+          "no_threshold": 0.1,
+          "n_trades": 289,
+          "yes_trades": 181,
+          "no_trades": 108,
+          "wins": 280,
+          "losses": 9,
+          "win_rate": 0.9688581314878892,
+          "pnl": 6.369999999999996,
+          "avg_pnl": 0.022041522491349465,
+          "avg_win_pnl": 0.05196428571428573,
+          "avg_loss_pnl": -0.9088888888888889,
+          "series": [
+            "KXAAAGASD"
+          ]
+        },
+        {
+          "name": "favorites|KXEURUSD",
+          "yes_threshold": 0.9,
+          "no_threshold": 0.1,
+          "n_trades": 215,
+          "yes_trades": 0,
+          "no_trades": 215,
+          "wins": 210,
+          "losses": 5,
+          "win_rate": 0.9767441860465116,
+          "pnl": 11.850000000000007,
+          "avg_pnl": 0.055116279069767474,
+          "avg_win_pnl": 0.07814285714285717,
+          "avg_loss_pnl": -0.9120000000000001,
+          "series": [
+            "KXEURUSD"
+          ]
+        },
+        {
+          "name": "favorites|KXNASDAQDUD",
+          "yes_threshold": 0.9,
+          "no_threshold": 0.1,
+          "n_trades": 3,
+          "yes_trades": 1,
+          "no_trades": 2,
+          "wins": 3,
+          "losses": 0,
+          "win_rate": 1.0,
+          "pnl": 0.25,
+          "avg_pnl": 0.08333333333333333,
+          "avg_win_pnl": 0.08333333333333333,
+          "avg_loss_pnl": 0.0,
+          "series": [
+            "KXNASDAQDUD"
+          ]
+        },
+        {
+          "name": "favorites|KXCPINDEX",
+          "yes_threshold": 0.9,
+          "no_threshold": 0.1,
+          "n_trades": 5,
+          "yes_trades": 1,
+          "no_trades": 4,
+          "wins": 4,
+          "losses": 1,
+          "win_rate": 0.8,
+          "pnl": -0.73,
+          "avg_pnl": -0.146,
+          "avg_win_pnl": 0.04500000000000001,
+          "avg_loss_pnl": -0.91,
+          "series": [
+            "KXCPINDEX"
+          ]
+        },
+        {
+          "name": "favorites|KXUSNFP",
+          "yes_threshold": 0.9,
+          "no_threshold": 0.1,
+          "n_trades": 18,
+          "yes_trades": 7,
+          "no_trades": 11,
+          "wins": 16,
+          "losses": 2,
+          "win_rate": 0.8888888888888888,
+          "pnl": -0.8399999999999995,
+          "avg_pnl": -0.04666666666666664,
+          "avg_win_pnl": 0.06250000000000003,
+          "avg_loss_pnl": -0.9199999999999999,
+          "series": [
+            "KXUSNFP"
+          ]
+        }
+      ],
+      "high_profit": [
+        {
+          "name": "high_profit|KXEURUSD",
+          "yes_threshold": 0.9,
+          "no_threshold": 0.3,
+          "n_trades": 387,
+          "yes_trades": 0,
+          "no_trades": 387,
+          "wins": 364,
+          "losses": 23,
+          "win_rate": 0.9405684754521964,
+          "pnl": 49.62999999999996,
+          "avg_pnl": 0.12824289405684744,
+          "avg_win_pnl": 0.18428571428571427,
+          "avg_loss_pnl": -0.758695652173913,
+          "series": [
+            "KXEURUSD"
+          ]
+        },
+        {
+          "name": "high_profit|KXAAAGASD",
+          "yes_threshold": 0.9,
+          "no_threshold": 0.3,
+          "n_trades": 314,
+          "yes_trades": 181,
+          "no_trades": 133,
+          "wins": 302,
+          "losses": 12,
+          "win_rate": 0.9617834394904459,
+          "pnl": 9.249999999999998,
+          "avg_pnl": 0.029458598726114643,
+          "avg_win_pnl": 0.0647019867549669,
+          "avg_loss_pnl": -0.8574999999999999,
+          "series": [
+            "KXAAAGASD"
+          ]
+        },
+        {
+          "name": "high_profit|KXNASDAQDUD",
+          "yes_threshold": 0.9,
+          "no_threshold": 0.3,
+          "n_trades": 7,
+          "yes_trades": 1,
+          "no_trades": 6,
+          "wins": 7,
+          "losses": 0,
+          "win_rate": 1.0,
+          "pnl": 1.1999999999999997,
+          "avg_pnl": 0.1714285714285714,
+          "avg_win_pnl": 0.17142857142857143,
+          "avg_loss_pnl": 0.0,
+          "series": [
+            "KXNASDAQDUD"
+          ]
+        },
+        {
+          "name": "high_profit|KXCPINDEX",
+          "yes_threshold": 0.9,
+          "no_threshold": 0.3,
+          "n_trades": 7,
+          "yes_trades": 1,
+          "no_trades": 6,
+          "wins": 6,
+          "losses": 1,
+          "win_rate": 0.8571428571428571,
+          "pnl": -0.36,
+          "avg_pnl": -0.05142857142857143,
+          "avg_win_pnl": 0.09166666666666667,
+          "avg_loss_pnl": -0.91,
+          "series": [
+            "KXCPINDEX"
+          ]
+        },
+        {
+          "name": "high_profit|KXUSNFP",
+          "yes_threshold": 0.9,
+          "no_threshold": 0.3,
+          "n_trades": 26,
+          "yes_trades": 7,
+          "no_trades": 19,
+          "wins": 19,
+          "losses": 7,
+          "win_rate": 0.7307692307692307,
+          "pnl": -3.9299999999999997,
+          "avg_pnl": -0.15115384615384614,
+          "avg_win_pnl": 0.07947368421052634,
+          "avg_loss_pnl": -0.777142857142857,
+          "series": [
+            "KXUSNFP"
+          ]
+        }
+      ]
+    }
+  }
+}

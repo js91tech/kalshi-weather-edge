@@ -369,3 +369,246 @@ def hunt_hit_rates(
             if r["win_rate"] >= 0.70
         ][:25],
     }
+
+
+def score_consensus_strategy(
+    candidates: list[dict[str, Any]],
+    *,
+    name: str,
+    yes_threshold: float,
+    no_threshold: float,
+    series_filter: set[str] | None = None,
+) -> dict[str, Any]:
+    """Backtest live-style favorites: BUY YES if mid >= yes_threshold, BUY NO if mid <= no_threshold."""
+    wins = losses = 0
+    pnl = 0.0
+    yes_trades = no_trades = 0
+    trades: list[dict[str, Any]] = []
+
+    for c in candidates:
+        if series_filter and c["series"] not in series_filter:
+            continue
+        mid = float(c["mid"])
+        if mid >= yes_threshold:
+            side = "YES"
+        elif mid <= no_threshold:
+            side = "NO"
+        else:
+            continue
+
+        result = c["result"]
+        if side == "YES":
+            won = result == "yes"
+            trade_pnl = _pnl_yes(float(c["yes_bid"]), won)
+            yes_trades += 1
+        else:
+            won = result == "no"
+            trade_pnl = _pnl_no(float(c["yes_ask"]), won)
+            no_trades += 1
+
+        wins += int(won)
+        losses += int(not won)
+        pnl += trade_pnl
+        trades.append({**c, "strategy": name, "side": side, "won": won, "pnl": trade_pnl})
+
+    n = wins + losses
+    avg_win, avg_loss = _avg_win_loss(trades)
+    return {
+        "name": name,
+        "yes_threshold": yes_threshold,
+        "no_threshold": no_threshold,
+        "n_trades": n,
+        "yes_trades": yes_trades,
+        "no_trades": no_trades,
+        "wins": wins,
+        "losses": losses,
+        "win_rate": (wins / n) if n else 0.0,
+        "pnl": pnl,
+        "avg_pnl": (pnl / n) if n else 0.0,
+        "avg_win_pnl": avg_win,
+        "avg_loss_pnl": avg_loss,
+        "trades": trades,
+    }
+
+
+def backtest_strategy_profiles(
+    candidates: list[dict[str, Any]],
+    profiles: list[dict[str, Any]],
+) -> dict[str, Any]:
+    """Run consensus backtests for named strategy profiles (favorites, high_profit, etc.)."""
+    results: list[dict[str, Any]] = []
+    for profile in profiles:
+        series = profile.get("series")
+        sfilter = set(series) if series else None
+        r = score_consensus_strategy(
+            candidates,
+            name=profile["name"],
+            yes_threshold=float(profile["yes_threshold"]),
+            no_threshold=float(profile["no_threshold"]),
+            series_filter=sfilter,
+        )
+        row = {k: v for k, v in r.items() if k != "trades"}
+        row["series"] = series or []
+        results.append(row)
+
+    by_series: dict[str, list[dict[str, Any]]] = {}
+    for profile in profiles:
+        for series in profile.get("series") or []:
+            scoped = profile.copy()
+            scoped["name"] = f"{profile['name']}|{series}"
+            r = score_consensus_strategy(
+                candidates,
+                name=scoped["name"],
+                yes_threshold=float(profile["yes_threshold"]),
+                no_threshold=float(profile["no_threshold"]),
+                series_filter={series},
+            )
+            row = {k: v for k, v in r.items() if k != "trades"}
+            row["series"] = [series]
+            by_series.setdefault(profile["name"], []).append(row)
+
+    return {
+        "profiles": results,
+        "per_series": by_series,
+    }
+
+
+def _avg_win_loss(trades: list[dict[str, Any]]) -> tuple[float, float]:
+    wins = [t["pnl"] for t in trades if t.get("won")]
+    losses = [t["pnl"] for t in trades if not t.get("won")]
+    avg_win = sum(wins) / len(wins) if wins else 0.0
+    avg_loss = sum(losses) / len(losses) if losses else 0.0
+    return avg_win, avg_loss
+
+
+def hunt_profit_strategies(
+    candidates: list[dict[str, Any]],
+    *,
+    min_trades: int = 25,
+    series_filter: set[str] | None = None,
+) -> dict[str, Any]:
+    """
+    Hunt strategies optimized for higher $/contract: looser favorites, longshots, fades.
+    """
+    if series_filter:
+        candidates = [c for c in candidates if c["series"] in series_filter]
+
+    series_list = sorted({c["series"] for c in candidates})
+    scopes: list[tuple[str, set[str] | None]] = [("ALL", None)]
+    for s in series_list:
+        scopes.append((s, {s}))
+
+    favorite_yes_thresholds = [0.70, 0.75, 0.80, 0.85, 0.90, 0.95]
+    favorite_no_thresholds = [0.30, 0.25, 0.20, 0.15, 0.10, 0.05]
+    longshot_yes_bands = [
+        (None, 0.05),
+        (None, 0.10),
+        (None, 0.15),
+        (None, 0.20),
+        (None, 0.30),
+        (0.30, 0.50),
+        (0.40, 0.60),
+    ]
+    fade_no_thresholds = [0.80, 0.85, 0.90, 0.95]
+    fade_yes_thresholds = [0.05, 0.10, 0.15, 0.20]
+
+    results: list[dict[str, Any]] = []
+
+    def _append(r: dict[str, Any], scope: str, family: str) -> None:
+        avg_win, avg_loss = _avg_win_loss(r["trades"])
+        row = {k: v for k, v in r.items() if k != "trades"}
+        row["scope"] = scope
+        row["family"] = family
+        row["avg_win_pnl"] = avg_win
+        row["avg_loss_pnl"] = avg_loss
+        row["_trades"] = r["trades"]
+        results.append(row)
+
+    for scope_name, sfilter in scopes:
+        for t in favorite_yes_thresholds:
+            r = score_strategy(
+                candidates,
+                name=f"{scope_name}|FAVORITE_YES|mid>={t:.2f}",
+                side="YES",
+                min_mid=t,
+                series_filter=sfilter,
+            )
+            _append(r, scope_name, "favorite_yes")
+
+        for t in favorite_no_thresholds:
+            r = score_strategy(
+                candidates,
+                name=f"{scope_name}|FAVORITE_NO|mid<={t:.2f}",
+                side="NO",
+                max_mid=t,
+                series_filter=sfilter,
+            )
+            _append(r, scope_name, "favorite_no")
+
+        for min_m, max_m in longshot_yes_bands:
+            label = f"mid<={max_m:.2f}" if min_m is None else f"{min_m:.2f}<=mid<={max_m:.2f}"
+            r = score_strategy(
+                candidates,
+                name=f"{scope_name}|LONGSHOT_YES|{label}",
+                side="YES",
+                min_mid=min_m,
+                max_mid=max_m,
+                series_filter=sfilter,
+            )
+            _append(r, scope_name, "longshot_yes")
+
+        for t in fade_no_thresholds:
+            r = score_strategy(
+                candidates,
+                name=f"{scope_name}|FADE_NO|mid>={t:.2f}",
+                side="NO",
+                min_mid=t,
+                series_filter=sfilter,
+            )
+            _append(r, scope_name, "fade_no")
+
+        for t in fade_yes_thresholds:
+            r = score_strategy(
+                candidates,
+                name=f"{scope_name}|FADE_YES|mid<={t:.2f}",
+                side="YES",
+                max_mid=t,
+                series_filter=sfilter,
+            )
+            _append(r, scope_name, "fade_yes")
+
+    eligible = [r for r in results if r["n_trades"] >= min_trades]
+
+    def _clean(r: dict[str, Any]) -> dict[str, Any]:
+        out = dict(r)
+        out.pop("_trades", None)
+        return out
+
+    by_avg_pnl = sorted(eligible, key=lambda r: (r["avg_pnl"], r["pnl"], r["win_rate"]), reverse=True)
+    by_pnl = sorted(eligible, key=lambda r: (r["pnl"], r["avg_pnl"]), reverse=True)
+
+    def _best_with_min_win_rate(min_wr: float) -> dict[str, Any] | None:
+        pool = [r for r in eligible if r["win_rate"] >= min_wr]
+        if not pool:
+            return None
+        return _clean(sorted(pool, key=lambda r: (r["avg_pnl"], r["pnl"]), reverse=True)[0])
+
+    def _best_avg_pnl_at_least(threshold: float) -> list[dict[str, Any]]:
+        pool = [r for r in eligible if r["avg_pnl"] >= threshold]
+        return [_clean(r) for r in sorted(pool, key=lambda r: (r["avg_pnl"], r["win_rate"]), reverse=True)[:15]]
+
+    return {
+        "n_strategies_tested": len(results),
+        "n_eligible": len(eligible),
+        "n_candidates": len(candidates),
+        "best_avg_pnl": _clean(by_avg_pnl[0]) if by_avg_pnl else None,
+        "best_total_pnl": _clean(by_pnl[0]) if by_pnl else None,
+        "best_avg_pnl_win_rate_ge_50": _best_with_min_win_rate(0.50),
+        "best_avg_pnl_win_rate_ge_60": _best_with_min_win_rate(0.60),
+        "best_avg_pnl_win_rate_ge_70": _best_with_min_win_rate(0.70),
+        "avg_pnl_ge_0.10": _best_avg_pnl_at_least(0.10),
+        "avg_pnl_ge_0.25": _best_avg_pnl_at_least(0.25),
+        "avg_pnl_ge_0.50": _best_avg_pnl_at_least(0.50),
+        "top20_by_avg_pnl": [_clean(r) for r in by_avg_pnl[:20]],
+        "top20_by_total_pnl": [_clean(r) for r in by_pnl[:20]],
+    }

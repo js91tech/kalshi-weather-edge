@@ -13,6 +13,18 @@ favorites:
     - KXCPINDEX   # CPI index
     - KXUSNFP     # Nonfarm payrolls
 
+# Looser NO band for higher $/contract (backtested separately from favorites)
+high_profit:
+  yes_threshold: 0.90
+  no_threshold: 0.30
+  contracts: 1.0
+  series:
+    - KXEURUSD
+    - KXAAAGASD
+    - KXNASDAQDUD
+    - KXCPINDEX
+    - KXUSNFP
+
 kalshi:
   base_url: https://external-api.kalshi.com/trade-api/v2
   demo_base_url: https://external-api.demo.kalshi.co/trade-api/v2

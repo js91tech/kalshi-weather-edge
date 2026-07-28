@@ -21,6 +21,10 @@ class Settings:
     favorites_no_threshold: float
     favorites_contracts: float
     favorites_series: list[str]
+    high_profit_yes_threshold: float
+    high_profit_no_threshold: float
+    high_profit_contracts: float
+    high_profit_series: list[str]
     kalshi_base_url: str
     kalshi_demo_base_url: str
     taker_fee_rate: float
@@ -49,6 +53,7 @@ def load_settings(path: Path | None = None) -> Settings:
     (data_dir / "cache").mkdir(parents=True, exist_ok=True)
 
     fav = raw.get("favorites") or {}
+    hp = raw.get("high_profit") or {}
     bt = raw.get("backtest") or {}
     kalshi = raw["kalshi"]
 
@@ -59,6 +64,10 @@ def load_settings(path: Path | None = None) -> Settings:
         favorites_no_threshold=float(fav.get("no_threshold", 0.10)),
         favorites_contracts=float(fav.get("contracts", 1.0)),
         favorites_series=list(fav.get("series") or []),
+        high_profit_yes_threshold=float(hp.get("yes_threshold", 0.90)),
+        high_profit_no_threshold=float(hp.get("no_threshold", 0.30)),
+        high_profit_contracts=float(hp.get("contracts", 1.0)),
+        high_profit_series=list(hp.get("series") or fav.get("series") or []),
         kalshi_base_url=kalshi["base_url"].rstrip("/"),
         kalshi_demo_base_url=str(
             kalshi.get("demo_base_url", "https://demo-api.kalshi.co/trade-api/v2")

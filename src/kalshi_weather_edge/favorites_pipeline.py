@@ -9,15 +9,39 @@ from .fees import dollar, half_spread, mid_price
 from .kalshi_client import KalshiClient
 
 
-def run_favorites_scan(
+def _scan_params(settings: Settings, strategy: str) -> tuple[str, list[str], float, float, float]:
+    if strategy == "high_profit":
+        return (
+            "high_profit",
+            settings.high_profit_series,
+            settings.high_profit_yes_threshold,
+            settings.high_profit_no_threshold,
+            settings.high_profit_contracts,
+        )
+    return (
+        "favorites",
+        settings.favorites_series,
+        settings.favorites_yes_threshold,
+        settings.favorites_no_threshold,
+        settings.favorites_contracts,
+    )
+
+
+def run_consensus_scan(
     settings: Settings | None = None,
-    notes: str = "favorites",
+    *,
+    strategy: str | None = None,
+    notes: str = "consensus",
 ) -> dict[str, Any]:
-    """Scan open Kalshi markets for extreme consensus (favorites) signals."""
+    """Scan open Kalshi markets using favorites or high_profit thresholds."""
     settings = settings or load_settings()
+    strategy_key, series_list, yes_threshold, no_threshold, contracts = _scan_params(
+        settings, strategy or settings.strategy
+    )
+
     client = KalshiClient(settings.kalshi_base_url)
     ledger = Ledger(settings.db_path)
-    run_id = ledger.start_run(notes=notes)
+    run_id = ledger.start_run(notes=f"{notes}:{strategy_key}")
 
     rows: list[dict[str, Any]] = []
     errors: list[str] = []
@@ -25,7 +49,7 @@ def run_favorites_scan(
     pass_count = 0
 
     try:
-        for series in settings.favorites_series:
+        for series in series_list:
             try:
                 markets = client.get_markets(series, status="open", limit=200)
             except Exception as exc:  # noqa: BLE001
@@ -44,9 +68,9 @@ def run_favorites_scan(
                     yes_bid=yes_bid,
                     yes_ask=yes_ask,
                     mid=mid,
-                    yes_threshold=settings.favorites_yes_threshold,
-                    no_threshold=settings.favorites_no_threshold,
-                    contracts=settings.favorites_contracts,
+                    yes_threshold=yes_threshold,
+                    no_threshold=no_threshold,
+                    contracts=contracts,
                 )
 
                 signal = {
@@ -69,11 +93,11 @@ def run_favorites_scan(
                     "reason": decision.reason,
                     "meta": {
                         "series": series,
-                        "strategy": "favorites",
+                        "strategy": strategy_key,
                         "title": market.get("title"),
                         "subtitle": market.get("subtitle") or market.get("no_sub_title"),
-                        "yes_threshold": settings.favorites_yes_threshold,
-                        "no_threshold": settings.favorites_no_threshold,
+                        "yes_threshold": yes_threshold,
+                        "no_threshold": no_threshold,
                     },
                 }
                 ledger.insert_signal(run_id, signal)
@@ -92,7 +116,9 @@ def run_favorites_scan(
     return {
         "run_id": run_id,
         "mode": settings.mode,
-        "strategy": settings.strategy,
+        "strategy": strategy_key,
+        "yes_threshold": yes_threshold,
+        "no_threshold": no_threshold,
         "markets_scored": len(rows),
         "trade_signals": trade_count,
         "pass_signals": pass_count,
@@ -102,12 +128,27 @@ def run_favorites_scan(
     }
 
 
+def run_favorites_scan(
+    settings: Settings | None = None,
+    notes: str = "favorites",
+) -> dict[str, Any]:
+    return run_consensus_scan(settings, strategy="favorites", notes=notes)
+
+
+def run_high_profit_scan(
+    settings: Settings | None = None,
+    notes: str = "high_profit",
+) -> dict[str, Any]:
+    return run_consensus_scan(settings, strategy="high_profit", notes=notes)
+
+
 def rows_to_dataframe_records(result: dict[str, Any]) -> list[dict[str, Any]]:
     out = []
     for r in result.get("rows") or []:
         meta = r.get("meta") or {}
         out.append(
             {
+                "strategy": meta.get("strategy") or result.get("strategy"),
                 "series": meta.get("series") or r.get("city_id"),
                 "ticker": r.get("ticker"),
                 "title": meta.get("title"),
