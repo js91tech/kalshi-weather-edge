@@ -9,28 +9,67 @@ import plotly.express as px
 import streamlit as st
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "src"))
-
-from kalshi_weather_edge.config import (  # noqa: E402
-    live_credentials_configured,
-    load_settings,
-    save_favorites_thresholds,
-    save_mode_to_config,
-    with_overrides,
-)
-from kalshi_weather_edge.db import Ledger  # noqa: E402
-from kalshi_weather_edge.favorites_pipeline import (  # noqa: E402
-    rows_to_dataframe_records,
-    run_consensus_scan,
-)
-from kalshi_weather_edge.hit_rate_scan import (  # noqa: E402
-    backtest_strategy_profiles,
-    build_candidates,
-)
-from kalshi_weather_edge.trading import execute_signal  # noqa: E402
-
+SRC = ROOT / "src"
+for path in (SRC, ROOT):
+    entry = str(path)
+    if entry not in sys.path:
+        sys.path.insert(0, entry)
 
 st.set_page_config(page_title="Kalshi Favorites", page_icon="📈", layout="wide")
+
+try:
+    from kalshi_weather_edge.config import (  # noqa: E402
+        live_credentials_configured,
+        load_settings,
+        save_favorites_thresholds,
+        save_mode_to_config,
+        with_overrides,
+    )
+    from kalshi_weather_edge.db import Ledger  # noqa: E402
+    from kalshi_weather_edge.favorites_pipeline import (  # noqa: E402
+        rows_to_dataframe_records,
+        run_consensus_scan,
+    )
+    from kalshi_weather_edge.trading import execute_signal  # noqa: E402
+except ImportError as exc:
+    st.error(f"Failed to load app modules: {exc}")
+    st.stop()
+
+
+def _run_strategy_backtest(settings, base_settings):
+    from datetime import date
+
+    from kalshi_weather_edge.hit_rate_scan import (  # noqa: E402
+        backtest_strategy_profiles,
+        build_candidates,
+    )
+
+    year = date.today().year
+    all_series = sorted(set(base_settings.favorites_series + base_settings.high_profit_series))
+    universe = build_candidates(
+        all_series,
+        settings,
+        start_date=f"{year}-01-01",
+        max_markets_per_series=settings.backtest_max_markets_per_series,
+        entry_hours_before_close=settings.backtest_entry_hours_before_close,
+    )
+    profiles = [
+        {
+            "name": "favorites",
+            "yes_threshold": base_settings.favorites_yes_threshold,
+            "no_threshold": base_settings.favorites_no_threshold,
+            "series": base_settings.favorites_series,
+        },
+        {
+            "name": "high_profit",
+            "yes_threshold": base_settings.high_profit_yes_threshold,
+            "no_threshold": base_settings.high_profit_no_threshold,
+            "series": base_settings.high_profit_series,
+        },
+    ]
+    bt_results = backtest_strategy_profiles(universe["candidates"], profiles)
+    return {**universe, "results": bt_results}
+
 
 st.title("Kalshi Favorites")
 st.caption(
@@ -141,34 +180,9 @@ if scan_clicked:
 if backtest_clicked:
     with st.spinner("Backtesting favorites vs high_profit on settled history..."):
         try:
-            from datetime import date
-
-            year = date.today().year
-            all_series = sorted(set(base_settings.favorites_series + base_settings.high_profit_series))
-            universe = build_candidates(
-                all_series,
-                settings,
-                start_date=f"{year}-01-01",
-                max_markets_per_series=settings.backtest_max_markets_per_series,
-                entry_hours_before_close=settings.backtest_entry_hours_before_close,
-            )
-            profiles = [
-                {
-                    "name": "favorites",
-                    "yes_threshold": base_settings.favorites_yes_threshold,
-                    "no_threshold": base_settings.favorites_no_threshold,
-                    "series": base_settings.favorites_series,
-                },
-                {
-                    "name": "high_profit",
-                    "yes_threshold": base_settings.high_profit_yes_threshold,
-                    "no_threshold": base_settings.high_profit_no_threshold,
-                    "series": base_settings.high_profit_series,
-                },
-            ]
-            bt_results = backtest_strategy_profiles(universe["candidates"], profiles)
-            st.session_state["backtest"] = {**universe, "results": bt_results}
-            hp = next(r for r in bt_results["profiles"] if r["name"] == "high_profit")
+            bt_payload = _run_strategy_backtest(settings, base_settings)
+            st.session_state["backtest"] = bt_payload
+            hp = next(r for r in bt_payload["results"]["profiles"] if r["name"] == "high_profit")
             st.success(
                 f"High profit: {hp['wins']}W/{hp['losses']}L ({hp['win_rate']:.1%}), "
                 f"avg ${hp['avg_pnl']:.3f}/contract, total ${hp['pnl']:.2f}"
@@ -269,10 +283,8 @@ with tab_signals:
 
 with tab_backtest:
     bt = st.session_state.get("backtest")
-    saved_path = ROOT / "data" / "backtests" / "strategy_profiles_2026-07-28.json"
-    if not saved_path.exists():
-        saved_path = sorted((ROOT / "data" / "backtests").glob("strategy_profiles_*.json"))[-1:] 
-        saved_path = saved_path[0] if saved_path else None
+    saved_files = sorted((ROOT / "data" / "backtests").glob("strategy_profiles_*.json"))
+    saved_path = saved_files[-1] if saved_files else None
 
     if bt and bt.get("results"):
         st.write(
