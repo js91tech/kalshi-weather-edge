@@ -18,11 +18,14 @@ for path in (SRC, ROOT):
 st.set_page_config(page_title="Kalshi Favorites", page_icon="📈", layout="wide")
 
 try:
+    from kalshi_weather_edge.alerts import maybe_alert_scan  # noqa: E402
     from kalshi_weather_edge.config import (  # noqa: E402
+        alert_webhook_url,
         live_credentials_configured,
         load_settings,
         save_favorites_thresholds,
         save_mode_to_config,
+        thresholds_for_series,
         with_overrides,
     )
     from kalshi_weather_edge.db import Ledger  # noqa: E402
@@ -30,6 +33,8 @@ try:
         rows_to_dataframe_records,
         run_consensus_scan,
     )
+    from kalshi_weather_edge.kalshi_client import KalshiClient  # noqa: E402
+    from kalshi_weather_edge.settlements import sync_settlements_for_open_signals  # noqa: E402
     from kalshi_weather_edge.trading import execute_signal  # noqa: E402
 except ImportError as exc:
     st.error(f"Failed to load app modules: {exc}")
@@ -71,9 +76,19 @@ def _run_strategy_backtest(settings, base_settings):
     return {**universe, "results": bt_results}
 
 
+def _load_latest_scan() -> dict | None:
+    path = ROOT / "data" / "scans" / "latest.json"
+    if not path.exists():
+        return None
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+
+
 st.title("Kalshi Favorites")
 st.caption(
-    "Consensus scanners: tight favorites (high hit rate) or high-profit (looser NO band). "
+    "Series-aware consensus scanner with settlements, equity board, and scheduled alerts. "
     "Paper by default. Not financial advice."
 )
 
@@ -96,6 +111,10 @@ with st.sidebar:
 
     use_demo = st.checkbox("Use Kalshi DEMO API", value=creds.get("env") == "demo")
     st.write("API keys: " + ("ready" if creds["ready"] else "not configured (.env)"))
+    st.write(
+        "Alert webhook: "
+        + ("ready" if alert_webhook_url() else "not set (ALERT_WEBHOOK_URL)")
+    )
     if mode == "live":
         st.warning("Live mode can place real orders.")
         confirm_live = st.checkbox("I understand — allow live order submission")
@@ -108,7 +127,9 @@ with st.sidebar:
         "Profile",
         options=["favorites", "high_profit"],
         index=0 if base_settings.strategy != "high_profit" else 1,
-        format_func=lambda s: "Favorites (0.90 / 0.10)" if s == "favorites" else "High profit (0.90 / 0.30)",
+        format_func=lambda s: (
+            "Favorites (tight)" if s == "favorites" else "High profit (series-aware)"
+        ),
     )
 
     if strategy == "high_profit":
@@ -116,22 +137,27 @@ with st.sidebar:
         no_thr = float(base_settings.high_profit_no_threshold)
         contracts = int(base_settings.high_profit_contracts)
         series_list = base_settings.high_profit_series
+        st.caption("Per-series overrides from config:")
+        for s in series_list:
+            y, n = thresholds_for_series(base_settings, "high_profit", s)
+            st.caption(f"`{s}` YES≥{y:.2f} NO≤{n:.2f}")
     else:
         yes_thr = float(base_settings.favorites_yes_threshold)
         no_thr = float(base_settings.favorites_no_threshold)
         contracts = int(base_settings.favorites_contracts)
         series_list = base_settings.favorites_series
-
-    st.caption(f"YES >= {yes_thr:.2f} · NO <= {no_thr:.2f} · {len(series_list)} series")
+        st.caption(f"Global YES≥{yes_thr:.2f} · NO≤{no_thr:.2f}")
 
     if strategy == "favorites":
         yes_thr = st.slider("Buy YES when mid >=", 0.80, 0.99, yes_thr, 0.01)
         no_thr = st.slider("Buy NO when mid <=", 0.01, 0.20, no_thr, 0.01)
     else:
-        yes_thr = st.slider("Buy YES when mid >=", 0.80, 0.99, yes_thr, 0.01)
-        no_thr = st.slider("Buy NO when mid <=", 0.05, 0.40, no_thr, 0.01)
+        st.info("High profit uses series overrides; sliders adjust global fallback only.")
+        yes_thr = st.slider("Fallback YES >=", 0.80, 0.99, yes_thr, 0.01)
+        no_thr = st.slider("Fallback NO <=", 0.05, 0.40, no_thr, 0.01)
 
     contracts = st.number_input("Contracts per signal", 1, 25, contracts)
+    top_n = st.slider("Show top N signals", 3, 25, 10)
 
     if strategy == "favorites":
         settings = with_overrides(
@@ -158,24 +184,46 @@ with st.sidebar:
 
     st.divider()
     scan_clicked = st.button("Scan open markets", type="primary", use_container_width=True)
+    settle_clicked = st.button("Sync settlements", use_container_width=True)
     backtest_clicked = st.button("Run strategy backtest", use_container_width=True)
+    alert_clicked = st.button("Send alert for last scan", use_container_width=True)
 
 ledger = Ledger(settings.db_path)
 
 if scan_clicked:
-    with st.spinner("Scanning Kalshi open markets..."):
+    with st.spinner("Scanning Kalshi open markets + settlements..."):
         try:
-            result = run_consensus_scan(settings, strategy=strategy, notes=f"streamlit:{mode}")
+            result = run_consensus_scan(
+                settings, strategy=strategy, notes=f"streamlit:{mode}", sync_settlements=True
+            )
             st.session_state["last_result"] = result
             st.session_state["last_strategy"] = strategy
+            settle = result.get("settlements") or {}
             st.success(
-                f"Run #{result['run_id']}: {result['markets_scored']} markets — "
-                f"{result['trade_signals']} signals / {result['pass_signals']} pass"
+                f"Run #{result['run_id']}: {result['trade_signals']} signals / "
+                f"{result['pass_signals']} pass · settlements updated {settle.get('signals_updated', 0)}"
             )
             if result["errors"]:
                 st.warning("\n".join(result["errors"]))
         except Exception as exc:  # noqa: BLE001
             st.error(f"Scan failed: {exc}")
+
+if settle_clicked:
+    with st.spinner("Fetching settlements for open paper trades..."):
+        try:
+            client = KalshiClient(settings.kalshi_base_url)
+            info = sync_settlements_for_open_signals(
+                ledger,
+                client,
+                series_list=sorted(set(base_settings.favorites_series + base_settings.high_profit_series)),
+            )
+            st.success(
+                f"Checked {info['tickers_checked']} tickers · "
+                f"upserted {info['settlements_upserted']} · "
+                f"updated {info['signals_updated']} signals"
+            )
+        except Exception as exc:  # noqa: BLE001
+            st.error(f"Settlement sync failed: {exc}")
 
 if backtest_clicked:
     with st.spinner("Backtesting favorites vs high_profit on settled history..."):
@@ -190,14 +238,37 @@ if backtest_clicked:
         except Exception as exc:  # noqa: BLE001
             st.error(f"Backtest failed: {exc}")
 
+if alert_clicked:
+    result = st.session_state.get("last_result")
+    if not result:
+        st.warning("Run a scan first.")
+    else:
+        alert = maybe_alert_scan(
+            settings,
+            strategy=strategy,
+            rows=result.get("rows") or [],
+            settled_updated=int((result.get("settlements") or {}).get("signals_updated") or 0),
+            paper_pnl=float((result.get("stats") or {}).get("paper_pnl") or 0),
+        )
+        if alert.get("ok"):
+            st.success(f"Alert sent ({alert.get('n', 0)} signals)")
+        else:
+            st.info(alert.get("reason") or alert.get("error") or str(alert))
+
 stats = ledger.signal_stats()
-c1, c2, c3, c4 = st.columns(4)
+c1, c2, c3, c4, c5 = st.columns(5)
 c1.metric("Mode", mode.upper())
 c2.metric("Strategy", strategy.replace("_", " ").title())
-c3.metric("Signals logged", stats["total_signals"])
-c4.metric("Paper PnL ($)", f"{stats['paper_pnl']:.2f}")
+c3.metric("Open trades", stats.get("open_trades", 0))
+c4.metric(
+    "Settled W/L",
+    f"{stats.get('wins', 0)}/{stats.get('losses', 0)}",
+    f"{stats.get('win_rate', 0):.0%} WR" if (stats.get("wins", 0) + stats.get("losses", 0)) else None,
+)
+c5.metric("Paper PnL ($)", f"{stats['paper_pnl']:.2f}")
 
 result = st.session_state.get("last_result")
+latest_scan = _load_latest_scan()
 if result:
     df = pd.DataFrame(rows_to_dataframe_records(result))
 else:
@@ -211,6 +282,7 @@ else:
             meta = {}
         records.append(
             {
+                "strategy": meta.get("strategy"),
                 "series": meta.get("series") or s.get("city_id"),
                 "ticker": s.get("ticker"),
                 "title": meta.get("title"),
@@ -221,6 +293,7 @@ else:
                 "market_mid": s.get("market_mid"),
                 "yes_bid": s.get("yes_bid"),
                 "yes_ask": s.get("yes_ask"),
+                "spread": s.get("spread"),
                 "edge": s.get("edge"),
                 "contracts": s.get("suggested_contracts"),
                 "reason": s.get("reason"),
@@ -228,21 +301,26 @@ else:
         )
     df = pd.DataFrame(records)
 
-tab_signals, tab_backtest, tab_help = st.tabs(["Live signals", "Backtest results", "Help"])
+tab_signals, tab_perf, tab_backtest, tab_help = st.tabs(
+    ["Live signals", "Performance", "Backtest", "Help"]
+)
 
 with tab_signals:
+    if latest_scan and not result:
+        st.caption(f"Last scheduled scan: {latest_scan.get('scanned_at', '?')}")
+
     if df.empty:
-        st.info("Click **Scan open markets** in the sidebar.")
+        st.info("Click **Scan open markets** in the sidebar (or wait for the GitHub Action).")
     else:
         show = df.copy()
-        show["market_mid"] = pd.to_numeric(show["market_mid"], errors="coerce")
-        st.dataframe(
-            show.sort_values(["action", "market_mid"], ascending=[True, False]),
-            use_container_width=True,
-            hide_index=True,
-        )
-        trades = show[show["action"] != "PASS"]
+        show["market_mid"] = pd.to_numeric(show.get("market_mid"), errors="coerce")
+        show["edge"] = pd.to_numeric(show.get("edge"), errors="coerce")
+        trades = show[show["action"] != "PASS"].copy()
         if not trades.empty:
+            trades = trades.sort_values("edge", key=lambda s: s.abs(), ascending=False)
+            st.subheader(f"Top {min(top_n, len(trades))} actionable signals")
+            st.dataframe(trades.head(top_n), use_container_width=True, hide_index=True)
+
             fig = px.histogram(
                 trades,
                 x="market_mid",
@@ -280,6 +358,35 @@ with tab_signals:
                         )
                     )
                 st.json(outs)
+        else:
+            st.info("No trade signals under current thresholds.")
+
+        with st.expander("All scored markets"):
+            st.dataframe(
+                show.sort_values(["action", "market_mid"], ascending=[True, False]),
+                use_container_width=True,
+                hide_index=True,
+            )
+
+with tab_perf:
+    board = ledger.performance_board()
+    st.write(
+        f"Settled equity **${board['final_equity']:.2f}** · "
+        f"{stats.get('wins', 0)}W / {stats.get('losses', 0)}L · "
+        f"{stats.get('open_trades', 0)} still open"
+    )
+    if board["equity_curve"]:
+        eq = pd.DataFrame(board["equity_curve"])
+        fig = px.line(eq, x="t", y="equity", title="Paper equity curve (settled trades)")
+        st.plotly_chart(fig, use_container_width=True)
+    if board["by_series"]:
+        st.subheader("By series")
+        st.dataframe(pd.DataFrame(board["by_series"]), use_container_width=True, hide_index=True)
+    if board["trades"]:
+        st.subheader("Recent settled trades")
+        st.dataframe(pd.DataFrame(board["trades"]), use_container_width=True, hide_index=True)
+    else:
+        st.info("No settled paper trades yet. Scan, wait for markets to resolve, then **Sync settlements**.")
 
 with tab_backtest:
     bt = st.session_state.get("backtest")
@@ -307,25 +414,34 @@ with tab_backtest:
         st.info("Click **Run strategy backtest** in the sidebar.")
 
 with tab_help:
+    ov = base_settings.high_profit_series_overrides
+    ov_lines = "\n".join(
+        f"- `{s}`: YES≥{t.yes_threshold:.2f} / NO≤{t.no_threshold:.2f}" for s, t in ov.items()
+    )
     st.markdown(
         f"""
 ### Strategy profiles
 
-| Profile | BUY YES | BUY NO | Goal |
-|---------|---------|--------|------|
-| **Favorites** | mid >= {base_settings.favorites_yes_threshold:.2f} | mid <= {base_settings.favorites_no_threshold:.2f} | Highest hit rate |
-| **High profit** | mid >= {base_settings.high_profit_yes_threshold:.2f} | mid <= {base_settings.high_profit_no_threshold:.2f} | More $/contract |
+| Profile | Behavior |
+|---------|----------|
+| **Favorites** | Global YES≥{base_settings.favorites_yes_threshold:.2f} / NO≤{base_settings.favorites_no_threshold:.2f} |
+| **High profit** | Series-aware (EUR NO≤0.30); skips NFP/CPI |
 
-Both trade **with** market consensus on bracket markets — not against it.
+**High-profit overrides**
+{ov_lines or '- (none)'}
 
-### Series
-- Favorites: {', '.join(f'`{s}`' for s in base_settings.favorites_series)}
-- High profit: {', '.join(f'`{s}`' for s in base_settings.high_profit_series)}
+### Risk controls
+- Max {base_settings.max_trades_per_event} trades per event
+- Skip spreads wider than {base_settings.max_spread:.2f}
+
+### Scheduled scans
+GitHub Action runs every 30 minutes (`scheduled_scan.yml`).
+Set repo secret `ALERT_WEBHOOK_URL` for Discord/Slack alerts.
 
 ### CLI
 ```
-python scripts/run_pipeline.py
 python scripts/run_pipeline.py --strategy high_profit
+python scripts/scheduled_scan.py --strategy both
 python scripts/backtest_strategies.py
 ```
 """

@@ -8,6 +8,8 @@ __pycache__/
 data/*.db
 data/*.sqlite
 data/cache/
+# Keep scan summaries / backtest JSON; ignore local stamped noise if huge
+data/scans/scan_*.json
 .streamlit/secrets.toml
 .pytest_cache/
 .mypy_cache/

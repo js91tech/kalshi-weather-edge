@@ -13,17 +13,36 @@ favorites:
     - KXCPINDEX   # CPI index
     - KXUSNFP     # Nonfarm payrolls
 
-# Looser NO band for higher $/contract (backtested separately from favorites)
+# Looser NO band for higher $/contract — EUR-heavy; skip NFP/CPI (lost money in backtest)
 high_profit:
   yes_threshold: 0.90
-  no_threshold: 0.30
+  no_threshold: 0.20
   contracts: 1.0
   series:
     - KXEURUSD
     - KXAAAGASD
     - KXNASDAQDUD
-    - KXCPINDEX
-    - KXUSNFP
+  # Per-series overrides (beat global defaults where researched)
+  series_overrides:
+    KXEURUSD:
+      yes_threshold: 0.90
+      no_threshold: 0.30
+    KXAAAGASD:
+      yes_threshold: 0.90
+      no_threshold: 0.10
+    KXNASDAQDUD:
+      yes_threshold: 0.90
+      no_threshold: 0.25
+
+risk:
+  max_trades_per_event: 3
+  max_spread: 0.08
+  max_signals_alert: 10
+  min_edge_for_alert: 0.15
+
+alerts:
+  enabled: true
+  # Set ALERT_WEBHOOK_URL in .env or GitHub Actions secrets (Discord/Slack compatible)
 
 kalshi:
   base_url: https://external-api.kalshi.com/trade-api/v2

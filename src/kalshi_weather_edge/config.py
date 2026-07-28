@@ -14,6 +14,12 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 @dataclass
+class SeriesThresholds:
+    yes_threshold: float
+    no_threshold: float
+
+
+@dataclass
 class Settings:
     mode: str
     strategy: str
@@ -25,6 +31,12 @@ class Settings:
     high_profit_no_threshold: float
     high_profit_contracts: float
     high_profit_series: list[str]
+    high_profit_series_overrides: dict[str, SeriesThresholds]
+    max_trades_per_event: int
+    max_spread: float
+    max_signals_alert: int
+    min_edge_for_alert: float
+    alerts_enabled: bool
     kalshi_base_url: str
     kalshi_demo_base_url: str
     taker_fee_rate: float
@@ -41,6 +53,22 @@ class Settings:
     raw: dict[str, Any]
 
 
+def _parse_overrides(
+    raw_overrides: dict[str, Any] | None,
+    default_yes: float,
+    default_no: float,
+) -> dict[str, SeriesThresholds]:
+    out: dict[str, SeriesThresholds] = {}
+    for series, vals in (raw_overrides or {}).items():
+        if not isinstance(vals, dict):
+            continue
+        out[str(series)] = SeriesThresholds(
+            yes_threshold=float(vals.get("yes_threshold", default_yes)),
+            no_threshold=float(vals.get("no_threshold", default_no)),
+        )
+    return out
+
+
 def load_settings(path: Path | None = None) -> Settings:
     load_dotenv(ROOT / ".env")
     cfg_path = path or (ROOT / "config.yaml")
@@ -54,8 +82,13 @@ def load_settings(path: Path | None = None) -> Settings:
 
     fav = raw.get("favorites") or {}
     hp = raw.get("high_profit") or {}
+    risk = raw.get("risk") or {}
+    alerts = raw.get("alerts") or {}
     bt = raw.get("backtest") or {}
     kalshi = raw["kalshi"]
+
+    hp_yes = float(hp.get("yes_threshold", 0.90))
+    hp_no = float(hp.get("no_threshold", 0.20))
 
     return Settings(
         mode=str(raw.get("mode", "paper")).lower(),
@@ -64,10 +97,18 @@ def load_settings(path: Path | None = None) -> Settings:
         favorites_no_threshold=float(fav.get("no_threshold", 0.10)),
         favorites_contracts=float(fav.get("contracts", 1.0)),
         favorites_series=list(fav.get("series") or []),
-        high_profit_yes_threshold=float(hp.get("yes_threshold", 0.90)),
-        high_profit_no_threshold=float(hp.get("no_threshold", 0.30)),
+        high_profit_yes_threshold=hp_yes,
+        high_profit_no_threshold=hp_no,
         high_profit_contracts=float(hp.get("contracts", 1.0)),
         high_profit_series=list(hp.get("series") or fav.get("series") or []),
+        high_profit_series_overrides=_parse_overrides(
+            hp.get("series_overrides"), hp_yes, hp_no
+        ),
+        max_trades_per_event=int(risk.get("max_trades_per_event", 3)),
+        max_spread=float(risk.get("max_spread", 0.08)),
+        max_signals_alert=int(risk.get("max_signals_alert", 10)),
+        min_edge_for_alert=float(risk.get("min_edge_for_alert", 0.15)),
+        alerts_enabled=bool(alerts.get("enabled", True)),
         kalshi_base_url=kalshi["base_url"].rstrip("/"),
         kalshi_demo_base_url=str(
             kalshi.get("demo_base_url", "https://demo-api.kalshi.co/trade-api/v2")
@@ -85,6 +126,20 @@ def load_settings(path: Path | None = None) -> Settings:
         db_path=db_path,
         raw=raw,
     )
+
+
+def thresholds_for_series(
+    settings: Settings,
+    strategy: str,
+    series: str,
+) -> tuple[float, float]:
+    """Return (yes_threshold, no_threshold) for a series under the active strategy."""
+    if strategy == "high_profit":
+        override = settings.high_profit_series_overrides.get(series)
+        if override:
+            return override.yes_threshold, override.no_threshold
+        return settings.high_profit_yes_threshold, settings.high_profit_no_threshold
+    return settings.favorites_yes_threshold, settings.favorites_no_threshold
 
 
 def with_overrides(settings: Settings, **kwargs: Any) -> Settings:
@@ -111,6 +166,12 @@ def active_kalshi_base_url(settings: Settings, use_demo: bool | None = None) -> 
     if use_demo is None:
         use_demo = os.getenv("KALSHI_ENV", "production").strip().lower() == "demo"
     return settings.kalshi_demo_base_url if use_demo else settings.kalshi_base_url
+
+
+def alert_webhook_url() -> str | None:
+    load_dotenv(ROOT / ".env")
+    url = os.getenv("ALERT_WEBHOOK_URL", "").strip()
+    return url or None
 
 
 def save_mode_to_config(mode: str, path: Path | None = None) -> None:

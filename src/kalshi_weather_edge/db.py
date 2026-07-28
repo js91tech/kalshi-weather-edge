@@ -265,12 +265,129 @@ class Ledger:
             pnl = conn.execute(
                 "SELECT COALESCE(SUM(pnl), 0) AS s FROM signals WHERE pnl IS NOT NULL"
             ).fetchone()["s"]
+            wins = conn.execute(
+                "SELECT COUNT(*) AS n FROM signals WHERE outcome = 1"
+            ).fetchone()["n"]
+            losses = conn.execute(
+                "SELECT COUNT(*) AS n FROM signals WHERE outcome = 0"
+            ).fetchone()["n"]
+            open_trades = conn.execute(
+                """
+                SELECT COUNT(*) AS n FROM signals
+                WHERE action != 'PASS' AND outcome IS NULL
+                """
+            ).fetchone()["n"]
+        decided = wins + losses
         return {
             "total_signals": total,
             "trade_signals": trades,
             "pass_signals": passes,
             "settled": settled,
+            "open_trades": open_trades,
+            "wins": wins,
+            "losses": losses,
+            "win_rate": (wins / decided) if decided else 0.0,
             "paper_pnl": pnl,
+        }
+
+    def unsettled_trade_tickers(self) -> list[dict[str, Any]]:
+        with self.connect() as conn:
+            rows = conn.execute(
+                """
+                SELECT DISTINCT ticker, city_id, event_ticker, meta_json
+                FROM signals
+                WHERE action != 'PASS' AND outcome IS NULL
+                """
+            ).fetchall()
+        out = []
+        for r in rows:
+            meta = {}
+            try:
+                meta = json.loads(r["meta_json"] or "{}")
+            except Exception:
+                meta = {}
+            out.append(
+                {
+                    "ticker": r["ticker"],
+                    "city_id": r["city_id"],
+                    "event_ticker": r["event_ticker"],
+                    "meta": meta,
+                }
+            )
+        return out
+
+    def performance_board(self, limit: int = 200) -> dict[str, Any]:
+        """Settled trade W/L board + equity curve points."""
+        with self.connect() as conn:
+            rows = conn.execute(
+                """
+                SELECT id, created_at, settled_at, city_id, ticker, action, side,
+                       market_mid, outcome, pnl, meta_json
+                FROM signals
+                WHERE outcome IS NOT NULL AND action != 'PASS'
+                ORDER BY COALESCE(settled_at, created_at) ASC, id ASC
+                LIMIT ?
+                """,
+                (limit,),
+            ).fetchall()
+
+        equity = 0.0
+        curve: list[dict[str, Any]] = []
+        by_series: dict[str, dict[str, Any]] = {}
+        trades = []
+        for r in rows:
+            row = dict(r)
+            meta = {}
+            try:
+                meta = json.loads(row.get("meta_json") or "{}")
+            except Exception:
+                meta = {}
+            series = meta.get("series") or row.get("city_id") or "unknown"
+            pnl = float(row.get("pnl") or 0)
+            equity += pnl
+            curve.append(
+                {
+                    "t": row.get("settled_at") or row.get("created_at"),
+                    "equity": equity,
+                    "pnl": pnl,
+                    "ticker": row.get("ticker"),
+                }
+            )
+            bucket = by_series.setdefault(
+                series, {"series": series, "wins": 0, "losses": 0, "pnl": 0.0, "n": 0}
+            )
+            bucket["n"] += 1
+            bucket["pnl"] += pnl
+            if row.get("outcome") == 1:
+                bucket["wins"] += 1
+            else:
+                bucket["losses"] += 1
+            trades.append(
+                {
+                    "settled_at": row.get("settled_at"),
+                    "series": series,
+                    "ticker": row.get("ticker"),
+                    "action": row.get("action"),
+                    "side": row.get("side"),
+                    "mid": row.get("market_mid"),
+                    "won": bool(row.get("outcome") == 1),
+                    "pnl": pnl,
+                    "strategy": meta.get("strategy"),
+                }
+            )
+
+        series_rows = []
+        for b in by_series.values():
+            n = b["wins"] + b["losses"]
+            b["win_rate"] = (b["wins"] / n) if n else 0.0
+            series_rows.append(b)
+        series_rows.sort(key=lambda x: x["pnl"], reverse=True)
+
+        return {
+            "equity_curve": curve,
+            "by_series": series_rows,
+            "trades": list(reversed(trades[-100:])),
+            "final_equity": equity,
         }
 
     def upsert_settlement(self, market: dict[str, Any]) -> None:

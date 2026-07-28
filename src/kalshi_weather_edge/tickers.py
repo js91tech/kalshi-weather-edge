@@ -45,7 +45,8 @@ def cap_trades_per_event(signals: list[dict[str, Any]], max_trades: int) -> list
 
     by_key: dict[tuple[str, str], list[dict[str, Any]]] = defaultdict(list)
     for s in signals:
-        key = (s.get("city_id") or "", s.get("target_date") or "")
+        event = s.get("event_ticker") or s.get("target_date") or s.get("ticker") or ""
+        key = (s.get("city_id") or "", str(event))
         by_key[key].append(s)
 
     out: list[dict[str, Any]] = []
@@ -59,8 +60,12 @@ def cap_trades_per_event(signals: list[dict[str, Any]], max_trades: int) -> list
             s = dict(s)
             s["action"] = "PASS"
             s["side"] = None
-            s["execution"] = None
-            s["reason"] = f"capped: max {max_trades} trades per event"
+            s["execution"] = "none"
+            s["suggested_contracts"] = 0.0
+            s["reason"] = f"capped: max {max_trades} trades per event — was {s.get('reason')}"
+            meta = dict(s.get("meta") or {})
+            meta["capped"] = True
+            s["meta"] = meta
             passes.append(s)
         out.extend(keep)
         out.extend(passes)
