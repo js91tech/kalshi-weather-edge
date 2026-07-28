@@ -18,9 +18,8 @@ for path in (SRC, ROOT):
 st.set_page_config(page_title="Kalshi Favorites", page_icon="📈", layout="wide")
 
 try:
-    from kalshi_weather_edge.alerts import maybe_alert_scan  # noqa: E402
+    from kalshi_weather_edge.alerts import maybe_alert_scan, webhook_ready  # noqa: E402
     from kalshi_weather_edge.config import (  # noqa: E402
-        alert_webhook_url,
         live_credentials_configured,
         load_settings,
         save_favorites_thresholds,
@@ -38,6 +37,10 @@ try:
     from kalshi_weather_edge.trading import execute_signal  # noqa: E402
 except ImportError as exc:
     st.error(f"Failed to load app modules: {exc}")
+    st.info(
+        "If this is Streamlit Cloud, reboot the app after the latest GitHub push "
+        "so it picks up new package files."
+    )
     st.stop()
 
 
@@ -88,9 +91,44 @@ def _load_latest_scan() -> dict | None:
 
 st.title("Kalshi Favorites")
 st.caption(
-    "Series-aware consensus scanner with settlements, equity board, and scheduled alerts. "
-    "Paper by default. Not financial advice."
+    "Finds markets where the crowd already agrees strongly — then suggests following that side. "
+    "Starts in paper mode (practice only). Not financial advice."
 )
+
+with st.expander("New here? Read this first (plain English)", expanded=False):
+    st.markdown(
+        """
+### What this app does
+Kalshi markets are like yes/no questions (example: “Will gas be above $4.10?”).  
+The **mid** price is roughly the market’s implied chance — `0.90` means “about 90% likely YES.”
+
+This app looks for **extreme** prices and suggests:
+- **BUY YES** when the market says YES is very likely
+- **BUY NO** when the market says YES is very unlikely (so NO is the favorite)
+
+You are **not** trying to outsmart the market — you are following strong consensus.
+
+### Key words
+| Term | Meaning |
+|------|---------|
+| **Paper mode** | Practice only. No real money. Safe default. |
+| **Live mode** | Can send real orders (needs API keys + your confirmation). |
+| **Mid** | Average of buy/sell prices ≈ implied probability (0 to 1). |
+| **BUY YES / BUY NO** | Which side of the contract to buy. |
+| **Contracts** | How many $1 contracts to size each suggestion. |
+| **Edge** | How extreme the mid is vs 50/50 (higher = more one-sided). |
+| **Settlement** | When Kalshi decides the winner; we then score paper wins/losses. |
+| **Hit rate / W–L** | How often settled paper trades were correct. |
+| **Alert** | Optional Discord/Slack ping with top signals — does **not** place trades. |
+
+### Suggested workflow
+1. Keep **Paper** mode on.
+2. Pick a strategy profile (Favorites = safer/tighter; High profit = a bit looser).
+3. Click **Scan open markets**.
+4. Review the **Top signals** table.
+5. Later, click **Sync settlements** to update wins/losses and paper PnL.
+"""
+    )
 
 base_settings = load_settings()
 creds = live_credentials_configured()
@@ -102,22 +140,38 @@ with st.sidebar:
         options=["paper", "live"],
         index=0 if base_settings.mode != "live" else 1,
         horizontal=True,
+        help=(
+            "Paper = practice only, logs suggestions without real orders. "
+            "Live = can place real Kalshi orders (dangerous until you know what you're doing)."
+        ),
     )
     if mode != base_settings.mode:
-        if st.button("Save mode to config.yaml"):
+        if st.button(
+            "Save mode to config.yaml",
+            help="Writes paper/live into config.yaml so the next restart remembers your choice.",
+        ):
             save_mode_to_config(mode)
             st.success(f"Saved mode={mode}")
             st.rerun()
 
-    use_demo = st.checkbox("Use Kalshi DEMO API", value=creds.get("env") == "demo")
-    st.write("API keys: " + ("ready" if creds["ready"] else "not configured (.env)"))
-    st.write(
-        "Alert webhook: "
-        + ("ready" if alert_webhook_url() else "not set (ALERT_WEBHOOK_URL)")
+    use_demo = st.checkbox(
+        "Use Kalshi DEMO API",
+        value=creds.get("env") == "demo",
+        help=(
+            "Use Kalshi's practice/demo exchange instead of real production markets. "
+            "Still separate from Paper mode in this app."
+        ),
+    )
+    st.caption("API keys: " + ("ready" if creds["ready"] else "not configured (.env)"))
+    st.caption(
+        "Alert webhook: " + ("ready" if webhook_ready() else "not set (ALERT_WEBHOOK_URL)")
     )
     if mode == "live":
         st.warning("Live mode can place real orders.")
-        confirm_live = st.checkbox("I understand — allow live order submission")
+        confirm_live = st.checkbox(
+            "I understand — allow live order submission",
+            help="Extra safety lock. Even in Live mode, orders only send if this is checked.",
+        )
     else:
         confirm_live = False
 
@@ -128,7 +182,12 @@ with st.sidebar:
         options=["favorites", "high_profit"],
         index=0 if base_settings.strategy != "high_profit" else 1,
         format_func=lambda s: (
-            "Favorites (tight)" if s == "favorites" else "High profit (series-aware)"
+            "Favorites (safer / tighter)" if s == "favorites" else "High profit (series-aware)"
+        ),
+        help=(
+            "Favorites only takes very extreme prices (fewer trades, higher hit rate). "
+            "High profit loosens some markets (especially EUR/USD) to earn a bit more per win, "
+            "with a slightly lower hit rate. High profit skips NFP/CPI."
         ),
     )
 
@@ -137,27 +196,73 @@ with st.sidebar:
         no_thr = float(base_settings.high_profit_no_threshold)
         contracts = int(base_settings.high_profit_contracts)
         series_list = base_settings.high_profit_series
-        st.caption("Per-series overrides from config:")
+        st.caption("Per-market rules (from config):")
         for s in series_list:
             y, n = thresholds_for_series(base_settings, "high_profit", s)
-            st.caption(f"`{s}` YES≥{y:.2f} NO≤{n:.2f}")
+            st.caption(f"`{s}` buy YES if mid≥{y:.0%} · buy NO if mid≤{n:.0%}")
     else:
         yes_thr = float(base_settings.favorites_yes_threshold)
         no_thr = float(base_settings.favorites_no_threshold)
         contracts = int(base_settings.favorites_contracts)
         series_list = base_settings.favorites_series
-        st.caption(f"Global YES≥{yes_thr:.2f} · NO≤{no_thr:.2f}")
+        st.caption(
+            f"Buy YES if market says ≥{yes_thr:.0%} · "
+            f"Buy NO if market says YES ≤{no_thr:.0%}"
+        )
+
+    yes_help = (
+        "Only suggest BUY YES when the market mid is at least this high. "
+        "Example: 0.90 means “market thinks YES is about 90%+ likely.” "
+        "Higher = fewer, more one-sided YES bets."
+    )
+    no_help = (
+        "Only suggest BUY NO when the YES mid is at most this low. "
+        "Example: 0.10 means “market thinks YES is about 10% or less,” so NO is the favorite. "
+        "Lower = fewer, more one-sided NO bets."
+    )
 
     if strategy == "favorites":
-        yes_thr = st.slider("Buy YES when mid >=", 0.80, 0.99, yes_thr, 0.01)
-        no_thr = st.slider("Buy NO when mid <=", 0.01, 0.20, no_thr, 0.01)
+        yes_thr = st.slider(
+            "Buy YES when mid ≥",
+            0.80,
+            0.99,
+            yes_thr,
+            0.01,
+            help=yes_help,
+        )
+        no_thr = st.slider(
+            "Buy NO when mid ≤",
+            0.01,
+            0.20,
+            no_thr,
+            0.01,
+            help=no_help,
+        )
     else:
-        st.info("High profit uses series overrides; sliders adjust global fallback only.")
-        yes_thr = st.slider("Fallback YES >=", 0.80, 0.99, yes_thr, 0.01)
-        no_thr = st.slider("Fallback NO <=", 0.05, 0.40, no_thr, 0.01)
+        st.info(
+            "High profit mainly uses per-series rules above. "
+            "These sliders only change the fallback for series without their own override."
+        )
+        yes_thr = st.slider("Fallback YES ≥", 0.80, 0.99, yes_thr, 0.01, help=yes_help)
+        no_thr = st.slider("Fallback NO ≤", 0.05, 0.40, no_thr, 0.01, help=no_help)
 
-    contracts = st.number_input("Contracts per signal", 1, 25, contracts)
-    top_n = st.slider("Show top N signals", 3, 25, 10)
+    contracts = st.number_input(
+        "Contracts per signal",
+        1,
+        25,
+        contracts,
+        help=(
+            "How many contracts each suggestion is sized for. "
+            "Each contract pays $1 if you win. Start with 1 while learning."
+        ),
+    )
+    top_n = st.slider(
+        "Show top N signals",
+        3,
+        25,
+        10,
+        help="How many of the strongest suggestions to highlight in the main table.",
+    )
 
     if strategy == "favorites":
         settings = with_overrides(
@@ -178,15 +283,42 @@ with st.sidebar:
             high_profit_contracts=float(contracts),
         )
 
-    if strategy == "favorites" and st.button("Save favorites thresholds to config"):
+    if strategy == "favorites" and st.button(
+        "Save favorites thresholds to config",
+        help="Writes the YES/NO sliders into config.yaml for next time.",
+    ):
         save_favorites_thresholds(yes_thr, no_thr)
         st.success("Saved favorites thresholds")
 
     st.divider()
-    scan_clicked = st.button("Scan open markets", type="primary", use_container_width=True)
-    settle_clicked = st.button("Sync settlements", use_container_width=True)
-    backtest_clicked = st.button("Run strategy backtest", use_container_width=True)
-    alert_clicked = st.button("Send alert for last scan", use_container_width=True)
+    st.subheader("Actions")
+    scan_clicked = st.button(
+        "Scan open markets",
+        type="primary",
+        use_container_width=True,
+        help="Pull live Kalshi markets, apply your strategy rules, and try to update settled paper trades.",
+    )
+    settle_clicked = st.button(
+        "Sync settlements",
+        use_container_width=True,
+        help=(
+            "Ask Kalshi which of your open paper trades have finished, then mark wins/losses "
+            "and update paper PnL."
+        ),
+    )
+    backtest_clicked = st.button(
+        "Run strategy backtest",
+        use_container_width=True,
+        help="Replay past settled markets to compare Favorites vs High profit (can take a few minutes).",
+    )
+    alert_clicked = st.button(
+        "Send alert for last scan",
+        use_container_width=True,
+        help=(
+            "Text your Discord/Slack webhook with the top signals from the last scan. "
+            "Does not place any trades."
+        ),
+    )
 
 ledger = Ledger(settings.db_path)
 
@@ -215,7 +347,9 @@ if settle_clicked:
             info = sync_settlements_for_open_signals(
                 ledger,
                 client,
-                series_list=sorted(set(base_settings.favorites_series + base_settings.high_profit_series)),
+                series_list=sorted(
+                    set(base_settings.favorites_series + base_settings.high_profit_series)
+                ),
             )
             st.success(
                 f"Checked {info['tickers_checked']} tickers · "
@@ -250,22 +384,37 @@ if alert_clicked:
             settled_updated=int((result.get("settlements") or {}).get("signals_updated") or 0),
             paper_pnl=float((result.get("stats") or {}).get("paper_pnl") or 0),
         )
-        if alert.get("ok"):
+        if alert.get("ok") and not alert.get("skipped"):
             st.success(f"Alert sent ({alert.get('n', 0)} signals)")
         else:
             st.info(alert.get("reason") or alert.get("error") or str(alert))
 
 stats = ledger.signal_stats()
 c1, c2, c3, c4, c5 = st.columns(5)
-c1.metric("Mode", mode.upper())
-c2.metric("Strategy", strategy.replace("_", " ").title())
-c3.metric("Open trades", stats.get("open_trades", 0))
+c1.metric("Mode", mode.upper(), help="Paper = practice. Live = real orders possible.")
+c2.metric(
+    "Strategy",
+    strategy.replace("_", " ").title(),
+    help="Which rule set is used when you scan.",
+)
+c3.metric(
+    "Open trades",
+    stats.get("open_trades", 0),
+    help="Paper suggestions that have not settled yet.",
+)
 c4.metric(
     "Settled W/L",
     f"{stats.get('wins', 0)}/{stats.get('losses', 0)}",
-    f"{stats.get('win_rate', 0):.0%} WR" if (stats.get("wins", 0) + stats.get("losses", 0)) else None,
+    f"{stats.get('win_rate', 0):.0%} WR"
+    if (stats.get("wins", 0) + stats.get("losses", 0))
+    else None,
+    help="Wins and losses after markets resolved (paper).",
 )
-c5.metric("Paper PnL ($)", f"{stats['paper_pnl']:.2f}")
+c5.metric(
+    "Paper PnL ($)",
+    f"{stats['paper_pnl']:.2f}",
+    help="Estimated practice profit/loss from settled signals only.",
+)
 
 result = st.session_state.get("last_result")
 latest_scan = _load_latest_scan()
@@ -307,7 +456,10 @@ tab_signals, tab_perf, tab_backtest, tab_help = st.tabs(
 
 with tab_signals:
     if latest_scan and not result:
-        st.caption(f"Last scheduled scan: {latest_scan.get('scanned_at', '?')}")
+        st.caption(
+            f"Last scheduled scan: {latest_scan.get('scanned_at', '?')} "
+            "(from GitHub Action / CLI). Click Scan to refresh live."
+        )
 
     if df.empty:
         st.info("Click **Scan open markets** in the sidebar (or wait for the GitHub Action).")
@@ -319,19 +471,31 @@ with tab_signals:
         if not trades.empty:
             trades = trades.sort_values("edge", key=lambda s: s.abs(), ascending=False)
             st.subheader(f"Top {min(top_n, len(trades))} actionable signals")
+            st.caption(
+                "These are the strongest suggestions. "
+                "**PASS** rows are skipped markets that did not meet your thresholds."
+            )
             st.dataframe(trades.head(top_n), use_container_width=True, hide_index=True)
 
             fig = px.histogram(
                 trades,
                 x="market_mid",
                 color="action",
-                title="Signal distribution by market mid",
+                title="Where signals sit on the probability scale (mid)",
             )
             st.plotly_chart(fig, use_container_width=True)
 
             st.subheader("Execute selected (paper or live)")
-            selected = st.multiselect("Tickers", options=trades["ticker"].tolist())
-            if st.button("Execute selected"):
+            st.caption(
+                "In Paper mode this only logs that you “took” the idea. "
+                "In Live mode (with confirmation) it can send real limit orders."
+            )
+            selected = st.multiselect(
+                "Tickers",
+                options=trades["ticker"].tolist(),
+                help="Pick one or more market tickers from the top signals list.",
+            )
+            if st.button("Execute selected", help="Run paper or live execution for the tickers you picked."):
                 trade_map = {r["ticker"]: r for r in (result.get("rows") if result else [])}
                 outs = []
                 for ticker in selected:
@@ -359,9 +523,9 @@ with tab_signals:
                     )
                 st.json(outs)
         else:
-            st.info("No trade signals under current thresholds.")
+            st.info("No trade signals under current thresholds — try High profit or loosen the sliders a bit.")
 
-        with st.expander("All scored markets"):
+        with st.expander("All scored markets (including PASS)"):
             st.dataframe(
                 show.sort_values(["action", "market_mid"], ascending=[True, False]),
                 use_container_width=True,
@@ -369,6 +533,10 @@ with tab_signals:
             )
 
 with tab_perf:
+    st.caption(
+        "This board only updates after markets settle and you sync settlements "
+        "(or after a scan that syncs automatically)."
+    )
     board = ledger.performance_board()
     st.write(
         f"Settled equity **${board['final_equity']:.2f}** · "
@@ -381,14 +549,21 @@ with tab_perf:
         st.plotly_chart(fig, use_container_width=True)
     if board["by_series"]:
         st.subheader("By series")
+        st.caption("Which market types (gas, EUR/USD, etc.) are helping or hurting paper PnL.")
         st.dataframe(pd.DataFrame(board["by_series"]), use_container_width=True, hide_index=True)
     if board["trades"]:
         st.subheader("Recent settled trades")
         st.dataframe(pd.DataFrame(board["trades"]), use_container_width=True, hide_index=True)
     else:
-        st.info("No settled paper trades yet. Scan, wait for markets to resolve, then **Sync settlements**.")
+        st.info(
+            "No settled paper trades yet. Scan, wait for markets to resolve, then **Sync settlements**."
+        )
 
 with tab_backtest:
+    st.caption(
+        "Backtests replay history to estimate hit rate and $/contract. "
+        "Past results do not guarantee future results."
+    )
     bt = st.session_state.get("backtest")
     saved_files = sorted((ROOT / "data" / "backtests").glob("strategy_profiles_*.json"))
     saved_path = saved_files[-1] if saved_files else None
@@ -431,12 +606,15 @@ with tab_help:
 {ov_lines or '- (none)'}
 
 ### Risk controls
-- Max {base_settings.max_trades_per_event} trades per event
-- Skip spreads wider than {base_settings.max_spread:.2f}
+- Max {base_settings.max_trades_per_event} trades per event (avoids buying every dead bracket)
+- Skip spreads wider than {base_settings.max_spread:.2f} (thin / hard-to-trade books)
+
+### Alerts
+Optional Discord/Slack messages with top signals. They **do not** place bets.  
+Set `ALERT_WEBHOOK_URL` in `.env` or as a GitHub Actions secret.
 
 ### Scheduled scans
-GitHub Action runs every 30 minutes (`scheduled_scan.yml`).
-Set repo secret `ALERT_WEBHOOK_URL` for Discord/Slack alerts.
+GitHub Action runs every 30 minutes (`.github/workflows/scheduled_scan.yml`).
 
 ### CLI
 ```

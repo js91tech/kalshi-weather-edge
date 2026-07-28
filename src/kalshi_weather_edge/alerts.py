@@ -1,12 +1,37 @@
 from __future__ import annotations
 
-import json
 import os
 from typing import Any
 
 import requests
 
-from .config import Settings, alert_webhook_url
+from .config import Settings
+
+try:
+    from .config import alert_webhook_url as _config_webhook_url
+except ImportError:  # pragma: no cover - older deploys
+    _config_webhook_url = None
+
+
+def get_webhook_url() -> str | None:
+    """Resolve ALERT_WEBHOOK_URL from env (.env or GitHub secrets)."""
+    if _config_webhook_url is not None:
+        try:
+            return _config_webhook_url()
+        except Exception:
+            pass
+    try:
+        from dotenv import load_dotenv
+
+        load_dotenv()
+    except Exception:
+        pass
+    url = os.getenv("ALERT_WEBHOOK_URL", "").strip()
+    return url or None
+
+
+def webhook_ready() -> bool:
+    return bool(get_webhook_url())
 
 
 def rank_alert_signals(
@@ -61,7 +86,7 @@ def send_webhook_alert(
     Post to Discord-style webhook (content) or Slack-style (text).
     Returns status dict; no-op if URL missing.
     """
-    url = webhook_url or alert_webhook_url() or os.getenv("ALERT_WEBHOOK_URL", "").strip()
+    url = webhook_url or get_webhook_url()
     if not url:
         return {"ok": False, "skipped": True, "reason": "ALERT_WEBHOOK_URL not set"}
 
