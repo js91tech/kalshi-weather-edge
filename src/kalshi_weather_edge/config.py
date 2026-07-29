@@ -36,6 +36,8 @@ class Settings:
     max_spread: float
     max_signals_alert: int
     min_edge_for_alert: float
+    scan_close_within_hours: float
+    dedup_open_trades: bool
     alerts_enabled: bool
     kalshi_base_url: str
     kalshi_demo_base_url: str
@@ -108,6 +110,8 @@ def load_settings(path: Path | None = None) -> Settings:
         max_spread=float(risk.get("max_spread", 0.08)),
         max_signals_alert=int(risk.get("max_signals_alert", 10)),
         min_edge_for_alert=float(risk.get("min_edge_for_alert", 0.15)),
+        scan_close_within_hours=float(risk.get("scan_close_within_hours", 24)),
+        dedup_open_trades=bool(risk.get("dedup_open_trades", True)),
         alerts_enabled=bool(alerts.get("enabled", True)),
         kalshi_base_url=kalshi["base_url"].rstrip("/"),
         kalshi_demo_base_url=str(

@@ -39,6 +39,8 @@ risk:
   max_spread: 0.08
   max_signals_alert: 10
   min_edge_for_alert: 0.15
+  scan_close_within_hours: 24
+  dedup_open_trades: true
 
 alerts:
   enabled: true

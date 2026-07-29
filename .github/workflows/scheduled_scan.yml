@@ -19,6 +19,8 @@ on:
 jobs:
   scan:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
@@ -46,5 +48,15 @@ jobs:
           path: |
             data/scans/latest.json
             data/scans/scan_*.json
+            data/ledger_snapshot.json
           if-no-files-found: warn
           retention-days: 14
+
+      - name: Commit ledger snapshot for Streamlit Cloud
+        if: github.ref == 'refs/heads/main'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/ledger_snapshot.json data/scans/latest.json || true
+          git diff --staged --quiet || git commit -m "chore: update ledger snapshot from scheduled scan"
+          git push || true

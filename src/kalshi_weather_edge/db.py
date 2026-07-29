@@ -316,6 +316,16 @@ class Ledger:
             )
         return out
 
+    def open_trade_ticker_set(self) -> set[str]:
+        with self.connect() as conn:
+            rows = conn.execute(
+                """
+                SELECT DISTINCT ticker FROM signals
+                WHERE action != 'PASS' AND outcome IS NULL
+                """
+            ).fetchall()
+        return {r["ticker"] for r in rows}
+
     def performance_board(self, limit: int = 200) -> dict[str, Any]:
         """Settled trade W/L board + equity curve points."""
         with self.connect() as conn:

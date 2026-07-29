@@ -33,6 +33,12 @@ try:
         run_consensus_scan,
     )
     from kalshi_weather_edge.kalshi_client import KalshiClient  # noqa: E402
+    from kalshi_weather_edge.ledger_snapshot import (  # noqa: E402
+        default_snapshot_path,
+        export_ledger_snapshot,
+        import_if_newer,
+        import_ledger_snapshot,
+    )
     from kalshi_weather_edge.settlements import sync_settlements_for_open_signals  # noqa: E402
     from kalshi_weather_edge.trading import execute_signal  # noqa: E402
 except ImportError as exc:
@@ -320,7 +326,45 @@ with st.sidebar:
         ),
     )
 
+    st.divider()
+    st.subheader("Paper ledger backup")
+    st.caption(
+        f"Cloud reboots wipe SQLite. Snapshots restore W/L + PnL from "
+        f"`data/ledger_snapshot.json` (updated by scans & GitHub Action)."
+    )
+    export_clicked = st.button(
+        "Export ledger snapshot",
+        use_container_width=True,
+        help="Save current paper trades to data/ledger_snapshot.json in the repo folder.",
+    )
+    import_clicked = st.button(
+        "Import ledger snapshot",
+        use_container_width=True,
+        help="Merge data/ledger_snapshot.json into the local database.",
+    )
+
 ledger = Ledger(settings.db_path)
+_snapshot_path = default_snapshot_path(base_settings.data_dir)
+
+if "snapshot_boot" not in st.session_state:
+    boot = import_if_newer(ledger, _snapshot_path)
+    st.session_state["snapshot_boot"] = boot
+    if boot.get("imported_signals"):
+        st.toast(f"Restored {boot['imported_signals']} signals from snapshot")
+
+if export_clicked:
+    info = export_ledger_snapshot(ledger, _snapshot_path)
+    st.success(f"Exported snapshot ({info['stats']['settled']} settled signals)")
+
+if import_clicked:
+    info = import_ledger_snapshot(ledger, _snapshot_path, merge=True)
+    if info.get("ok"):
+        st.success(
+            f"Imported {info.get('imported_signals', 0)} signals · "
+            f"paper PnL ${info['stats']['paper_pnl']:.2f}"
+        )
+    else:
+        st.info(info.get("reason", "Import skipped"))
 
 if scan_clicked:
     with st.spinner("Scanning Kalshi open markets + settlements..."):
@@ -331,9 +375,12 @@ if scan_clicked:
             st.session_state["last_result"] = result
             st.session_state["last_strategy"] = strategy
             settle = result.get("settlements") or {}
+            filt = result.get("filtered_close", 0)
+            ded = result.get("deduped", 0)
             st.success(
                 f"Run #{result['run_id']}: {result['trade_signals']} signals / "
-                f"{result['pass_signals']} pass · settlements updated {settle.get('signals_updated', 0)}"
+                f"{result['pass_signals']} pass · settlements {settle.get('signals_updated', 0)} · "
+                f"filtered {filt} (not closing soon) · deduped {ded}"
             )
             if result["errors"]:
                 st.warning("\n".join(result["errors"]))
@@ -351,6 +398,7 @@ if settle_clicked:
                     set(base_settings.favorites_series + base_settings.high_profit_series)
                 ),
             )
+            export_ledger_snapshot(ledger, _snapshot_path)
             st.success(
                 f"Checked {info['tickers_checked']} tickers · "
                 f"upserted {info['settlements_upserted']} · "
@@ -472,10 +520,33 @@ with tab_signals:
             trades = trades.sort_values("edge", key=lambda s: s.abs(), ascending=False)
             st.subheader(f"Top {min(top_n, len(trades))} actionable signals")
             st.caption(
-                "These are the strongest suggestions. "
-                "**PASS** rows are skipped markets that did not meet your thresholds."
+                "Only markets **closing within "
+                f"{base_settings.scan_close_within_hours:.0f}h** (matches backtest style). "
+                "Duplicates for open paper trades are hidden."
             )
-            st.dataframe(trades.head(top_n), use_container_width=True, hide_index=True)
+            top = trades.head(top_n)
+            show_cols = [
+                c
+                for c in (
+                    "action",
+                    "series",
+                    "ticker",
+                    "subtitle",
+                    "market_mid",
+                    "win_if_right",
+                    "loss_if_wrong",
+                    "contracts",
+                    "edge",
+                )
+                if c in top.columns
+            ]
+            st.dataframe(top[show_cols], use_container_width=True, hide_index=True)
+
+            st.subheader("What these mean (payoff preview)")
+            for _, row in top.iterrows():
+                label = f"{row.get('action')} · {row.get('ticker')}"
+                with st.expander(label, expanded=len(top) <= 3):
+                    st.markdown(row.get("explain") or row.get("reason") or "")
 
             fig = px.histogram(
                 trades,

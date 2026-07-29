@@ -7,6 +7,9 @@ from .db import Ledger, utc_now
 from .favorites import evaluate_favorite
 from .fees import dollar, half_spread, mid_price
 from .kalshi_client import KalshiClient
+from .ledger_snapshot import default_snapshot_path, export_ledger_snapshot, import_if_newer
+from .market_filters import dedup_open_trades, filter_closing_soon
+from .payoffs import enrich_row
 from .settlements import sync_settlements_for_open_signals
 from .tickers import cap_trades_per_event
 
@@ -31,6 +34,7 @@ def run_consensus_scan(
     strategy: str | None = None,
     notes: str = "consensus",
     sync_settlements: bool = True,
+    persist_snapshot: bool = True,
 ) -> dict[str, Any]:
     """Scan open Kalshi markets using favorites or high_profit thresholds."""
     settings = settings or load_settings()
@@ -40,10 +44,17 @@ def run_consensus_scan(
 
     client = KalshiClient(settings.kalshi_base_url)
     ledger = Ledger(settings.db_path)
+    snapshot_path = default_snapshot_path(settings.data_dir)
+    import_if_newer(ledger, snapshot_path)
+
     run_id = ledger.start_run(notes=f"{notes}:{strategy_key}")
+    open_tickers = ledger.open_trade_ticker_set() if settings.dedup_open_trades else set()
 
     rows: list[dict[str, Any]] = []
+    markets_by_ticker: dict[str, dict[str, Any]] = {}
     errors: list[str] = []
+    filtered_close = 0
+    deduped = 0
 
     try:
         for series in series_list:
@@ -57,6 +68,10 @@ def run_consensus_scan(
                 continue
 
             for market in markets:
+                ticker = market.get("ticker")
+                if ticker:
+                    markets_by_ticker[ticker] = market
+
                 yes_bid = dollar(market.get("yes_bid_dollars"))
                 yes_ask = dollar(market.get("yes_ask_dollars"))
                 last = dollar(market.get("last_price_dollars"))
@@ -66,35 +81,19 @@ def run_consensus_scan(
 
                 spread = half_spread(yes_bid, yes_ask)
                 if settings.max_spread > 0 and spread > settings.max_spread:
-                    signal = {
-                        "created_at": utc_now(),
-                        "city_id": series,
-                        "ticker": market["ticker"],
-                        "event_ticker": market.get("event_ticker"),
-                        "target_date": None,
-                        "action": "PASS",
-                        "side": None,
-                        "execution": "none",
-                        "model_p": mid,
-                        "market_mid": mid,
-                        "yes_bid": yes_bid,
-                        "yes_ask": yes_ask,
-                        "spread": spread,
-                        "fee": settings.maker_fee_rate,
-                        "edge": 0.0,
-                        "suggested_contracts": 0.0,
-                        "reason": f"spread {spread:.3f} > max {settings.max_spread:.3f}",
-                        "meta": {
-                            "series": series,
-                            "strategy": strategy_key,
-                            "title": market.get("title"),
-                            "subtitle": market.get("subtitle") or market.get("no_sub_title"),
-                            "yes_threshold": yes_threshold,
-                            "no_threshold": no_threshold,
-                            "wide_spread": True,
-                        },
-                    }
-                    rows.append(signal)
+                    rows.append(
+                        _pass_signal(
+                            series=series,
+                            market=market,
+                            mid=mid,
+                            spread=spread,
+                            strategy_key=strategy_key,
+                            yes_threshold=yes_threshold,
+                            no_threshold=no_threshold,
+                            reason=f"spread {spread:.3f} > max {settings.max_spread:.3f}",
+                            tag="wide_spread",
+                        )
+                    )
                     continue
 
                 decision = evaluate_favorite(
@@ -106,36 +105,48 @@ def run_consensus_scan(
                     contracts=contracts,
                 )
 
-                signal = {
-                    "created_at": utc_now(),
-                    "city_id": series,
-                    "ticker": market["ticker"],
-                    "event_ticker": market.get("event_ticker"),
-                    "target_date": None,
-                    "action": decision.action,
-                    "side": decision.side,
-                    "execution": decision.execution,
-                    "model_p": decision.market_mid,
-                    "market_mid": decision.market_mid,
-                    "yes_bid": yes_bid,
-                    "yes_ask": yes_ask,
-                    "spread": spread,
-                    "fee": settings.maker_fee_rate,
-                    "edge": decision.edge,
-                    "suggested_contracts": decision.suggested_contracts,
-                    "reason": decision.reason,
-                    "meta": {
-                        "series": series,
-                        "strategy": strategy_key,
-                        "title": market.get("title"),
-                        "subtitle": market.get("subtitle") or market.get("no_sub_title"),
-                        "yes_threshold": yes_threshold,
-                        "no_threshold": no_threshold,
-                    },
-                }
-                rows.append(signal)
+                rows.append(
+                    {
+                        "created_at": utc_now(),
+                        "city_id": series,
+                        "ticker": market["ticker"],
+                        "event_ticker": market.get("event_ticker"),
+                        "target_date": None,
+                        "action": decision.action,
+                        "side": decision.side,
+                        "execution": decision.execution,
+                        "model_p": decision.market_mid,
+                        "market_mid": decision.market_mid,
+                        "yes_bid": yes_bid,
+                        "yes_ask": yes_ask,
+                        "spread": spread,
+                        "fee": settings.maker_fee_rate,
+                        "edge": decision.edge,
+                        "suggested_contracts": decision.suggested_contracts,
+                        "reason": decision.reason,
+                        "meta": {
+                            "series": series,
+                            "strategy": strategy_key,
+                            "title": market.get("title"),
+                            "subtitle": market.get("subtitle") or market.get("no_sub_title"),
+                            "yes_threshold": yes_threshold,
+                            "no_threshold": no_threshold,
+                        },
+                    }
+                )
 
-        # Cap trades per event before writing (keep strongest edges)
+        before = sum(1 for r in rows if r["action"] != "PASS")
+        rows = filter_closing_soon(
+            rows,
+            markets_by_ticker,
+            settings.scan_close_within_hours,
+        )
+        filtered_close = before - sum(1 for r in rows if r["action"] != "PASS")
+
+        before = sum(1 for r in rows if r["action"] != "PASS")
+        rows = dedup_open_trades(rows, open_tickers)
+        deduped = before - sum(1 for r in rows if r["action"] != "PASS")
+
         capped = cap_trades_per_event(rows, settings.max_trades_per_event)
         trade_count = 0
         pass_count = 0
@@ -161,6 +172,13 @@ def run_consensus_scan(
             except Exception as exc:  # noqa: BLE001
                 errors.append(f"settlements: {exc}")
 
+        snapshot_info: dict[str, Any] = {"skipped": True}
+        if persist_snapshot:
+            snapshot_info = {
+                "path": str(snapshot_path),
+                "exported_at": export_ledger_snapshot(ledger, snapshot_path).get("exported_at"),
+            }
+
         ledger.finish_run(run_id)
     except Exception:
         ledger.finish_run(run_id)
@@ -174,11 +192,57 @@ def run_consensus_scan(
         "markets_scored": len(capped),
         "trade_signals": trade_count,
         "pass_signals": pass_count,
+        "filtered_close": filtered_close,
+        "deduped": deduped,
         "settlements": settlement_info,
+        "snapshot": snapshot_info,
         "errors": errors,
         "rows": capped,
         "stats": ledger.signal_stats(),
         "performance": ledger.performance_board(),
+    }
+
+
+def _pass_signal(
+    *,
+    series: str,
+    market: dict[str, Any],
+    mid: float,
+    spread: float,
+    strategy_key: str,
+    yes_threshold: float,
+    no_threshold: float,
+    reason: str,
+    tag: str,
+) -> dict[str, Any]:
+    meta = {
+        "series": series,
+        "strategy": strategy_key,
+        "title": market.get("title"),
+        "subtitle": market.get("subtitle") or market.get("no_sub_title"),
+        "yes_threshold": yes_threshold,
+        "no_threshold": no_threshold,
+        tag: True,
+    }
+    return {
+        "created_at": utc_now(),
+        "city_id": series,
+        "ticker": market["ticker"],
+        "event_ticker": market.get("event_ticker"),
+        "target_date": None,
+        "action": "PASS",
+        "side": None,
+        "execution": "none",
+        "model_p": mid,
+        "market_mid": mid,
+        "yes_bid": dollar(market.get("yes_bid_dollars")),
+        "yes_ask": dollar(market.get("yes_ask_dollars")),
+        "spread": spread,
+        "fee": 0.0,
+        "edge": 0.0,
+        "suggested_contracts": 0.0,
+        "reason": reason,
+        "meta": meta,
     }
 
 
@@ -200,25 +264,25 @@ def rows_to_dataframe_records(result: dict[str, Any]) -> list[dict[str, Any]]:
     out = []
     for r in result.get("rows") or []:
         meta = r.get("meta") or {}
-        out.append(
-            {
-                "strategy": meta.get("strategy") or result.get("strategy"),
-                "series": meta.get("series") or r.get("city_id"),
-                "ticker": r.get("ticker"),
-                "title": meta.get("title"),
-                "subtitle": meta.get("subtitle"),
-                "action": r.get("action"),
-                "side": r.get("side"),
-                "execution": r.get("execution"),
-                "market_mid": r.get("market_mid"),
-                "yes_bid": r.get("yes_bid"),
-                "yes_ask": r.get("yes_ask"),
-                "spread": r.get("spread"),
-                "edge": r.get("edge"),
-                "contracts": r.get("suggested_contracts"),
-                "yes_thr": meta.get("yes_threshold"),
-                "no_thr": meta.get("no_threshold"),
-                "reason": r.get("reason"),
-            }
-        )
+        row = {
+            "strategy": meta.get("strategy") or result.get("strategy"),
+            "series": meta.get("series") or r.get("city_id"),
+            "ticker": r.get("ticker"),
+            "title": meta.get("title"),
+            "subtitle": meta.get("subtitle"),
+            "action": r.get("action"),
+            "side": r.get("side"),
+            "execution": r.get("execution"),
+            "market_mid": r.get("market_mid"),
+            "yes_bid": r.get("yes_bid"),
+            "yes_ask": r.get("yes_ask"),
+            "spread": r.get("spread"),
+            "edge": r.get("edge"),
+            "contracts": r.get("suggested_contracts"),
+            "yes_thr": meta.get("yes_threshold"),
+            "no_thr": meta.get("no_threshold"),
+            "hours_to_close": meta.get("hours_to_close"),
+            "reason": r.get("reason"),
+        }
+        out.append(enrich_row(row))
     return out
