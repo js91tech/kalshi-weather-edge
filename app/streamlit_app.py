@@ -20,6 +20,7 @@ st.set_page_config(page_title="Kalshi Favorites", page_icon="📈", layout="wide
 try:
     from kalshi_weather_edge.alerts import maybe_alert_scan, webhook_ready  # noqa: E402
     from kalshi_weather_edge.config import (  # noqa: E402
+        active_fee_rate,
         live_credentials_configured,
         load_settings,
         save_favorites_thresholds,
@@ -39,6 +40,11 @@ try:
         import_if_newer,
         import_ledger_snapshot,
     )
+    from kalshi_weather_edge.session_auth import (  # noqa: E402
+        connect_from_env,
+        connect_kalshi_account,
+        refresh_balance,
+    )
     from kalshi_weather_edge.settlements import sync_settlements_for_open_signals  # noqa: E402
     from kalshi_weather_edge.trading import execute_signal  # noqa: E402
 except ImportError as exc:
@@ -50,7 +56,7 @@ except ImportError as exc:
     st.stop()
 
 
-def _run_strategy_backtest(settings, base_settings):
+def _run_strategy_backtest(settings, base_settings, *, entry_hours: int, fee_rate: float):
     from datetime import date
 
     from kalshi_weather_edge.hit_rate_scan import (  # noqa: E402
@@ -65,7 +71,7 @@ def _run_strategy_backtest(settings, base_settings):
         settings,
         start_date=f"{year}-01-01",
         max_markets_per_series=settings.backtest_max_markets_per_series,
-        entry_hours_before_close=settings.backtest_entry_hours_before_close,
+        entry_hours_before_close=entry_hours,
     )
     profiles = [
         {
@@ -81,8 +87,34 @@ def _run_strategy_backtest(settings, base_settings):
             "series": base_settings.high_profit_series,
         },
     ]
-    bt_results = backtest_strategy_profiles(universe["candidates"], profiles)
-    return {**universe, "results": bt_results}
+    bt_results = backtest_strategy_profiles(
+        universe["candidates"], profiles, fee_rate=fee_rate
+    )
+    return {
+        **universe,
+        "results": bt_results,
+        "entry_hours_before_close": entry_hours,
+        "fee_rate": fee_rate,
+    }
+
+
+def _clear_kalshi_session() -> None:
+    for key in (
+        "kalshi_connected",
+        "kalshi_api_key_id",
+        "kalshi_private_key_pem",
+        "kalshi_private_key_path",
+        "kalshi_use_demo",
+        "kalshi_balance",
+        "kalshi_key_suffix",
+    ):
+        st.session_state.pop(key, None)
+
+
+def _session_bankroll() -> float | None:
+    bal = st.session_state.get("kalshi_balance") or {}
+    dollars = bal.get("balance_dollars")
+    return float(dollars) if dollars is not None else None
 
 
 def _load_latest_scan() -> dict | None:
@@ -128,11 +160,13 @@ You are **not** trying to outsmart the market — you are following strong conse
 | **Alert** | Optional Discord/Slack ping with top signals — does **not** place trades. |
 
 ### Suggested workflow
-1. Keep **Paper** mode on.
-2. Pick a strategy profile (Favorites = safer/tighter; High profit = a bit looser).
-3. Click **Scan open markets**.
-4. Review the **Top signals** table.
-5. Later, click **Sync settlements** to update wins/losses and paper PnL.
+1. **Connect Kalshi login** in the sidebar (API Key ID + private key) to see real balance.
+2. Keep **Paper** mode on while learning.
+3. Pick a strategy profile (Favorites = safer/tighter; High profit = a bit looser).
+4. Choose **Fee assumption** (maker vs taker) — taker is more conservative.
+5. Click **Scan open markets**.
+6. Review the **Top signals** table (includes net EV + sized contracts).
+7. Later, click **Sync settlements** to update wins/losses and paper PnL.
 """
     )
 
@@ -140,6 +174,113 @@ base_settings = load_settings()
 creds = live_credentials_configured()
 
 with st.sidebar:
+    st.header("Kalshi login")
+    st.caption(
+        "Uses your real Kalshi API Key ID + RSA private key. "
+        "We call `/portfolio/balance` to verify the connection."
+    )
+    if st.session_state.get("kalshi_connected"):
+        bal = st.session_state.get("kalshi_balance") or {}
+        dollars = bal.get("balance_dollars")
+        env_label = "DEMO" if st.session_state.get("kalshi_use_demo") else "PROD"
+        st.success(
+            f"Connected ({env_label}) · …{st.session_state.get('kalshi_key_suffix', '')}"
+        )
+        st.metric(
+            "Available balance",
+            f"${dollars:,.2f}" if dollars is not None else "—",
+            help="Live balance from Kalshi portfolio API.",
+        )
+        col_a, col_b = st.columns(2)
+        with col_a:
+            if st.button("Refresh", use_container_width=True, help="Re-fetch balance"):
+                try:
+                    st.session_state["kalshi_balance"] = refresh_balance(
+                        base_settings,
+                        api_key_id=st.session_state["kalshi_api_key_id"],
+                        private_key_pem=st.session_state.get("kalshi_private_key_pem"),
+                        private_key_path=st.session_state.get("kalshi_private_key_path"),
+                        use_demo=bool(st.session_state.get("kalshi_use_demo")),
+                    )
+                    st.rerun()
+                except Exception as exc:  # noqa: BLE001
+                    st.error(str(exc))
+        with col_b:
+            if st.button("Disconnect", use_container_width=True):
+                _clear_kalshi_session()
+                st.rerun()
+    else:
+        with st.expander("Connect Kalshi account", expanded=True):
+            login_demo = st.checkbox(
+                "Demo exchange",
+                value=creds.get("env") == "demo",
+                help="Use Kalshi demo API instead of production.",
+            )
+            api_key_id = st.text_input(
+                "API Key ID",
+                value=creds.get("key_id") or "",
+                help="From Kalshi → Account → Profile → API Keys.",
+            )
+            pem_text = st.text_area(
+                "Private key (PEM)",
+                value=creds.get("private_key_pem") or "",
+                height=120,
+                help="Paste the RSA private key downloaded when you created the API key.",
+            )
+            pem_file = st.file_uploader(
+                "Or upload .pem file",
+                type=["pem", "key", "txt"],
+                help="Alternative to pasting the key.",
+            )
+            if pem_file is not None:
+                pem_text = pem_file.getvalue().decode("utf-8", errors="ignore")
+            use_env = st.button(
+                "Connect from .env / secrets",
+                use_container_width=True,
+                disabled=not creds.get("ready"),
+                help="Uses KALSHI_API_KEY_ID + PEM/PATH already configured on the server.",
+            )
+            connect_clicked = st.button(
+                "Connect",
+                type="primary",
+                use_container_width=True,
+                help="Validate credentials against Kalshi and load your balance.",
+            )
+            if use_env:
+                try:
+                    info = connect_from_env(base_settings, use_demo=login_demo)
+                    st.session_state["kalshi_connected"] = True
+                    st.session_state["kalshi_api_key_id"] = info["api_key_id"]
+                    st.session_state["kalshi_private_key_pem"] = info.get("private_key_pem")
+                    st.session_state["kalshi_private_key_path"] = info.get("private_key_path")
+                    st.session_state["kalshi_use_demo"] = info["use_demo"]
+                    st.session_state["kalshi_balance"] = info["balance"]
+                    st.session_state["kalshi_key_suffix"] = info["key_id_suffix"]
+                    st.success("Connected from environment")
+                    st.rerun()
+                except Exception as exc:  # noqa: BLE001
+                    st.error(str(exc))
+            if connect_clicked:
+                try:
+                    info = connect_kalshi_account(
+                        base_settings,
+                        api_key_id=api_key_id,
+                        private_key_pem=pem_text,
+                        use_demo=login_demo,
+                    )
+                    st.session_state["kalshi_connected"] = True
+                    st.session_state["kalshi_api_key_id"] = info["api_key_id"]
+                    st.session_state["kalshi_private_key_pem"] = info.get("private_key_pem")
+                    st.session_state["kalshi_private_key_path"] = info.get("private_key_path")
+                    st.session_state["kalshi_use_demo"] = info["use_demo"]
+                    st.session_state["kalshi_balance"] = info["balance"]
+                    st.session_state["kalshi_key_suffix"] = info["key_id_suffix"]
+                    st.success("Kalshi account connected")
+                    st.rerun()
+                except Exception as exc:  # noqa: BLE001
+                    st.error(f"Login failed: {exc}")
+
+    st.divider()
     st.header("Trading mode")
     mode = st.radio(
         "Mode",
@@ -160,26 +301,49 @@ with st.sidebar:
             st.success(f"Saved mode={mode}")
             st.rerun()
 
-    use_demo = st.checkbox(
-        "Use Kalshi DEMO API",
-        value=creds.get("env") == "demo",
-        help=(
-            "Use Kalshi's practice/demo exchange instead of real production markets. "
-            "Still separate from Paper mode in this app."
-        ),
+    if st.session_state.get("kalshi_connected"):
+        use_demo = bool(st.session_state.get("kalshi_use_demo"))
+        st.caption(f"Orders target {'DEMO' if use_demo else 'PRODUCTION'} (from login).")
+    else:
+        use_demo = st.checkbox(
+            "Use Kalshi DEMO API",
+            value=creds.get("env") == "demo",
+            help=(
+                "Use Kalshi's practice/demo exchange instead of real production markets. "
+                "Still separate from Paper mode in this app."
+            ),
+        )
+    st.caption(
+        "API keys: "
+        + (
+            "session login"
+            if st.session_state.get("kalshi_connected")
+            else ("ready (.env)" if creds["ready"] else "not configured")
+        )
     )
-    st.caption("API keys: " + ("ready" if creds["ready"] else "not configured (.env)"))
     st.caption(
         "Alert webhook: " + ("ready" if webhook_ready() else "not set (ALERT_WEBHOOK_URL)")
     )
     if mode == "live":
         st.warning("Live mode can place real orders.")
+        if not st.session_state.get("kalshi_connected") and not creds["ready"]:
+            st.error("Connect Kalshi login above before live trading.")
         confirm_live = st.checkbox(
             "I understand — allow live order submission",
             help="Extra safety lock. Even in Live mode, orders only send if this is checked.",
         )
     else:
         confirm_live = False
+
+    fee_assumption = st.selectbox(
+        "Fee assumption",
+        options=["maker", "taker"],
+        index=0 if base_settings.fee_assumption != "taker" else 1,
+        help=(
+            "Maker assumes limit orders resting on the book (often $0 fee). "
+            "Taker assumes crossing the spread and subtracts Kalshi taker fees from EV/sizing."
+        ),
+    )
 
     st.divider()
     st.header("Strategy")
@@ -253,13 +417,13 @@ with st.sidebar:
         no_thr = st.slider("Fallback NO ≤", 0.05, 0.40, no_thr, 0.01, help=no_help)
 
     contracts = st.number_input(
-        "Contracts per signal",
+        "Contracts per signal (fallback)",
         1,
         25,
         contracts,
         help=(
-            "How many contracts each suggestion is sized for. "
-            "Each contract pays $1 if you win. Start with 1 while learning."
+            "Used when not logged in, or when balance sizing is off. "
+            "When connected, size ≈ risk% of Kalshi balance / entry price."
         ),
     )
     top_n = st.slider(
@@ -268,6 +432,13 @@ with st.sidebar:
         25,
         10,
         help="How many of the strongest suggestions to highlight in the main table.",
+    )
+    bt_entry_hours = st.slider(
+        "Backtest entry hours before close",
+        1,
+        48,
+        int(base_settings.backtest_entry_hours_before_close),
+        help="When replaying history, sample mid this many hours before market close.",
     )
 
     if strategy == "favorites":
@@ -278,6 +449,7 @@ with st.sidebar:
             favorites_yes_threshold=float(yes_thr),
             favorites_no_threshold=float(no_thr),
             favorites_contracts=float(contracts),
+            fee_assumption=fee_assumption,
         )
     else:
         settings = with_overrides(
@@ -287,6 +459,7 @@ with st.sidebar:
             high_profit_yes_threshold=float(yes_thr),
             high_profit_no_threshold=float(no_thr),
             high_profit_contracts=float(contracts),
+            fee_assumption=fee_assumption,
         )
 
     if strategy == "favorites" and st.button(
@@ -370,17 +543,22 @@ if scan_clicked:
     with st.spinner("Scanning Kalshi open markets + settlements..."):
         try:
             result = run_consensus_scan(
-                settings, strategy=strategy, notes=f"streamlit:{mode}", sync_settlements=True
+                settings,
+                strategy=strategy,
+                notes=f"streamlit:{mode}",
+                sync_settlements=True,
+                bankroll_dollars=_session_bankroll(),
             )
             st.session_state["last_result"] = result
             st.session_state["last_strategy"] = strategy
             settle = result.get("settlements") or {}
             filt = result.get("filtered_close", 0)
             ded = result.get("deduped", 0)
+            fev = result.get("filtered_ev", 0)
             st.success(
                 f"Run #{result['run_id']}: {result['trade_signals']} signals / "
                 f"{result['pass_signals']} pass · settlements {settle.get('signals_updated', 0)} · "
-                f"filtered {filt} (not closing soon) · deduped {ded}"
+                f"filtered {filt} close · deduped {ded} · EV-filtered {fev}"
             )
             if result["errors"]:
                 st.warning("\n".join(result["errors"]))
@@ -410,11 +588,18 @@ if settle_clicked:
 if backtest_clicked:
     with st.spinner("Backtesting favorites vs high_profit on settled history..."):
         try:
-            bt_payload = _run_strategy_backtest(settings, base_settings)
+            fee_rate = active_fee_rate(settings)
+            bt_payload = _run_strategy_backtest(
+                settings,
+                base_settings,
+                entry_hours=int(bt_entry_hours),
+                fee_rate=fee_rate,
+            )
             st.session_state["backtest"] = bt_payload
             hp = next(r for r in bt_payload["results"]["profiles"] if r["name"] == "high_profit")
             st.success(
-                f"High profit: {hp['wins']}W/{hp['losses']}L ({hp['win_rate']:.1%}), "
+                f"High profit @ {bt_entry_hours}h / fee={fee_rate:.3f}: "
+                f"{hp['wins']}W/{hp['losses']}L ({hp['win_rate']:.1%}), "
                 f"avg ${hp['avg_pnl']:.3f}/contract, total ${hp['pnl']:.2f}"
             )
         except Exception as exc:  # noqa: BLE001
@@ -438,7 +623,8 @@ if alert_clicked:
             st.info(alert.get("reason") or alert.get("error") or str(alert))
 
 stats = ledger.signal_stats()
-c1, c2, c3, c4, c5 = st.columns(5)
+bankroll = _session_bankroll()
+c1, c2, c3, c4, c5, c6 = st.columns(6)
 c1.metric("Mode", mode.upper(), help="Paper = practice. Live = real orders possible.")
 c2.metric(
     "Strategy",
@@ -446,11 +632,16 @@ c2.metric(
     help="Which rule set is used when you scan.",
 )
 c3.metric(
+    "Kalshi $",
+    f"${bankroll:,.2f}" if bankroll is not None else "—",
+    help="Live available balance after login (used for sizing when enabled).",
+)
+c4.metric(
     "Open trades",
     stats.get("open_trades", 0),
     help="Paper suggestions that have not settled yet.",
 )
-c4.metric(
+c5.metric(
     "Settled W/L",
     f"{stats.get('wins', 0)}/{stats.get('losses', 0)}",
     f"{stats.get('win_rate', 0):.0%} WR"
@@ -458,7 +649,7 @@ c4.metric(
     else None,
     help="Wins and losses after markets resolved (paper).",
 )
-c5.metric(
+c6.metric(
     "Paper PnL ($)",
     f"{stats['paper_pnl']:.2f}",
     help="Estimated practice profit/loss from settled signals only.",
@@ -535,6 +726,7 @@ with tab_signals:
                     "market_mid",
                     "win_if_right",
                     "loss_if_wrong",
+                    "net_ev",
                     "contracts",
                     "edge",
                 )
@@ -590,6 +782,9 @@ with tab_signals:
                             mode=mode,
                             confirm_live=confirm_live,
                             use_demo=use_demo,
+                            api_key_id=st.session_state.get("kalshi_api_key_id"),
+                            private_key_pem=st.session_state.get("kalshi_private_key_pem"),
+                            private_key_path=st.session_state.get("kalshi_private_key_path"),
                         )
                     )
                 st.json(outs)
@@ -642,7 +837,9 @@ with tab_backtest:
     if bt and bt.get("results"):
         st.write(
             f"Window **{bt.get('data_start')} -> {bt.get('data_end')}** · "
-            f"{bt.get('n_candidates')} candidates"
+            f"{bt.get('n_candidates')} candidates · "
+            f"entry **{bt.get('entry_hours_before_close', '?')}h** before close · "
+            f"fee_rate **{bt.get('fee_rate', 0):.3f}**"
         )
         profiles = bt["results"].get("profiles") or []
         st.dataframe(pd.DataFrame(profiles), use_container_width=True, hide_index=True)
@@ -679,6 +876,14 @@ with tab_help:
 ### Risk controls
 - Max {base_settings.max_trades_per_event} trades per event (avoids buying every dead bracket)
 - Skip spreads wider than {base_settings.max_spread:.2f} (thin / hard-to-trade books)
+- Closing-soon window: {base_settings.scan_close_within_hours:.0f}h
+- Fee assumption default: `{base_settings.fee_assumption}` (taker fee rate {base_settings.taker_fee_rate})
+- Assumed win rate for EV filter: {base_settings.assumed_win_rate:.0%}
+- Balance sizing: {"on" if base_settings.use_balance_sizing else "off"} at {base_settings.bankroll_risk_fraction:.0%} of Kalshi balance when logged in
+
+### Kalshi login
+Create an API key at [kalshi.com/account/profile](https://kalshi.com/account/profile), then paste **API Key ID** + **private key PEM** in the sidebar.  
+The app verifies login by calling the real `/portfolio/balance` endpoint. Keys stay in this browser session only (unless you also set `.env` / Streamlit secrets).
 
 ### Alerts
 Optional Discord/Slack messages with top signals. They **do not** place bets.  

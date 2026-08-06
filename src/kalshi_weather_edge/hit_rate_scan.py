@@ -8,6 +8,7 @@ from typing import Any
 import requests
 
 from .config import ROOT, Settings, load_settings
+from .fees import taker_fee_per_contract
 from .market_history import KalshiMarketData
 from .tickers import parse_event_date
 
@@ -231,14 +232,28 @@ def build_candidates(
     }
 
 
-def _pnl_yes(bid: float, won: bool, contracts: float = 1.0) -> float:
-    return contracts * ((1.0 - bid) if won else (-bid))
+def _pnl_yes(
+    bid: float,
+    won: bool,
+    contracts: float = 1.0,
+    fee_rate: float = 0.0,
+) -> float:
+    fee = taker_fee_per_contract(bid, fee_rate) if fee_rate else 0.0
+    gross = (1.0 - bid) if won else (-bid)
+    return contracts * (gross - fee)
 
 
-def _pnl_no(ask: float, won: bool, contracts: float = 1.0) -> float:
+def _pnl_no(
+    ask: float,
+    won: bool,
+    contracts: float = 1.0,
+    fee_rate: float = 0.0,
+) -> float:
     # Buy NO at ~(1-ask)
     entry = 1.0 - ask
-    return contracts * ((1.0 - entry) if won else (-entry))
+    fee = taker_fee_per_contract(entry, fee_rate) if fee_rate else 0.0
+    gross = (1.0 - entry) if won else (-entry)
+    return contracts * (gross - fee)
 
 
 def score_strategy(
@@ -249,6 +264,7 @@ def score_strategy(
     min_mid: float | None = None,
     max_mid: float | None = None,
     series_filter: set[str] | None = None,
+    fee_rate: float = 0.0,
 ) -> dict[str, Any]:
     """
     side='YES' buys YES when mid in [min_mid, max_mid]
@@ -268,10 +284,10 @@ def score_strategy(
         result = c["result"]
         if side == "YES":
             won = result == "yes"
-            trade_pnl = _pnl_yes(float(c["yes_bid"]), won)
+            trade_pnl = _pnl_yes(float(c["yes_bid"]), won, fee_rate=fee_rate)
         else:
             won = result == "no"
-            trade_pnl = _pnl_no(float(c["yes_ask"]), won)
+            trade_pnl = _pnl_no(float(c["yes_ask"]), won, fee_rate=fee_rate)
         wins += int(won)
         losses += int(not won)
         pnl += trade_pnl
@@ -289,6 +305,7 @@ def score_strategy(
         "win_rate": (wins / n) if n else 0.0,
         "pnl": pnl,
         "avg_pnl": (pnl / n) if n else 0.0,
+        "fee_rate": fee_rate,
         "trades": trades,
     }
 
@@ -378,6 +395,7 @@ def score_consensus_strategy(
     yes_threshold: float,
     no_threshold: float,
     series_filter: set[str] | None = None,
+    fee_rate: float = 0.0,
 ) -> dict[str, Any]:
     """Backtest live-style favorites: BUY YES if mid >= yes_threshold, BUY NO if mid <= no_threshold."""
     wins = losses = 0
@@ -399,11 +417,11 @@ def score_consensus_strategy(
         result = c["result"]
         if side == "YES":
             won = result == "yes"
-            trade_pnl = _pnl_yes(float(c["yes_bid"]), won)
+            trade_pnl = _pnl_yes(float(c["yes_bid"]), won, fee_rate=fee_rate)
             yes_trades += 1
         else:
             won = result == "no"
-            trade_pnl = _pnl_no(float(c["yes_ask"]), won)
+            trade_pnl = _pnl_no(float(c["yes_ask"]), won, fee_rate=fee_rate)
             no_trades += 1
 
         wins += int(won)
@@ -427,6 +445,7 @@ def score_consensus_strategy(
         "avg_pnl": (pnl / n) if n else 0.0,
         "avg_win_pnl": avg_win,
         "avg_loss_pnl": avg_loss,
+        "fee_rate": fee_rate,
         "trades": trades,
     }
 
@@ -434,18 +453,22 @@ def score_consensus_strategy(
 def backtest_strategy_profiles(
     candidates: list[dict[str, Any]],
     profiles: list[dict[str, Any]],
+    *,
+    fee_rate: float = 0.0,
 ) -> dict[str, Any]:
     """Run consensus backtests for named strategy profiles (favorites, high_profit, etc.)."""
     results: list[dict[str, Any]] = []
     for profile in profiles:
         series = profile.get("series")
         sfilter = set(series) if series else None
+        profile_fee = float(profile.get("fee_rate", fee_rate))
         r = score_consensus_strategy(
             candidates,
             name=profile["name"],
             yes_threshold=float(profile["yes_threshold"]),
             no_threshold=float(profile["no_threshold"]),
             series_filter=sfilter,
+            fee_rate=profile_fee,
         )
         row = {k: v for k, v in r.items() if k != "trades"}
         row["series"] = series or []
@@ -453,6 +476,7 @@ def backtest_strategy_profiles(
 
     by_series: dict[str, list[dict[str, Any]]] = {}
     for profile in profiles:
+        profile_fee = float(profile.get("fee_rate", fee_rate))
         for series in profile.get("series") or []:
             scoped = profile.copy()
             scoped["name"] = f"{profile['name']}|{series}"
@@ -462,6 +486,7 @@ def backtest_strategy_profiles(
                 yes_threshold=float(profile["yes_threshold"]),
                 no_threshold=float(profile["no_threshold"]),
                 series_filter={series},
+                fee_rate=profile_fee,
             )
             row = {k: v for k, v in r.items() if k != "trades"}
             row["series"] = [series]
@@ -470,6 +495,7 @@ def backtest_strategy_profiles(
     return {
         "profiles": results,
         "per_series": by_series,
+        "fee_rate": fee_rate,
     }
 
 

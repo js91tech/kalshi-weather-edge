@@ -38,6 +38,11 @@ class Settings:
     min_edge_for_alert: float
     scan_close_within_hours: float
     dedup_open_trades: bool
+    bankroll_risk_fraction: float
+    assumed_win_rate: float
+    require_positive_net_ev: bool
+    fee_assumption: str
+    use_balance_sizing: bool
     alerts_enabled: bool
     kalshi_base_url: str
     kalshi_demo_base_url: str
@@ -112,6 +117,11 @@ def load_settings(path: Path | None = None) -> Settings:
         min_edge_for_alert=float(risk.get("min_edge_for_alert", 0.15)),
         scan_close_within_hours=float(risk.get("scan_close_within_hours", 24)),
         dedup_open_trades=bool(risk.get("dedup_open_trades", True)),
+        bankroll_risk_fraction=float(risk.get("bankroll_risk_fraction", 0.02)),
+        assumed_win_rate=float(risk.get("assumed_win_rate", 0.94)),
+        require_positive_net_ev=bool(risk.get("require_positive_net_ev", True)),
+        fee_assumption=str(risk.get("fee_assumption", "maker")).lower(),
+        use_balance_sizing=bool(risk.get("use_balance_sizing", True)),
         alerts_enabled=bool(alerts.get("enabled", True)),
         kalshi_base_url=kalshi["base_url"].rstrip("/"),
         kalshi_demo_base_url=str(
@@ -130,6 +140,13 @@ def load_settings(path: Path | None = None) -> Settings:
         db_path=db_path,
         raw=raw,
     )
+
+
+def active_fee_rate(settings: Settings, fee_assumption: str | None = None) -> float:
+    assumption = (fee_assumption or settings.fee_assumption or "maker").lower()
+    if assumption == "taker":
+        return float(settings.taker_fee_rate)
+    return float(settings.maker_fee_rate)
 
 
 def thresholds_for_series(
@@ -154,14 +171,19 @@ def live_credentials_configured() -> dict[str, Any]:
     load_dotenv(ROOT / ".env")
     key_id = os.getenv("KALSHI_API_KEY_ID", "").strip()
     key_path = os.getenv("KALSHI_PRIVATE_KEY_PATH", "").strip()
+    pem = os.getenv("KALSHI_PRIVATE_KEY_PEM", "").strip()
     env = os.getenv("KALSHI_ENV", "production").strip().lower()
     path_ok = bool(key_path) and Path(key_path).expanduser().exists()
+    pem_set = bool(pem)
     return {
+        "key_id": key_id,
         "key_id_set": bool(key_id),
         "key_path": key_path,
         "key_path_exists": path_ok,
+        "private_key_pem": pem if pem_set else "",
+        "pem_set": pem_set,
         "env": env,
-        "ready": bool(key_id) and path_ok,
+        "ready": bool(key_id) and (path_ok or pem_set),
     }
 
 

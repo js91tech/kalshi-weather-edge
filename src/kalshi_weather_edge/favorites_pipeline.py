@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from .config import Settings, load_settings, thresholds_for_series
+from .config import Settings, active_fee_rate, load_settings, thresholds_for_series
 from .db import Ledger, utc_now
 from .favorites import evaluate_favorite
 from .fees import dollar, half_spread, mid_price
@@ -11,6 +11,7 @@ from .ledger_snapshot import default_snapshot_path, export_ledger_snapshot, impo
 from .market_filters import dedup_open_trades, filter_closing_soon
 from .payoffs import enrich_row
 from .settlements import sync_settlements_for_open_signals
+from .sizing import size_signal
 from .tickers import cap_trades_per_event
 
 
@@ -35,12 +36,15 @@ def run_consensus_scan(
     notes: str = "consensus",
     sync_settlements: bool = True,
     persist_snapshot: bool = True,
+    bankroll_dollars: float | None = None,
 ) -> dict[str, Any]:
     """Scan open Kalshi markets using favorites or high_profit thresholds."""
     settings = settings or load_settings()
     strategy_key, series_list, contracts = _scan_params(
         settings, strategy or settings.strategy
     )
+    fee_rate = active_fee_rate(settings)
+    sizing_bankroll = bankroll_dollars if settings.use_balance_sizing else None
 
     client = KalshiClient(settings.kalshi_base_url)
     ledger = Ledger(settings.db_path)
@@ -55,6 +59,7 @@ def run_consensus_scan(
     errors: list[str] = []
     filtered_close = 0
     deduped = 0
+    filtered_ev = 0
 
     try:
         for series in series_list:
@@ -120,7 +125,7 @@ def run_consensus_scan(
                         "yes_bid": yes_bid,
                         "yes_ask": yes_ask,
                         "spread": spread,
-                        "fee": settings.maker_fee_rate,
+                        "fee": fee_rate,
                         "edge": decision.edge,
                         "suggested_contracts": decision.suggested_contracts,
                         "reason": decision.reason,
@@ -146,6 +151,26 @@ def run_consensus_scan(
         before = sum(1 for r in rows if r["action"] != "PASS")
         rows = dedup_open_trades(rows, open_tickers)
         deduped = before - sum(1 for r in rows if r["action"] != "PASS")
+
+        sized_rows: list[dict[str, Any]] = []
+        for row in rows:
+            if row.get("action") == "PASS":
+                sized_rows.append(row)
+                continue
+            sized = size_signal(
+                row,
+                fee_rate=fee_rate,
+                assumed_win_rate=settings.assumed_win_rate,
+                require_positive_net_ev=settings.require_positive_net_ev,
+                bankroll_dollars=sizing_bankroll,
+                risk_fraction=settings.bankroll_risk_fraction,
+                max_contracts=settings.max_contracts_per_signal,
+                base_contracts=contracts,
+            )
+            if sized.get("action") == "PASS" and row.get("action") != "PASS":
+                filtered_ev += 1
+            sized_rows.append(sized)
+        rows = sized_rows
 
         capped = cap_trades_per_event(rows, settings.max_trades_per_event)
         trade_count = 0
@@ -194,6 +219,9 @@ def run_consensus_scan(
         "pass_signals": pass_count,
         "filtered_close": filtered_close,
         "deduped": deduped,
+        "filtered_ev": filtered_ev,
+        "fee_rate": fee_rate,
+        "bankroll_dollars": sizing_bankroll,
         "settlements": settlement_info,
         "snapshot": snapshot_info,
         "errors": errors,
@@ -279,6 +307,7 @@ def rows_to_dataframe_records(result: dict[str, Any]) -> list[dict[str, Any]]:
             "spread": r.get("spread"),
             "edge": r.get("edge"),
             "contracts": r.get("suggested_contracts"),
+            "net_ev": r.get("net_ev"),
             "yes_thr": meta.get("yes_threshold"),
             "no_thr": meta.get("no_threshold"),
             "hours_to_close": meta.get("hours_to_close"),

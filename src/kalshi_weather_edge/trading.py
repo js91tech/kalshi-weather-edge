@@ -4,6 +4,7 @@ from typing import Any
 
 from .auth_client import KalshiTradingClient
 from .config import Settings, active_kalshi_base_url, live_credentials_configured
+from .session_auth import build_trading_client
 
 
 def cents_from_dollars(price: float | None) -> int | None:
@@ -19,10 +20,15 @@ def execute_signal(
     mode: str,
     confirm_live: bool = False,
     use_demo: bool | None = None,
+    api_key_id: str | None = None,
+    private_key_pem: str | None = None,
+    private_key_path: str | None = None,
+    client: KalshiTradingClient | None = None,
 ) -> dict[str, Any]:
     """
     Paper: log-only acknowledgment.
     Live: place a small maker limit order when credentials + confirm_live are set.
+    Session credentials (api_key_id + PEM) take precedence over .env.
     """
     mode = (mode or "paper").lower()
     action = signal.get("action")
@@ -53,12 +59,16 @@ def execute_signal(
             "error": "Live mode requires explicit confirmation before sending orders",
         }
 
+    session_ready = bool(api_key_id and (private_key_pem or private_key_path or client))
     creds = live_credentials_configured()
-    if not creds["ready"]:
+    if not session_ready and not creds["ready"]:
         return {
             "ok": False,
             "mode": "live",
-            "error": "Missing KALSHI_API_KEY_ID or KALSHI_PRIVATE_KEY_PATH (.env)",
+            "error": (
+                "Not logged in. Connect with Kalshi API Key ID + private key in the sidebar, "
+                "or set KALSHI_API_KEY_ID + KALSHI_PRIVATE_KEY_PEM/PATH in .env"
+            ),
             "credentials": creds,
         }
 
@@ -97,7 +107,6 @@ def execute_signal(
     else:
         order_side = "no"
         order_action = "buy"
-        # Buy NO as maker around market NO bid ≈ 1 - yes_ask
         no_px = None
         if yes_ask is not None:
             no_px = 1.0 - float(yes_ask)
@@ -106,9 +115,15 @@ def execute_signal(
         no_price = cents_from_dollars(no_px)
         yes_price = None
 
-    client = KalshiTradingClient(base_url=active_kalshi_base_url(settings, use_demo=use_demo))
     try:
-        resp = client.place_order(
+        trading_client = client or build_trading_client(
+            settings,
+            api_key_id=api_key_id or creds.get("key_id"),
+            private_key_pem=private_key_pem or creds.get("private_key_pem") or None,
+            private_key_path=private_key_path or (creds.get("key_path") if not private_key_pem else None),
+            use_demo=use_demo,
+        )
+        resp = trading_client.place_order(
             ticker=str(signal["ticker"]),
             side=order_side,
             action=order_action,
@@ -127,6 +142,7 @@ def execute_signal(
             "yes_price": yes_price,
             "no_price": no_price,
             "response": resp,
+            "base_url": active_kalshi_base_url(settings, use_demo=use_demo),
         }
     except Exception as exc:  # noqa: BLE001
         return {"ok": False, "mode": "live", "error": str(exc)}

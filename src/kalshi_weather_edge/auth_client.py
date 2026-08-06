@@ -17,40 +17,58 @@ from .config import ROOT
 
 
 class KalshiTradingClient:
-    """Authenticated Kalshi client for live/demo order placement."""
+    """Authenticated Kalshi client for live/demo portfolio + order placement."""
 
     def __init__(
         self,
         base_url: str,
         api_key_id: str | None = None,
         private_key_path: str | None = None,
+        private_key_pem: str | None = None,
         timeout: float = 30.0,
     ) -> None:
         load_dotenv(ROOT / ".env")
         self.base_url = base_url.rstrip("/")
         self.api_key_id = (api_key_id or os.getenv("KALSHI_API_KEY_ID", "")).strip()
+        pem = (private_key_pem or os.getenv("KALSHI_PRIVATE_KEY_PEM", "")).strip()
         path = private_key_path or os.getenv("KALSHI_PRIVATE_KEY_PATH", "")
-        self.private_key_path = str(Path(path).expanduser()) if path else ""
+        self.private_key_path = str(Path(path).expanduser()) if path and not pem else ""
         self.timeout = timeout
-        if not self.api_key_id or not self.private_key_path:
+        if not self.api_key_id or (not pem and not self.private_key_path):
             raise ValueError(
-                "Live trading requires KALSHI_API_KEY_ID and KALSHI_PRIVATE_KEY_PATH in .env"
+                "Live trading requires KALSHI_API_KEY_ID and either "
+                "KALSHI_PRIVATE_KEY_PEM or KALSHI_PRIVATE_KEY_PATH"
             )
-        self._private_key = self._load_private_key(self.private_key_path)
+        if pem:
+            self._private_key = self._load_private_key_pem(pem)
+        else:
+            self._private_key = self._load_private_key(self.private_key_path)
         self.session = requests.Session()
         self.session.headers.update(
-            {"Accept": "application/json", "Content-Type": "application/json", "User-Agent": "kalshi-weather-edge/0.2"}
+            {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "User-Agent": "kalshi-weather-edge/0.3",
+            }
         )
 
     @staticmethod
     def _load_private_key(path: str) -> Any:
         with open(path, "rb") as f:
-            return serialization.load_pem_private_key(f.read(), password=None, backend=default_backend())
+            return serialization.load_pem_private_key(
+                f.read(), password=None, backend=default_backend()
+            )
+
+    @staticmethod
+    def _load_private_key_pem(pem: str | bytes) -> Any:
+        data = pem.encode("utf-8") if isinstance(pem, str) else pem
+        return serialization.load_pem_private_key(
+            data, password=None, backend=default_backend()
+        )
 
     def _sign_path(self, method: str, path_with_query: str) -> dict[str, str]:
         # Sign full API path from root without query string
         parsed = urlparse(self.base_url + path_with_query.split("?")[0])
-        # base_url already includes /trade-api/v2; request paths are like /portfolio/...
         sign_path = parsed.path
         timestamp = str(int(time.time() * 1000))
         message = f"{timestamp}{method.upper()}{sign_path}".encode("utf-8")
@@ -93,6 +111,12 @@ class KalshiTradingClient:
 
     def get_balance(self) -> dict[str, Any]:
         return self._request("GET", "/portfolio/balance")
+
+    def get_positions(self, *, limit: int = 100, cursor: str | None = None) -> dict[str, Any]:
+        params: dict[str, Any] = {"limit": int(limit)}
+        if cursor:
+            params["cursor"] = cursor
+        return self._request("GET", "/portfolio/positions", params=params)
 
     def place_order(
         self,

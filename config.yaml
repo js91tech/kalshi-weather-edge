@@ -41,6 +41,12 @@ risk:
   min_edge_for_alert: 0.15
   scan_close_within_hours: 24
   dedup_open_trades: true
+  # Fee-aware sizing (uses Kalshi balance when logged in)
+  fee_assumption: maker   # maker | taker
+  assumed_win_rate: 0.94
+  require_positive_net_ev: true
+  use_balance_sizing: true
+  bankroll_risk_fraction: 0.02  # ~2% of available balance per signal
 
 alerts:
   enabled: true
