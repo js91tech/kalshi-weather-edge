@@ -219,28 +219,36 @@ def _kalshi_login_dialog(settings, env_creds: dict) -> None:
 base_settings = load_settings()
 creds = live_credentials_configured()
 
-title_col, login_col = st.columns([4, 1])
-with title_col:
-    st.title("Kalshi Favorites")
-    st.caption(
-        "Finds markets where the crowd already agrees strongly — then suggests following that side. "
-        "Starts in paper mode (practice only). Not financial advice."
-    )
-with login_col:
-    st.write("")  # vertical align with title
+# Always-visible account bar (hard to miss on Cloud / mobile)
+acct_l, acct_r = st.columns([3, 1])
+with acct_l:
     if st.session_state.get("kalshi_connected"):
         bal = st.session_state.get("kalshi_balance") or {}
         dollars = bal.get("balance_dollars")
         env_label = "DEMO" if st.session_state.get("kalshi_use_demo") else "PROD"
-        st.caption(f"{env_label} · …{st.session_state.get('kalshi_key_suffix', '')}")
-        if dollars is not None:
-            st.caption(f"${dollars:,.2f}")
-        if st.button("Logout", use_container_width=True, key="header_logout"):
+        money = f"${dollars:,.2f}" if dollars is not None else "—"
+        st.info(
+            f"**Logged in** ({env_label}) · …{st.session_state.get('kalshi_key_suffix', '')} · "
+            f"balance **{money}**"
+        )
+    else:
+        st.warning(
+            "**Not logged in** — click **Login** to connect your Kalshi API key and load live balance."
+        )
+with acct_r:
+    if st.session_state.get("kalshi_connected"):
+        if st.button("Logout", use_container_width=True, key="top_logout"):
             _clear_kalshi_session()
             st.rerun()
     else:
-        if st.button("Login", type="primary", use_container_width=True, key="header_login"):
+        if st.button("Login", type="primary", use_container_width=True, key="top_login"):
             _kalshi_login_dialog(base_settings, creds)
+
+st.title("Kalshi Favorites")
+st.caption(
+    "Finds markets where the crowd already agrees strongly — then suggests following that side. "
+    "Starts in paper mode (practice only). Not financial advice."
+)
 
 with st.expander("New here? Read this first (plain English)", expanded=False):
     st.markdown(
@@ -269,7 +277,7 @@ You are **not** trying to outsmart the market — you are following strong conse
 | **Alert** | Optional Discord/Slack ping with top signals — does **not** place trades. |
 
 ### Suggested workflow
-1. Click **Login** (top right) with your Kalshi API Key ID + private key to see real balance.
+1. Click **Login** at the top with your Kalshi API Key ID + private key to see real balance.
 2. Keep **Paper** mode on while learning.
 3. Pick a strategy profile (Favorites = safer/tighter; High profit = a bit looser).
 4. Choose **Fee assumption** (maker vs taker) — taker is more conservative.
