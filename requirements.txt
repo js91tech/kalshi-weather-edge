@@ -8,4 +8,5 @@ plotly>=5.22.0
 python-dateutil>=2.9.0
 cryptography>=42.0.0
 python-dotenv>=1.0.0
+# Bump forces Streamlit Cloud to reinstall the editable package after auth changes.
 -e .
