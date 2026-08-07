@@ -43,6 +43,7 @@ try:
     from kalshi_weather_edge.session_auth import (  # noqa: E402
         connect_from_env,
         connect_kalshi_account,
+        connect_with_password,
         refresh_balance,
     )
     from kalshi_weather_edge.settlements import sync_settlements_for_open_signals  # noqa: E402
@@ -104,21 +105,29 @@ def _clear_kalshi_session() -> None:
         "kalshi_api_key_id",
         "kalshi_private_key_pem",
         "kalshi_private_key_path",
+        "kalshi_access_token",
+        "kalshi_email",
+        "kalshi_auth_mode",
         "kalshi_use_demo",
         "kalshi_balance",
         "kalshi_key_suffix",
+        "kalshi_display_name",
     ):
         st.session_state.pop(key, None)
 
 
 def _apply_kalshi_session(info: dict) -> None:
     st.session_state["kalshi_connected"] = True
-    st.session_state["kalshi_api_key_id"] = info["api_key_id"]
+    st.session_state["kalshi_auth_mode"] = info.get("auth_mode") or "api_key"
+    st.session_state["kalshi_api_key_id"] = info.get("api_key_id")
     st.session_state["kalshi_private_key_pem"] = info.get("private_key_pem")
     st.session_state["kalshi_private_key_path"] = info.get("private_key_path")
+    st.session_state["kalshi_access_token"] = info.get("access_token")
+    st.session_state["kalshi_email"] = info.get("email")
     st.session_state["kalshi_use_demo"] = info["use_demo"]
     st.session_state["kalshi_balance"] = info["balance"]
-    st.session_state["kalshi_key_suffix"] = info["key_id_suffix"]
+    st.session_state["kalshi_key_suffix"] = info.get("key_id_suffix") or ""
+    st.session_state["kalshi_display_name"] = info.get("display_name") or info.get("key_id_suffix") or ""
 
 
 def _session_bankroll() -> float | None:
@@ -139,82 +148,143 @@ def _load_latest_scan() -> dict | None:
 
 @st.dialog("Log in to Kalshi")
 def _kalshi_login_dialog(settings, env_creds: dict) -> None:
-    """Modal login: validates API Key ID + PEM against Kalshi /portfolio/balance."""
-    st.markdown(
-        "Enter your Kalshi **API Key ID** and **RSA private key**. "
-        "Login calls the live balance endpoint to confirm your account."
-    )
-    st.caption("Get keys at [kalshi.com/account/profile](https://kalshi.com/account/profile) → API Keys.")
+    """Modal login: email/password first, API key as fallback."""
+    from kalshi_weather_edge.password_auth import env_password_configured  # noqa: E402
+
+    pw_env = env_password_configured()
     login_demo = st.checkbox(
         "Use DEMO exchange",
         value=env_creds.get("env") == "demo",
         help="Demo practice exchange vs production.",
         key="dialog_login_demo",
     )
-    api_key_id = st.text_input(
-        "API Key ID",
-        value=env_creds.get("key_id") or "",
-        key="dialog_api_key_id",
-        help="From Kalshi → Account → Profile → API Keys.",
-    )
-    pem_text = st.text_area(
-        "Private key (PEM)",
-        value=env_creds.get("private_key_pem") or "",
-        height=140,
-        key="dialog_pem_text",
-        help="Paste the RSA private key downloaded when you created the API key.",
-    )
-    pem_file = st.file_uploader(
-        "Or upload .pem file",
-        type=["pem", "key", "txt"],
-        key="dialog_pem_file",
-    )
-    if pem_file is not None:
-        pem_text = pem_file.getvalue().decode("utf-8", errors="ignore")
 
-    col_login, col_env = st.columns(2)
-    with col_login:
-        login_clicked = st.button(
+    tab_pw, tab_key = st.tabs(["Email & password", "API key"])
+
+    with tab_pw:
+        st.markdown("Sign in with the **same email and password** you use on kalshi.com.")
+        st.caption(
+            "If Kalshi rejects password login for apps (common on the new Trade API), "
+            "use the **API key** tab instead — that is Kalshi’s official method."
+        )
+        email = st.text_input(
+            "Email",
+            value=pw_env.get("email") or "",
+            key="dialog_email",
+            autocomplete="username",
+        )
+        password = st.text_input(
+            "Password",
+            type="password",
+            key="dialog_password",
+            autocomplete="current-password",
+        )
+        pw_login = st.button(
             "Login",
             type="primary",
             use_container_width=True,
-            key="dialog_login_btn",
-            help="Verify credentials with Kalshi and load your balance.",
+            key="dialog_pw_login_btn",
+            help="Log in with your Kalshi website email and password.",
         )
-    with col_env:
-        env_clicked = st.button(
-            "Login with .env",
+        if pw_env.get("ready") and st.button(
+            "Login with saved .env email/password",
             use_container_width=True,
-            disabled=not env_creds.get("ready"),
-            key="dialog_env_btn",
-            help="Use KALSHI_API_KEY_ID + PEM/PATH already on the server.",
+            key="dialog_pw_env_btn",
+        ):
+            try:
+                import os
+
+                with st.spinner("Signing in..."):
+                    info = connect_with_password(
+                        settings,
+                        email=pw_env["email"],
+                        password=os.getenv("KALSHI_PASSWORD", ""),
+                        use_demo=login_demo,
+                    )
+                _apply_kalshi_session(info)
+                st.success("Logged in with email/password.")
+                st.rerun()
+            except Exception as exc:  # noqa: BLE001
+                st.error(str(exc))
+        if pw_login:
+            try:
+                with st.spinner("Signing in to Kalshi..."):
+                    info = connect_with_password(
+                        settings,
+                        email=email,
+                        password=password,
+                        use_demo=login_demo,
+                    )
+                _apply_kalshi_session(info)
+                st.success("Logged in — balance loaded.")
+                st.rerun()
+            except Exception as exc:  # noqa: BLE001
+                st.error(str(exc))
+
+    with tab_key:
+        st.markdown(
+            "Official Kalshi app auth: **API Key ID** + **private key** from "
+            "[Account → API Keys](https://kalshi.com/account/profile)."
         )
+        api_key_id = st.text_input(
+            "API Key ID",
+            value=env_creds.get("key_id") or "",
+            key="dialog_api_key_id",
+        )
+        pem_text = st.text_area(
+            "Private key (PEM)",
+            value=env_creds.get("private_key_pem") or "",
+            height=120,
+            key="dialog_pem_text",
+        )
+        pem_file = st.file_uploader(
+            "Or upload .pem file",
+            type=["pem", "key", "txt"],
+            key="dialog_pem_file",
+        )
+        if pem_file is not None:
+            pem_text = pem_file.getvalue().decode("utf-8", errors="ignore")
 
-    if login_clicked:
-        try:
-            with st.spinner("Connecting to Kalshi..."):
-                info = connect_kalshi_account(
-                    settings,
-                    api_key_id=api_key_id,
-                    private_key_pem=pem_text,
-                    use_demo=login_demo,
-                )
-            _apply_kalshi_session(info)
-            st.success("Logged in — balance loaded.")
-            st.rerun()
-        except Exception as exc:  # noqa: BLE001
-            st.error(f"Login failed: {exc}")
+        col_login, col_env = st.columns(2)
+        with col_login:
+            key_login = st.button(
+                "Login with API key",
+                type="primary",
+                use_container_width=True,
+                key="dialog_login_btn",
+            )
+        with col_env:
+            env_clicked = st.button(
+                "Login with .env key",
+                use_container_width=True,
+                disabled=not env_creds.get("ready"),
+                key="dialog_env_btn",
+            )
 
-    if env_clicked:
-        try:
-            with st.spinner("Connecting from environment..."):
-                info = connect_from_env(settings, use_demo=login_demo)
-            _apply_kalshi_session(info)
-            st.success("Logged in from .env / secrets.")
-            st.rerun()
-        except Exception as exc:  # noqa: BLE001
-            st.error(f"Login failed: {exc}")
+        if key_login:
+            try:
+                with st.spinner("Connecting to Kalshi..."):
+                    info = connect_kalshi_account(
+                        settings,
+                        api_key_id=api_key_id,
+                        private_key_pem=pem_text,
+                        use_demo=login_demo,
+                    )
+                _apply_kalshi_session(info)
+                st.success("Logged in — balance loaded.")
+                st.rerun()
+            except Exception as exc:  # noqa: BLE001
+                st.error(f"Login failed: {exc}")
 
+        if env_clicked:
+            try:
+                with st.spinner("Connecting from environment..."):
+                    info = connect_from_env(settings, use_demo=login_demo)
+                _apply_kalshi_session(info)
+                st.success("Logged in from .env / secrets.")
+                st.rerun()
+            except Exception as exc:  # noqa: BLE001
+                st.error(f"Login failed: {exc}")
 
 base_settings = load_settings()
 creds = live_credentials_configured()
@@ -227,9 +297,10 @@ with acct_l:
         dollars = bal.get("balance_dollars")
         env_label = "DEMO" if st.session_state.get("kalshi_use_demo") else "PROD"
         money = f"${dollars:,.2f}" if dollars is not None else "—"
+        who = st.session_state.get("kalshi_display_name") or st.session_state.get("kalshi_key_suffix") or ""
+        mode = st.session_state.get("kalshi_auth_mode") or "api_key"
         st.info(
-            f"**Logged in** ({env_label}) · …{st.session_state.get('kalshi_key_suffix', '')} · "
-            f"balance **{money}**"
+            f"**Logged in** ({env_label} · {mode}) · {who} · balance **{money}**"
         )
     else:
         st.warning(
@@ -277,7 +348,7 @@ You are **not** trying to outsmart the market — you are following strong conse
 | **Alert** | Optional Discord/Slack ping with top signals — does **not** place trades. |
 
 ### Suggested workflow
-1. Click **Login** at the top with your Kalshi API Key ID + private key to see real balance.
+1. Click **Login** and sign in with your Kalshi **email & password** (or API key if password login is blocked).
 2. Keep **Paper** mode on while learning.
 3. Pick a strategy profile (Favorites = safer/tighter; High profit = a bit looser).
 4. Choose **Fee assumption** (maker vs taker) — taker is more conservative.
@@ -307,9 +378,10 @@ with st.sidebar:
                 try:
                     st.session_state["kalshi_balance"] = refresh_balance(
                         base_settings,
-                        api_key_id=st.session_state["kalshi_api_key_id"],
+                        api_key_id=st.session_state.get("kalshi_api_key_id"),
                         private_key_pem=st.session_state.get("kalshi_private_key_pem"),
                         private_key_path=st.session_state.get("kalshi_private_key_path"),
+                        access_token=st.session_state.get("kalshi_access_token"),
                         use_demo=bool(st.session_state.get("kalshi_use_demo")),
                     )
                     st.rerun()
@@ -855,6 +927,7 @@ with tab_signals:
                             api_key_id=st.session_state.get("kalshi_api_key_id"),
                             private_key_pem=st.session_state.get("kalshi_private_key_pem"),
                             private_key_path=st.session_state.get("kalshi_private_key_path"),
+                            access_token=st.session_state.get("kalshi_access_token"),
                         )
                     )
                 st.json(outs)
@@ -952,8 +1025,9 @@ with tab_help:
 - Balance sizing: {"on" if base_settings.use_balance_sizing else "off"} at {base_settings.bankroll_risk_fraction:.0%} of Kalshi balance when logged in
 
 ### Kalshi login
-Click **Login** (top right or sidebar). Create an API key at [kalshi.com/account/profile](https://kalshi.com/account/profile), then paste **API Key ID** + **private key PEM**.  
-The app verifies login by calling the real `/portfolio/balance` endpoint. Keys stay in this browser session only (unless you also set `.env` / Streamlit secrets).
+Click **Login** and use the **Email & password** tab (same credentials as kalshi.com).  
+If Kalshi rejects password login for apps, switch to the **API key** tab and create a key at [kalshi.com/account/profile](https://kalshi.com/account/profile).  
+Session credentials stay in the browser session only (or use `.env` / Streamlit secrets).
 
 ### Alerts
 Optional Discord/Slack messages with top signals. They **do not** place bets.  

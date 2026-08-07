@@ -17,7 +17,7 @@ from .config import ROOT
 
 
 class KalshiTradingClient:
-    """Authenticated Kalshi client for live/demo portfolio + order placement."""
+    """Authenticated Kalshi client (API-key RSA signing or Bearer session token)."""
 
     def __init__(
         self,
@@ -25,30 +25,38 @@ class KalshiTradingClient:
         api_key_id: str | None = None,
         private_key_path: str | None = None,
         private_key_pem: str | None = None,
+        access_token: str | None = None,
         timeout: float = 30.0,
     ) -> None:
         load_dotenv(ROOT / ".env")
         self.base_url = base_url.rstrip("/")
+        self.timeout = timeout
+        self.access_token = (access_token or os.getenv("KALSHI_ACCESS_TOKEN", "")).strip() or None
         self.api_key_id = (api_key_id or os.getenv("KALSHI_API_KEY_ID", "")).strip()
         pem = (private_key_pem or os.getenv("KALSHI_PRIVATE_KEY_PEM", "")).strip()
         path = private_key_path or os.getenv("KALSHI_PRIVATE_KEY_PATH", "")
         self.private_key_path = str(Path(path).expanduser()) if path and not pem else ""
-        self.timeout = timeout
-        if not self.api_key_id or (not pem and not self.private_key_path):
-            raise ValueError(
-                "Live trading requires KALSHI_API_KEY_ID and either "
-                "KALSHI_PRIVATE_KEY_PEM or KALSHI_PRIVATE_KEY_PATH"
-            )
-        if pem:
-            self._private_key = self._load_private_key_pem(pem)
+        self._private_key = None
+
+        if self.access_token:
+            pass  # bearer mode
+        elif self.api_key_id and (pem or self.private_key_path):
+            if pem:
+                self._private_key = self._load_private_key_pem(pem)
+            else:
+                self._private_key = self._load_private_key(self.private_key_path)
         else:
-            self._private_key = self._load_private_key(self.private_key_path)
+            raise ValueError(
+                "Provide either a session access_token (email/password login) or "
+                "KALSHI_API_KEY_ID + private key PEM/path"
+            )
+
         self.session = requests.Session()
         self.session.headers.update(
             {
                 "Accept": "application/json",
                 "Content-Type": "application/json",
-                "User-Agent": "kalshi-weather-edge/0.3",
+                "User-Agent": "kalshi-weather-edge/0.4",
             }
         )
 
@@ -67,7 +75,6 @@ class KalshiTradingClient:
         )
 
     def _sign_path(self, method: str, path_with_query: str) -> dict[str, str]:
-        # Sign full API path from root without query string
         parsed = urlparse(self.base_url + path_with_query.split("?")[0])
         sign_path = parsed.path
         timestamp = str(int(time.time() * 1000))
@@ -86,6 +93,11 @@ class KalshiTradingClient:
             "KALSHI-ACCESS-SIGNATURE": base64.b64encode(signature).decode("utf-8"),
         }
 
+    def _auth_headers(self, method: str, path: str) -> dict[str, str]:
+        if self.access_token:
+            return {"Authorization": f"Bearer {self.access_token}"}
+        return self._sign_path(method, path)
+
     def _request(
         self,
         method: str,
@@ -93,7 +105,7 @@ class KalshiTradingClient:
         params: dict[str, Any] | None = None,
         json_body: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
-        headers = self._sign_path(method, path)
+        headers = self._auth_headers(method, path)
         url = f"{self.base_url}{path}"
         resp = self.session.request(
             method.upper(),
@@ -129,12 +141,6 @@ class KalshiTradingClient:
         no_price: int | None = None,
         order_type: str = "limit",
     ) -> dict[str, Any]:
-        """
-        Place an order.
-        side: 'yes' | 'no'
-        action: 'buy' | 'sell'
-        yes_price/no_price: integer cents 1-99 for limit orders
-        """
         body: dict[str, Any] = {
             "ticker": ticker,
             "side": side.lower(),

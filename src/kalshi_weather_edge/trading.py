@@ -23,12 +23,13 @@ def execute_signal(
     api_key_id: str | None = None,
     private_key_pem: str | None = None,
     private_key_path: str | None = None,
+    access_token: str | None = None,
     client: KalshiTradingClient | None = None,
 ) -> dict[str, Any]:
     """
     Paper: log-only acknowledgment.
     Live: place a small maker limit order when credentials + confirm_live are set.
-    Session credentials (api_key_id + PEM) take precedence over .env.
+    Session credentials (token or API key) take precedence over .env.
     """
     mode = (mode or "paper").lower()
     action = signal.get("action")
@@ -59,15 +60,19 @@ def execute_signal(
             "error": "Live mode requires explicit confirmation before sending orders",
         }
 
-    session_ready = bool(api_key_id and (private_key_pem or private_key_path or client))
+    session_ready = bool(
+        client
+        or access_token
+        or (api_key_id and (private_key_pem or private_key_path))
+    )
     creds = live_credentials_configured()
     if not session_ready and not creds["ready"]:
         return {
             "ok": False,
             "mode": "live",
             "error": (
-                "Not logged in. Connect with Kalshi API Key ID + private key in the sidebar, "
-                "or set KALSHI_API_KEY_ID + KALSHI_PRIVATE_KEY_PEM/PATH in .env"
+                "Not logged in. Use Login with your Kalshi email/password or API key, "
+                "or set credentials in .env / Streamlit secrets."
             ),
             "credentials": creds,
         }
@@ -121,6 +126,7 @@ def execute_signal(
             api_key_id=api_key_id or creds.get("key_id"),
             private_key_pem=private_key_pem or creds.get("private_key_pem") or None,
             private_key_path=private_key_path or (creds.get("key_path") if not private_key_pem else None),
+            access_token=access_token,
             use_demo=use_demo,
         )
         resp = trading_client.place_order(
