@@ -5,7 +5,17 @@ from typing import Any
 
 from .auth_client import KalshiTradingClient
 from .config import Settings, active_kalshi_base_url, live_credentials_configured
-from .password_auth import env_password_configured, login_with_password
+
+try:
+    from .password_auth import env_password_configured, login_with_password
+except ImportError:  # pragma: no cover - Cloud partial deploys
+    def env_password_configured() -> dict[str, Any]:
+        return {"email": "", "password_set": False, "ready": False}
+
+    def login_with_password(*_args: Any, **_kwargs: Any) -> dict[str, Any]:
+        raise RuntimeError(
+            "password_auth module missing. Reboot the Streamlit app after the latest deploy."
+        )
 
 
 def normalize_pem(pem: str) -> str:
@@ -183,3 +193,14 @@ def refresh_balance(
         use_demo=use_demo,
     )
     return format_balance(client.get_balance())
+
+
+__all__ = [
+    "build_trading_client",
+    "connect_from_env",
+    "connect_kalshi_account",
+    "connect_with_password",
+    "format_balance",
+    "normalize_pem",
+    "refresh_balance",
+]

@@ -40,19 +40,28 @@ try:
         import_if_newer,
         import_ledger_snapshot,
     )
-    from kalshi_weather_edge.session_auth import (  # noqa: E402
-        connect_from_env,
-        connect_kalshi_account,
-        connect_with_password,
-        refresh_balance,
-    )
+    from kalshi_weather_edge import session_auth as _session_auth  # noqa: E402
     from kalshi_weather_edge.settlements import sync_settlements_for_open_signals  # noqa: E402
     from kalshi_weather_edge.trading import execute_signal  # noqa: E402
+
+    connect_from_env = _session_auth.connect_from_env
+    connect_kalshi_account = _session_auth.connect_kalshi_account
+    refresh_balance = _session_auth.refresh_balance
+    # Password login may be missing on a stale Cloud install — fall back gracefully.
+    connect_with_password = getattr(_session_auth, "connect_with_password", None)
+    if connect_with_password is None:
+
+        def connect_with_password(*_a, **_k):  # type: ignore[misc]
+            raise RuntimeError(
+                "Password login is unavailable on this deploy. "
+                "Reboot the Streamlit app, or use the API key tab. "
+                f"(session_auth exports: {', '.join(sorted(x for x in dir(_session_auth) if not x.startswith('_')))})"
+            )
 except ImportError as exc:
     st.error(f"Failed to load app modules: {exc}")
     st.info(
         "If this is Streamlit Cloud, reboot the app after the latest GitHub push "
-        "so it picks up new package files."
+        "so it picks up new package files. Also confirm the deploy branch is **main**."
     )
     st.stop()
 
