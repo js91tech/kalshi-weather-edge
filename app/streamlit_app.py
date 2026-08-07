@@ -588,6 +588,10 @@ if "snapshot_boot" not in st.session_state:
     st.session_state["snapshot_boot"] = boot
     if boot.get("imported_signals"):
         st.toast(f"Restored {boot['imported_signals']} signals from snapshot")
+    elif boot.get("ok") is False and boot.get("reason"):
+        st.warning(f"Ledger snapshot restore skipped: {boot['reason']}")
+    elif boot.get("errors"):
+        st.warning("Snapshot import had partial errors: " + "; ".join(boot["errors"][:3]))
 
 if export_clicked:
     info = export_ledger_snapshot(ledger, _snapshot_path)
@@ -600,6 +604,8 @@ if import_clicked:
             f"Imported {info.get('imported_signals', 0)} signals · "
             f"paper PnL ${info['stats']['paper_pnl']:.2f}"
         )
+        if info.get("errors"):
+            st.warning("; ".join(info["errors"][:5]))
     else:
         st.info(info.get("reason", "Import skipped"))
 
