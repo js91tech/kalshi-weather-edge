@@ -1,49 +1,58 @@
 {
-  "scanned_at": "2026-08-13T23:36:22+00:00",
+  "scanned_at": "2026-08-14T01:27:10+00:00",
   "strategies": [
     {
       "strategy": "favorites",
       "run_id": 2,
-      "markets_scored": 32,
-      "trade_signals": 0,
+      "markets_scored": 33,
+      "trade_signals": 1,
       "pass_signals": 32,
       "settlements": {
         "tickers_checked": 74,
-        "settlements_upserted": 1,
-        "signals_updated": 1
-      },
-      "errors": [],
-      "stats": {
-        "total_signals": 10464,
-        "trade_signals": 249,
-        "pass_signals": 10215,
-        "settled": 152,
-        "open_trades": 97,
-        "wins": 146,
-        "losses": 6,
-        "win_rate": 0.9605263157894737,
-        "paper_pnl": 8.290000000000001
-      },
-      "top_trades": []
-    },
-    {
-      "strategy": "high_profit",
-      "run_id": 3,
-      "markets_scored": 32,
-      "trade_signals": 0,
-      "pass_signals": 32,
-      "settlements": {
-        "tickers_checked": 73,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 10496,
-        "trade_signals": 249,
-        "pass_signals": 10247,
+        "total_signals": 10529,
+        "trade_signals": 250,
+        "pass_signals": 10279,
         "settled": 152,
-        "open_trades": 97,
+        "open_trades": 98,
+        "wins": 146,
+        "losses": 6,
+        "win_rate": 0.9605263157894737,
+        "paper_pnl": 8.290000000000001
+      },
+      "top_trades": [
+        {
+          "ticker": "KXAAAGASD-26AUG14-4.075",
+          "action": "BUY_YES",
+          "series": "KXAAAGASD",
+          "mid": 0.91,
+          "edge": 0.41000000000000003,
+          "reason": "Favorite YES: mid 0.910 >= 0.90"
+        }
+      ]
+    },
+    {
+      "strategy": "high_profit",
+      "run_id": 3,
+      "markets_scored": 33,
+      "trade_signals": 0,
+      "pass_signals": 33,
+      "settlements": {
+        "tickers_checked": 74,
+        "settlements_upserted": 0,
+        "signals_updated": 0
+      },
+      "errors": [],
+      "stats": {
+        "total_signals": 10562,
+        "trade_signals": 250,
+        "pass_signals": 10312,
+        "settled": 152,
+        "open_trades": 98,
         "wins": 146,
         "losses": 6,
         "win_rate": 0.9605263157894737,
@@ -53,9 +62,9 @@
     }
   ],
   "alert": {
-    "ok": true,
+    "ok": false,
     "skipped": true,
-    "reason": "no signals above alert threshold",
-    "n": 0
+    "reason": "ALERT_WEBHOOK_URL not set",
+    "n": 1
   }
 }
