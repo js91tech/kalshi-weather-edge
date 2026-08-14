@@ -1,49 +1,24 @@
 {
-  "scanned_at": "2026-08-14T16:14:27+00:00",
+  "scanned_at": "2026-08-14T17:27:16+00:00",
   "strategies": [
     {
       "strategy": "favorites",
       "run_id": 2,
       "markets_scored": 33,
-      "trade_signals": 0,
-      "pass_signals": 33,
+      "trade_signals": 2,
+      "pass_signals": 31,
       "settlements": {
-        "tickers_checked": 60,
+        "tickers_checked": 63,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 11051,
-        "trade_signals": 252,
-        "pass_signals": 10799,
+        "total_signals": 11117,
+        "trade_signals": 255,
+        "pass_signals": 10862,
         "settled": 168,
-        "open_trades": 84,
-        "wins": 158,
-        "losses": 10,
-        "win_rate": 0.9404761904761905,
-        "paper_pnl": 6.250000000000001
-      },
-      "top_trades": []
-    },
-    {
-      "strategy": "high_profit",
-      "run_id": 3,
-      "markets_scored": 33,
-      "trade_signals": 1,
-      "pass_signals": 32,
-      "settlements": {
-        "tickers_checked": 61,
-        "settlements_upserted": 0,
-        "signals_updated": 0
-      },
-      "errors": [],
-      "stats": {
-        "total_signals": 11084,
-        "trade_signals": 253,
-        "pass_signals": 10831,
-        "settled": 168,
-        "open_trades": 85,
+        "open_trades": 87,
         "wins": 158,
         "losses": 10,
         "win_rate": 0.9404761904761905,
@@ -51,20 +26,53 @@
       },
       "top_trades": [
         {
-          "ticker": "KXNASDAQDUD-26AUG14H1600-T30084.50",
+          "ticker": "KXAAAGASD-26AUG15-4.065",
+          "action": "BUY_YES",
+          "series": "KXAAAGASD",
+          "mid": 0.935,
+          "edge": 0.43500000000000005,
+          "reason": "Favorite YES: mid 0.935 >= 0.90"
+        },
+        {
+          "ticker": "KXAAAGASD-26AUG15-4.085",
           "action": "BUY_NO",
-          "series": "KXNASDAQDUD",
-          "mid": 0.16,
-          "edge": 0.33999999999999997,
-          "reason": "Favorite NO: mid 0.160 <= 0.25"
+          "series": "KXAAAGASD",
+          "mid": 0.08499999999999999,
+          "edge": 0.41500000000000004,
+          "reason": "Favorite NO: mid 0.085 <= 0.10"
         }
       ]
+    },
+    {
+      "strategy": "high_profit",
+      "run_id": 3,
+      "markets_scored": 33,
+      "trade_signals": 0,
+      "pass_signals": 33,
+      "settlements": {
+        "tickers_checked": 63,
+        "settlements_upserted": 0,
+        "signals_updated": 0
+      },
+      "errors": [],
+      "stats": {
+        "total_signals": 11150,
+        "trade_signals": 255,
+        "pass_signals": 10895,
+        "settled": 168,
+        "open_trades": 87,
+        "wins": 158,
+        "losses": 10,
+        "win_rate": 0.9404761904761905,
+        "paper_pnl": 6.250000000000001
+      },
+      "top_trades": []
     }
   ],
   "alert": {
     "ok": false,
     "skipped": true,
     "reason": "ALERT_WEBHOOK_URL not set",
-    "n": 1
+    "n": 2
   }
 }
