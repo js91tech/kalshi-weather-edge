@@ -1,24 +1,24 @@
 {
-  "scanned_at": "2026-08-14T17:27:16+00:00",
+  "scanned_at": "2026-08-14T18:24:43+00:00",
   "strategies": [
     {
       "strategy": "favorites",
       "run_id": 2,
       "markets_scored": 33,
-      "trade_signals": 2,
-      "pass_signals": 31,
+      "trade_signals": 1,
+      "pass_signals": 32,
       "settlements": {
-        "tickers_checked": 63,
+        "tickers_checked": 64,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 11117,
-        "trade_signals": 255,
-        "pass_signals": 10862,
+        "total_signals": 11183,
+        "trade_signals": 256,
+        "pass_signals": 10927,
         "settled": 168,
-        "open_trades": 87,
+        "open_trades": 88,
         "wins": 158,
         "losses": 10,
         "win_rate": 0.9404761904761905,
@@ -26,20 +26,12 @@
       },
       "top_trades": [
         {
-          "ticker": "KXAAAGASD-26AUG15-4.065",
+          "ticker": "KXAAAGASD-26AUG15-4.055",
           "action": "BUY_YES",
           "series": "KXAAAGASD",
-          "mid": 0.935,
-          "edge": 0.43500000000000005,
-          "reason": "Favorite YES: mid 0.935 >= 0.90"
-        },
-        {
-          "ticker": "KXAAAGASD-26AUG15-4.085",
-          "action": "BUY_NO",
-          "series": "KXAAAGASD",
-          "mid": 0.08499999999999999,
-          "edge": 0.41500000000000004,
-          "reason": "Favorite NO: mid 0.085 <= 0.10"
+          "mid": 0.9550000000000001,
+          "edge": 0.45500000000000007,
+          "reason": "Favorite YES: mid 0.955 >= 0.90"
         }
       ]
     },
@@ -50,17 +42,17 @@
       "trade_signals": 0,
       "pass_signals": 33,
       "settlements": {
-        "tickers_checked": 63,
+        "tickers_checked": 64,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 11150,
-        "trade_signals": 255,
-        "pass_signals": 10895,
+        "total_signals": 11216,
+        "trade_signals": 256,
+        "pass_signals": 10960,
         "settled": 168,
-        "open_trades": 87,
+        "open_trades": 88,
         "wins": 158,
         "losses": 10,
         "win_rate": 0.9404761904761905,
@@ -73,6 +65,6 @@
     "ok": false,
     "skipped": true,
     "reason": "ALERT_WEBHOOK_URL not set",
-    "n": 2
+    "n": 1
   }
 }
