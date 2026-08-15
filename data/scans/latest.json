@@ -1,30 +1,39 @@
 {
-  "scanned_at": "2026-08-15T19:18:23+00:00",
+  "scanned_at": "2026-08-15T19:44:14+00:00",
   "strategies": [
     {
       "strategy": "favorites",
       "run_id": 2,
       "markets_scored": 33,
-      "trade_signals": 0,
-      "pass_signals": 33,
+      "trade_signals": 1,
+      "pass_signals": 32,
       "settlements": {
-        "tickers_checked": 62,
+        "tickers_checked": 63,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 13363,
-        "trade_signals": 260,
-        "pass_signals": 13103,
+        "total_signals": 13429,
+        "trade_signals": 261,
+        "pass_signals": 13168,
         "settled": 174,
-        "open_trades": 86,
+        "open_trades": 87,
         "wins": 164,
         "losses": 10,
         "win_rate": 0.9425287356321839,
         "paper_pnl": 6.75
       },
-      "top_trades": []
+      "top_trades": [
+        {
+          "ticker": "KXAAAGASD-26AUG16-4.070",
+          "action": "BUY_NO",
+          "series": "KXAAAGASD",
+          "mid": 0.1,
+          "edge": 0.4,
+          "reason": "Favorite NO: mid 0.100 <= 0.10"
+        }
+      ]
     },
     {
       "strategy": "high_profit",
@@ -33,17 +42,17 @@
       "trade_signals": 0,
       "pass_signals": 33,
       "settlements": {
-        "tickers_checked": 62,
+        "tickers_checked": 63,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 13396,
-        "trade_signals": 260,
-        "pass_signals": 13136,
+        "total_signals": 13462,
+        "trade_signals": 261,
+        "pass_signals": 13201,
         "settled": 174,
-        "open_trades": 86,
+        "open_trades": 87,
         "wins": 164,
         "losses": 10,
         "win_rate": 0.9425287356321839,
@@ -53,9 +62,9 @@
     }
   ],
   "alert": {
-    "ok": true,
+    "ok": false,
     "skipped": true,
-    "reason": "no signals above alert threshold",
-    "n": 0
+    "reason": "ALERT_WEBHOOK_URL not set",
+    "n": 1
   }
 }
