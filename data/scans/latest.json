@@ -1,5 +1,5 @@
 {
-  "scanned_at": "2026-08-16T20:16:51+00:00",
+  "scanned_at": "2026-08-16T20:46:10+00:00",
   "strategies": [
     {
       "strategy": "favorites",
@@ -14,9 +14,9 @@
       },
       "errors": [],
       "stats": {
-        "total_signals": 15734,
+        "total_signals": 15825,
         "trade_signals": 272,
-        "pass_signals": 15462,
+        "pass_signals": 15553,
         "settled": 177,
         "open_trades": 95,
         "wins": 167,
@@ -39,9 +39,9 @@
       },
       "errors": [],
       "stats": {
-        "total_signals": 15767,
+        "total_signals": 15858,
         "trade_signals": 272,
-        "pass_signals": 15495,
+        "pass_signals": 15586,
         "settled": 177,
         "open_trades": 95,
         "wins": 167,
