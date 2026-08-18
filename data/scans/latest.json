@@ -1,61 +1,119 @@
 {
-  "scanned_at": "2026-08-18T13:38:55+00:00",
+  "scanned_at": "2026-08-18T14:28:19+00:00",
   "strategies": [
     {
       "strategy": "favorites",
       "run_id": 2,
       "markets_scored": 58,
-      "trade_signals": 0,
-      "pass_signals": 58,
+      "trade_signals": 4,
+      "pass_signals": 54,
       "settlements": {
-        "tickers_checked": 74,
-        "settlements_upserted": 0,
-        "signals_updated": 0
+        "tickers_checked": 78,
+        "settlements_upserted": 12,
+        "signals_updated": 12
       },
       "errors": [],
       "stats": {
-        "total_signals": 20191,
-        "trade_signals": 293,
-        "pass_signals": 19898,
-        "settled": 195,
-        "open_trades": 98,
-        "wins": 184,
-        "losses": 11,
-        "win_rate": 0.9435897435897436,
-        "paper_pnl": 8.13
+        "total_signals": 20282,
+        "trade_signals": 297,
+        "pass_signals": 19985,
+        "settled": 207,
+        "open_trades": 90,
+        "wins": 195,
+        "losses": 12,
+        "win_rate": 0.9420289855072463,
+        "paper_pnl": 9.01
       },
-      "top_trades": []
+      "top_trades": [
+        {
+          "ticker": "KXEURUSD-26AUG1910-B1.149",
+          "action": "BUY_NO",
+          "series": "KXEURUSD",
+          "mid": 0.045,
+          "edge": 0.455,
+          "reason": "Favorite NO: mid 0.045 <= 0.10"
+        },
+        {
+          "ticker": "KXEURUSD-26AUG1910-T1.16999",
+          "action": "BUY_NO",
+          "series": "KXEURUSD",
+          "mid": 0.049999999999999996,
+          "edge": 0.45,
+          "reason": "Favorite NO: mid 0.050 <= 0.10"
+        },
+        {
+          "ticker": "KXEURUSD-26AUG1910-B1.169",
+          "action": "BUY_NO",
+          "series": "KXEURUSD",
+          "mid": 0.049999999999999996,
+          "edge": 0.45,
+          "reason": "Favorite NO: mid 0.050 <= 0.10"
+        },
+        {
+          "ticker": "KXAAAGASD-26AUG19-4.0750",
+          "action": "BUY_YES",
+          "series": "KXAAAGASD",
+          "mid": 0.935,
+          "edge": 0.43500000000000005,
+          "reason": "Favorite YES: mid 0.935 >= 0.90"
+        }
+      ]
     },
     {
       "strategy": "high_profit",
       "run_id": 3,
       "markets_scored": 33,
-      "trade_signals": 0,
-      "pass_signals": 33,
+      "trade_signals": 3,
+      "pass_signals": 30,
       "settlements": {
-        "tickers_checked": 74,
+        "tickers_checked": 69,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 20224,
-        "trade_signals": 293,
-        "pass_signals": 19931,
-        "settled": 195,
-        "open_trades": 98,
-        "wins": 184,
-        "losses": 11,
-        "win_rate": 0.9435897435897436,
-        "paper_pnl": 8.13
+        "total_signals": 20315,
+        "trade_signals": 300,
+        "pass_signals": 20015,
+        "settled": 207,
+        "open_trades": 93,
+        "wins": 195,
+        "losses": 12,
+        "win_rate": 0.9420289855072463,
+        "paper_pnl": 9.01
       },
-      "top_trades": []
+      "top_trades": [
+        {
+          "ticker": "KXEURUSD-26AUG1910-B1.167",
+          "action": "BUY_NO",
+          "series": "KXEURUSD",
+          "mid": 0.049999999999999996,
+          "edge": 0.45,
+          "reason": "Favorite NO: mid 0.050 <= 0.30"
+        },
+        {
+          "ticker": "KXEURUSD-26AUG1910-B1.165",
+          "action": "BUY_NO",
+          "series": "KXEURUSD",
+          "mid": 0.049999999999999996,
+          "edge": 0.45,
+          "reason": "Favorite NO: mid 0.050 <= 0.30"
+        },
+        {
+          "ticker": "KXEURUSD-26AUG1910-B1.151",
+          "action": "BUY_NO",
+          "series": "KXEURUSD",
+          "mid": 0.049999999999999996,
+          "edge": 0.45,
+          "reason": "Favorite NO: mid 0.050 <= 0.30"
+        }
+      ]
     }
   ],
   "alert": {
-    "ok": true,
+    "ok": false,
     "skipped": true,
-    "reason": "no signals above alert threshold",
-    "n": 0
+    "reason": "ALERT_WEBHOOK_URL not set",
+    "n": 3
   }
 }
