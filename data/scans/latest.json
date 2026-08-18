@@ -1,5 +1,5 @@
 {
-  "scanned_at": "2026-08-18T05:01:37+00:00",
+  "scanned_at": "2026-08-18T05:54:12+00:00",
   "strategies": [
     {
       "strategy": "favorites",
@@ -8,17 +8,17 @@
       "trade_signals": 0,
       "pass_signals": 41,
       "settlements": {
-        "tickers_checked": 75,
+        "tickers_checked": 76,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 19513,
-        "trade_signals": 290,
-        "pass_signals": 19223,
+        "total_signals": 19570,
+        "trade_signals": 291,
+        "pass_signals": 19279,
         "settled": 191,
-        "open_trades": 99,
+        "open_trades": 100,
         "wins": 180,
         "losses": 11,
         "win_rate": 0.9424083769633508,
@@ -30,8 +30,8 @@
       "strategy": "high_profit",
       "run_id": 3,
       "markets_scored": 16,
-      "trade_signals": 1,
-      "pass_signals": 15,
+      "trade_signals": 0,
+      "pass_signals": 16,
       "settlements": {
         "tickers_checked": 76,
         "settlements_upserted": 0,
@@ -39,9 +39,9 @@
       },
       "errors": [],
       "stats": {
-        "total_signals": 19529,
+        "total_signals": 19586,
         "trade_signals": 291,
-        "pass_signals": 19238,
+        "pass_signals": 19295,
         "settled": 191,
         "open_trades": 100,
         "wins": 180,
@@ -49,22 +49,13 @@
         "win_rate": 0.9424083769633508,
         "paper_pnl": 7.79
       },
-      "top_trades": [
-        {
-          "ticker": "KXNASDAQDUD-26AUG18H1600-T29995.38",
-          "action": "BUY_NO",
-          "series": "KXNASDAQDUD",
-          "mid": 0.19,
-          "edge": 0.31,
-          "reason": "Favorite NO: mid 0.190 <= 0.25"
-        }
-      ]
+      "top_trades": []
     }
   ],
   "alert": {
-    "ok": false,
+    "ok": true,
     "skipped": true,
-    "reason": "ALERT_WEBHOOK_URL not set",
-    "n": 1
+    "reason": "no signals above alert threshold",
+    "n": 0
   }
 }
