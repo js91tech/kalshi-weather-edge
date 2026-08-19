@@ -1,30 +1,39 @@
 {
-  "scanned_at": "2026-08-19T02:18:35+00:00",
+  "scanned_at": "2026-08-19T03:24:50+00:00",
   "strategies": [
     {
       "strategy": "favorites",
       "run_id": 2,
       "markets_scored": 58,
-      "trade_signals": 0,
-      "pass_signals": 58,
+      "trade_signals": 1,
+      "pass_signals": 57,
       "settlements": {
-        "tickers_checked": 75,
+        "tickers_checked": 76,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 21904,
-        "trade_signals": 307,
-        "pass_signals": 21597,
+        "total_signals": 21995,
+        "trade_signals": 308,
+        "pass_signals": 21687,
         "settled": 208,
-        "open_trades": 99,
+        "open_trades": 100,
         "wins": 196,
         "losses": 12,
         "win_rate": 0.9423076923076923,
         "paper_pnl": 9.23
       },
-      "top_trades": []
+      "top_trades": [
+        {
+          "ticker": "KXAAAGASD-26AUG19-4.1050",
+          "action": "BUY_NO",
+          "series": "KXAAAGASD",
+          "mid": 0.045,
+          "edge": 0.455,
+          "reason": "Favorite NO: mid 0.045 <= 0.10"
+        }
+      ]
     },
     {
       "strategy": "high_profit",
@@ -33,17 +42,17 @@
       "trade_signals": 0,
       "pass_signals": 33,
       "settlements": {
-        "tickers_checked": 75,
+        "tickers_checked": 76,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 21937,
-        "trade_signals": 307,
-        "pass_signals": 21630,
+        "total_signals": 22028,
+        "trade_signals": 308,
+        "pass_signals": 21720,
         "settled": 208,
-        "open_trades": 99,
+        "open_trades": 100,
         "wins": 196,
         "losses": 12,
         "win_rate": 0.9423076923076923,
@@ -53,9 +62,9 @@
     }
   ],
   "alert": {
-    "ok": true,
+    "ok": false,
     "skipped": true,
-    "reason": "no signals above alert threshold",
-    "n": 0
+    "reason": "ALERT_WEBHOOK_URL not set",
+    "n": 1
   }
 }
