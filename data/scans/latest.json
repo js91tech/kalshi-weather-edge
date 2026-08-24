@@ -1,5 +1,5 @@
 {
-  "scanned_at": "2026-08-24T06:46:41+00:00",
+  "scanned_at": "2026-08-24T07:54:04+00:00",
   "strategies": [
     {
       "strategy": "favorites",
@@ -8,17 +8,17 @@
       "trade_signals": 0,
       "pass_signals": 41,
       "settlements": {
-        "tickers_checked": 74,
+        "tickers_checked": 75,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 36384,
-        "trade_signals": 374,
-        "pass_signals": 36010,
+        "total_signals": 36441,
+        "trade_signals": 375,
+        "pass_signals": 36066,
         "settled": 276,
-        "open_trades": 98,
+        "open_trades": 99,
         "wins": 261,
         "losses": 15,
         "win_rate": 0.9456521739130435,
@@ -30,8 +30,8 @@
       "strategy": "high_profit",
       "run_id": 3,
       "markets_scored": 16,
-      "trade_signals": 1,
-      "pass_signals": 15,
+      "trade_signals": 0,
+      "pass_signals": 16,
       "settlements": {
         "tickers_checked": 75,
         "settlements_upserted": 0,
@@ -39,9 +39,9 @@
       },
       "errors": [],
       "stats": {
-        "total_signals": 36400,
+        "total_signals": 36457,
         "trade_signals": 375,
-        "pass_signals": 36025,
+        "pass_signals": 36082,
         "settled": 276,
         "open_trades": 99,
         "wins": 261,
@@ -49,22 +49,13 @@
         "win_rate": 0.9456521739130435,
         "paper_pnl": 14.629999999999999
       },
-      "top_trades": [
-        {
-          "ticker": "KXNASDAQDUD-26AUG24H1600-T29308.86",
-          "action": "BUY_NO",
-          "series": "KXNASDAQDUD",
-          "mid": 0.16999999999999998,
-          "edge": 0.33,
-          "reason": "Favorite NO: mid 0.170 <= 0.25"
-        }
-      ]
+      "top_trades": []
     }
   ],
   "alert": {
-    "ok": false,
+    "ok": true,
     "skipped": true,
-    "reason": "ALERT_WEBHOOK_URL not set",
-    "n": 1
+    "reason": "no signals above alert threshold",
+    "n": 0
   }
 }
