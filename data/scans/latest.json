@@ -1,30 +1,39 @@
 {
-  "scanned_at": "2026-08-26T02:36:21+00:00",
+  "scanned_at": "2026-08-26T03:50:30+00:00",
   "strategies": [
     {
       "strategy": "favorites",
       "run_id": 2,
       "markets_scored": 58,
-      "trade_signals": 0,
-      "pass_signals": 58,
+      "trade_signals": 1,
+      "pass_signals": 57,
       "settlements": {
-        "tickers_checked": 74,
+        "tickers_checked": 75,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 40889,
-        "trade_signals": 413,
-        "pass_signals": 40476,
+        "total_signals": 40980,
+        "trade_signals": 414,
+        "pass_signals": 40566,
         "settled": 315,
-        "open_trades": 98,
+        "open_trades": 99,
         "wins": 297,
         "losses": 18,
         "win_rate": 0.9428571428571428,
         "paper_pnl": 16.58
       },
-      "top_trades": []
+      "top_trades": [
+        {
+          "ticker": "KXEURUSD-26AUG2610-B1.155",
+          "action": "BUY_NO",
+          "series": "KXEURUSD",
+          "mid": 0.05,
+          "edge": 0.45,
+          "reason": "Favorite NO: mid 0.050 <= 0.10"
+        }
+      ]
     },
     {
       "strategy": "high_profit",
@@ -33,17 +42,17 @@
       "trade_signals": 0,
       "pass_signals": 33,
       "settlements": {
-        "tickers_checked": 74,
+        "tickers_checked": 75,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 40922,
-        "trade_signals": 413,
-        "pass_signals": 40509,
+        "total_signals": 41013,
+        "trade_signals": 414,
+        "pass_signals": 40599,
         "settled": 315,
-        "open_trades": 98,
+        "open_trades": 99,
         "wins": 297,
         "losses": 18,
         "win_rate": 0.9428571428571428,
@@ -53,9 +62,9 @@
     }
   ],
   "alert": {
-    "ok": true,
+    "ok": false,
     "skipped": true,
-    "reason": "no signals above alert threshold",
-    "n": 0
+    "reason": "ALERT_WEBHOOK_URL not set",
+    "n": 1
   }
 }
