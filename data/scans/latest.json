@@ -1,37 +1,61 @@
 {
-  "scanned_at": "2026-08-30T12:06:15+00:00",
+  "scanned_at": "2026-08-30T16:53:20+00:00",
   "strategies": [
     {
       "strategy": "favorites",
       "run_id": 2,
       "markets_scored": 58,
-      "trade_signals": 1,
-      "pass_signals": 57,
+      "trade_signals": 4,
+      "pass_signals": 54,
       "settlements": {
-        "tickers_checked": 63,
-        "settlements_upserted": 0,
-        "signals_updated": 0
+        "tickers_checked": 67,
+        "settlements_upserted": 3,
+        "signals_updated": 3
       },
       "errors": [],
       "stats": {
-        "total_signals": 43209,
-        "trade_signals": 450,
-        "pass_signals": 42759,
-        "settled": 363,
-        "open_trades": 87,
-        "wins": 341,
+        "total_signals": 43300,
+        "trade_signals": 454,
+        "pass_signals": 42846,
+        "settled": 366,
+        "open_trades": 88,
+        "wins": 344,
         "losses": 22,
-        "win_rate": 0.9393939393939394,
-        "paper_pnl": 18.959999999999997
+        "win_rate": 0.9398907103825137,
+        "paper_pnl": 19.34
       },
       "top_trades": [
         {
-          "ticker": "KXAAAGASD-26AUG31-4.1050",
+          "ticker": "KXEURUSD-26AUG3110-B1.167",
           "action": "BUY_NO",
+          "series": "KXEURUSD",
+          "mid": 0.055,
+          "edge": 0.445,
+          "reason": "Favorite NO: mid 0.055 <= 0.10"
+        },
+        {
+          "ticker": "KXEURUSD-26AUG3110-B1.165",
+          "action": "BUY_NO",
+          "series": "KXEURUSD",
+          "mid": 0.055,
+          "edge": 0.445,
+          "reason": "Favorite NO: mid 0.055 <= 0.10"
+        },
+        {
+          "ticker": "KXEURUSD-26AUG3110-B1.163",
+          "action": "BUY_NO",
+          "series": "KXEURUSD",
+          "mid": 0.055,
+          "edge": 0.445,
+          "reason": "Favorite NO: mid 0.055 <= 0.10"
+        },
+        {
+          "ticker": "KXAAAGASD-26AUG31-4.0750",
+          "action": "BUY_YES",
           "series": "KXAAAGASD",
-          "mid": 0.075,
-          "edge": 0.425,
-          "reason": "Favorite NO: mid 0.075 <= 0.10"
+          "mid": 0.905,
+          "edge": 0.405,
+          "reason": "Favorite YES: mid 0.905 >= 0.90"
         }
       ]
     },
@@ -39,32 +63,57 @@
       "strategy": "high_profit",
       "run_id": 3,
       "markets_scored": 33,
-      "trade_signals": 0,
-      "pass_signals": 33,
+      "trade_signals": 3,
+      "pass_signals": 30,
       "settlements": {
-        "tickers_checked": 63,
+        "tickers_checked": 67,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 43242,
-        "trade_signals": 450,
-        "pass_signals": 42792,
-        "settled": 363,
-        "open_trades": 87,
-        "wins": 341,
+        "total_signals": 43333,
+        "trade_signals": 457,
+        "pass_signals": 42876,
+        "settled": 366,
+        "open_trades": 91,
+        "wins": 344,
         "losses": 22,
-        "win_rate": 0.9393939393939394,
-        "paper_pnl": 18.959999999999997
+        "win_rate": 0.9398907103825137,
+        "paper_pnl": 19.34
       },
-      "top_trades": []
+      "top_trades": [
+        {
+          "ticker": "KXEURUSD-26AUG3110-B1.153",
+          "action": "BUY_NO",
+          "series": "KXEURUSD",
+          "mid": 0.065,
+          "edge": 0.435,
+          "reason": "Favorite NO: mid 0.065 <= 0.30"
+        },
+        {
+          "ticker": "KXEURUSD-26AUG3110-B1.155",
+          "action": "BUY_NO",
+          "series": "KXEURUSD",
+          "mid": 0.12,
+          "edge": 0.38,
+          "reason": "Favorite NO: mid 0.120 <= 0.30"
+        },
+        {
+          "ticker": "KXEURUSD-26AUG3110-B1.157",
+          "action": "BUY_NO",
+          "series": "KXEURUSD",
+          "mid": 0.24,
+          "edge": 0.26,
+          "reason": "Favorite NO: mid 0.240 <= 0.30"
+        }
+      ]
     }
   ],
   "alert": {
     "ok": false,
     "skipped": true,
     "reason": "ALERT_WEBHOOK_URL not set",
-    "n": 1
+    "n": 3
   }
 }
