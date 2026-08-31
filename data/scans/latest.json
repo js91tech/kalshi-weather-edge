@@ -1,46 +1,12 @@
 {
-  "scanned_at": "2026-08-30T22:19:49+00:00",
+  "scanned_at": "2026-08-31T00:43:54+00:00",
   "strategies": [
     {
       "strategy": "favorites",
       "run_id": 2,
       "markets_scored": 58,
-      "trade_signals": 1,
-      "pass_signals": 57,
-      "settlements": {
-        "tickers_checked": 68,
-        "settlements_upserted": 0,
-        "signals_updated": 0
-      },
-      "errors": [],
-      "stats": {
-        "total_signals": 43482,
-        "trade_signals": 458,
-        "pass_signals": 43024,
-        "settled": 366,
-        "open_trades": 92,
-        "wins": 344,
-        "losses": 22,
-        "win_rate": 0.9398907103825137,
-        "paper_pnl": 19.34
-      },
-      "top_trades": [
-        {
-          "ticker": "KXEURUSD-26AUG3110-B1.161",
-          "action": "BUY_NO",
-          "series": "KXEURUSD",
-          "mid": 0.08,
-          "edge": 0.42,
-          "reason": "Favorite NO: mid 0.080 <= 0.10"
-        }
-      ]
-    },
-    {
-      "strategy": "high_profit",
-      "run_id": 3,
-      "markets_scored": 33,
       "trade_signals": 0,
-      "pass_signals": 33,
+      "pass_signals": 58,
       "settlements": {
         "tickers_checked": 68,
         "settlements_upserted": 0,
@@ -48,9 +14,9 @@
       },
       "errors": [],
       "stats": {
-        "total_signals": 43515,
+        "total_signals": 43573,
         "trade_signals": 458,
-        "pass_signals": 43057,
+        "pass_signals": 43115,
         "settled": 366,
         "open_trades": 92,
         "wins": 344,
@@ -59,6 +25,40 @@
         "paper_pnl": 19.34
       },
       "top_trades": []
+    },
+    {
+      "strategy": "high_profit",
+      "run_id": 3,
+      "markets_scored": 33,
+      "trade_signals": 1,
+      "pass_signals": 32,
+      "settlements": {
+        "tickers_checked": 69,
+        "settlements_upserted": 0,
+        "signals_updated": 0
+      },
+      "errors": [],
+      "stats": {
+        "total_signals": 43606,
+        "trade_signals": 459,
+        "pass_signals": 43147,
+        "settled": 366,
+        "open_trades": 93,
+        "wins": 344,
+        "losses": 22,
+        "win_rate": 0.9398907103825137,
+        "paper_pnl": 19.34
+      },
+      "top_trades": [
+        {
+          "ticker": "KXEURUSD-26AUG3110-B1.159",
+          "action": "BUY_NO",
+          "series": "KXEURUSD",
+          "mid": 0.28500000000000003,
+          "edge": 0.21499999999999997,
+          "reason": "Favorite NO: mid 0.285 <= 0.30"
+        }
+      ]
     }
   ],
   "alert": {
