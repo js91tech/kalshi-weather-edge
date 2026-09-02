@@ -1,12 +1,12 @@
 {
-  "scanned_at": "2026-09-02T02:32:05+00:00",
+  "scanned_at": "2026-09-02T07:33:19+00:00",
   "strategies": [
     {
       "strategy": "favorites",
       "run_id": 2,
-      "markets_scored": 58,
+      "markets_scored": 41,
       "trade_signals": 0,
-      "pass_signals": 58,
+      "pass_signals": 41,
       "settlements": {
         "tickers_checked": 73,
         "settlements_upserted": 0,
@@ -14,9 +14,9 @@
       },
       "errors": [],
       "stats": {
-        "total_signals": 44466,
+        "total_signals": 44540,
         "trade_signals": 490,
-        "pass_signals": 43976,
+        "pass_signals": 44050,
         "settled": 393,
         "open_trades": 97,
         "wins": 368,
@@ -29,33 +29,42 @@
     {
       "strategy": "high_profit",
       "run_id": 3,
-      "markets_scored": 33,
-      "trade_signals": 0,
-      "pass_signals": 33,
+      "markets_scored": 16,
+      "trade_signals": 1,
+      "pass_signals": 15,
       "settlements": {
-        "tickers_checked": 73,
+        "tickers_checked": 74,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 44499,
-        "trade_signals": 490,
-        "pass_signals": 44009,
+        "total_signals": 44556,
+        "trade_signals": 491,
+        "pass_signals": 44065,
         "settled": 393,
-        "open_trades": 97,
+        "open_trades": 98,
         "wins": 368,
         "losses": 25,
         "win_rate": 0.9363867684478372,
         "paper_pnl": 20.0
       },
-      "top_trades": []
+      "top_trades": [
+        {
+          "ticker": "KXEURUSD-26SEP0210-B1.161",
+          "action": "BUY_NO",
+          "series": "KXEURUSD",
+          "mid": 0.13,
+          "edge": 0.37,
+          "reason": "Favorite NO: mid 0.130 <= 0.30"
+        }
+      ]
     }
   ],
   "alert": {
-    "ok": true,
+    "ok": false,
     "skipped": true,
-    "reason": "no signals above alert threshold",
-    "n": 0
+    "reason": "ALERT_WEBHOOK_URL not set",
+    "n": 1
   }
 }
