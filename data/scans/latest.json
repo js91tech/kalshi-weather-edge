@@ -1,61 +1,87 @@
 {
-  "scanned_at": "2026-09-08T07:45:43+00:00",
+  "scanned_at": "2026-09-08T12:34:08+00:00",
   "strategies": [
     {
       "strategy": "favorites",
       "run_id": 2,
-      "markets_scored": 41,
-      "trade_signals": 0,
-      "pass_signals": 41,
+      "markets_scored": 58,
+      "trade_signals": 2,
+      "pass_signals": 56,
       "settlements": {
-        "tickers_checked": 74,
+        "tickers_checked": 76,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 47369,
-        "trade_signals": 550,
-        "pass_signals": 46819,
+        "total_signals": 47443,
+        "trade_signals": 552,
+        "pass_signals": 46891,
         "settled": 452,
-        "open_trades": 98,
+        "open_trades": 100,
         "wins": 424,
         "losses": 28,
         "win_rate": 0.9380530973451328,
         "paper_pnl": 24.259999999999998
       },
-      "top_trades": []
+      "top_trades": [
+        {
+          "ticker": "KXAAAGASD-26SEP09-4.1400",
+          "action": "BUY_YES",
+          "series": "KXAAAGASD",
+          "mid": 0.95,
+          "edge": 0.44999999999999996,
+          "reason": "Favorite YES: mid 0.950 >= 0.90"
+        },
+        {
+          "ticker": "KXAAAGASD-26SEP09-4.1700",
+          "action": "BUY_NO",
+          "series": "KXAAAGASD",
+          "mid": 0.07500000000000001,
+          "edge": 0.425,
+          "reason": "Favorite NO: mid 0.075 <= 0.10"
+        }
+      ]
     },
     {
       "strategy": "high_profit",
       "run_id": 3,
-      "markets_scored": 16,
-      "trade_signals": 0,
-      "pass_signals": 16,
+      "markets_scored": 33,
+      "trade_signals": 1,
+      "pass_signals": 32,
       "settlements": {
-        "tickers_checked": 74,
+        "tickers_checked": 77,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 47385,
-        "trade_signals": 550,
-        "pass_signals": 46835,
+        "total_signals": 47476,
+        "trade_signals": 553,
+        "pass_signals": 46923,
         "settled": 452,
-        "open_trades": 98,
+        "open_trades": 101,
         "wins": 424,
         "losses": 28,
         "win_rate": 0.9380530973451328,
         "paper_pnl": 24.259999999999998
       },
-      "top_trades": []
+      "top_trades": [
+        {
+          "ticker": "KXEURUSD-26SEP0810-B1.163",
+          "action": "BUY_NO",
+          "series": "KXEURUSD",
+          "mid": 0.295,
+          "edge": 0.20500000000000002,
+          "reason": "Favorite NO: mid 0.295 <= 0.30"
+        }
+      ]
     }
   ],
   "alert": {
-    "ok": true,
+    "ok": false,
     "skipped": true,
-    "reason": "no signals above alert threshold",
-    "n": 0
+    "reason": "ALERT_WEBHOOK_URL not set",
+    "n": 1
   }
 }
