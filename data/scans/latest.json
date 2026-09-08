@@ -1,24 +1,24 @@
 {
-  "scanned_at": "2026-09-08T02:45:14+00:00",
+  "scanned_at": "2026-09-08T07:45:43+00:00",
   "strategies": [
     {
       "strategy": "favorites",
       "run_id": 2,
-      "markets_scored": 58,
+      "markets_scored": 41,
       "trade_signals": 0,
-      "pass_signals": 58,
+      "pass_signals": 41,
       "settlements": {
-        "tickers_checked": 73,
+        "tickers_checked": 74,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 47295,
-        "trade_signals": 549,
-        "pass_signals": 46746,
+        "total_signals": 47369,
+        "trade_signals": 550,
+        "pass_signals": 46819,
         "settled": 452,
-        "open_trades": 97,
+        "open_trades": 98,
         "wins": 424,
         "losses": 28,
         "win_rate": 0.9380530973451328,
@@ -29,9 +29,9 @@
     {
       "strategy": "high_profit",
       "run_id": 3,
-      "markets_scored": 33,
-      "trade_signals": 1,
-      "pass_signals": 32,
+      "markets_scored": 16,
+      "trade_signals": 0,
+      "pass_signals": 16,
       "settlements": {
         "tickers_checked": 74,
         "settlements_upserted": 0,
@@ -39,9 +39,9 @@
       },
       "errors": [],
       "stats": {
-        "total_signals": 47328,
+        "total_signals": 47385,
         "trade_signals": 550,
-        "pass_signals": 46778,
+        "pass_signals": 46835,
         "settled": 452,
         "open_trades": 98,
         "wins": 424,
@@ -49,22 +49,13 @@
         "win_rate": 0.9380530973451328,
         "paper_pnl": 24.259999999999998
       },
-      "top_trades": [
-        {
-          "ticker": "KXEURUSD-26SEP0810-B1.165",
-          "action": "BUY_NO",
-          "series": "KXEURUSD",
-          "mid": 0.16,
-          "edge": 0.33999999999999997,
-          "reason": "Favorite NO: mid 0.160 <= 0.30"
-        }
-      ]
+      "top_trades": []
     }
   ],
   "alert": {
-    "ok": false,
+    "ok": true,
     "skipped": true,
-    "reason": "ALERT_WEBHOOK_URL not set",
-    "n": 1
+    "reason": "no signals above alert threshold",
+    "n": 0
   }
 }
