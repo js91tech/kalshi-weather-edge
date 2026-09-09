@@ -1,24 +1,24 @@
 {
-  "scanned_at": "2026-09-09T21:04:43+00:00",
+  "scanned_at": "2026-09-09T23:25:03+00:00",
   "strategies": [
     {
       "strategy": "favorites",
       "run_id": 2,
       "markets_scored": 67,
-      "trade_signals": 4,
-      "pass_signals": 63,
+      "trade_signals": 2,
+      "pass_signals": 65,
       "settlements": {
-        "tickers_checked": 75,
+        "tickers_checked": 80,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 48303,
-        "trade_signals": 583,
-        "pass_signals": 47720,
+        "total_signals": 48412,
+        "trade_signals": 588,
+        "pass_signals": 47824,
         "settled": 484,
-        "open_trades": 99,
+        "open_trades": 104,
         "wins": 449,
         "losses": 35,
         "win_rate": 0.9276859504132231,
@@ -26,36 +26,20 @@
       },
       "top_trades": [
         {
-          "ticker": "KXEURUSD-26SEP1010-B1.175",
-          "action": "BUY_NO",
-          "series": "KXEURUSD",
-          "mid": 0.055,
-          "edge": 0.445,
-          "reason": "Favorite NO: mid 0.055 <= 0.10"
-        },
-        {
-          "ticker": "KXEURUSD-26SEP1010-B1.153",
-          "action": "BUY_NO",
-          "series": "KXEURUSD",
-          "mid": 0.055,
-          "edge": 0.445,
-          "reason": "Favorite NO: mid 0.055 <= 0.10"
-        },
-        {
-          "ticker": "KXEURUSD-26SEP1010-B1.173",
-          "action": "BUY_NO",
-          "series": "KXEURUSD",
-          "mid": 0.06,
-          "edge": 0.44,
-          "reason": "Favorite NO: mid 0.060 <= 0.10"
-        },
-        {
-          "ticker": "KXAAAGASD-26SEP10-4.2650",
+          "ticker": "KXAAAGASD-26SEP10-4.2750",
           "action": "BUY_YES",
           "series": "KXAAAGASD",
-          "mid": 0.9099999999999999,
-          "edge": 0.4099999999999999,
-          "reason": "Favorite YES: mid 0.910 >= 0.90"
+          "mid": 0.935,
+          "edge": 0.43500000000000005,
+          "reason": "Favorite YES: mid 0.935 >= 0.90"
+        },
+        {
+          "ticker": "KXAAAGASD-26SEP10-4.2800",
+          "action": "BUY_YES",
+          "series": "KXAAAGASD",
+          "mid": 0.9,
+          "edge": 0.4,
+          "reason": "Favorite YES: mid 0.900 >= 0.90"
         }
       ]
     },
@@ -63,57 +47,32 @@
       "strategy": "high_profit",
       "run_id": 3,
       "markets_scored": 42,
-      "trade_signals": 3,
-      "pass_signals": 39,
+      "trade_signals": 0,
+      "pass_signals": 42,
       "settlements": {
-        "tickers_checked": 78,
+        "tickers_checked": 80,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 48345,
-        "trade_signals": 586,
-        "pass_signals": 47759,
+        "total_signals": 48454,
+        "trade_signals": 588,
+        "pass_signals": 47866,
         "settled": 484,
-        "open_trades": 102,
+        "open_trades": 104,
         "wins": 449,
         "losses": 35,
         "win_rate": 0.9276859504132231,
         "paper_pnl": 21.609999999999996
       },
-      "top_trades": [
-        {
-          "ticker": "KXEURUSD-26SEP1010-B1.151",
-          "action": "BUY_NO",
-          "series": "KXEURUSD",
-          "mid": 0.06,
-          "edge": 0.44,
-          "reason": "Favorite NO: mid 0.060 <= 0.30"
-        },
-        {
-          "ticker": "KXEURUSD-26SEP1010-B1.155",
-          "action": "BUY_NO",
-          "series": "KXEURUSD",
-          "mid": 0.07,
-          "edge": 0.43,
-          "reason": "Favorite NO: mid 0.070 <= 0.30"
-        },
-        {
-          "ticker": "KXEURUSD-26SEP1010-B1.157",
-          "action": "BUY_NO",
-          "series": "KXEURUSD",
-          "mid": 0.09999999999999999,
-          "edge": 0.4,
-          "reason": "Favorite NO: mid 0.100 <= 0.30"
-        }
-      ]
+      "top_trades": []
     }
   ],
   "alert": {
     "ok": false,
     "skipped": true,
     "reason": "ALERT_WEBHOOK_URL not set",
-    "n": 3
+    "n": 2
   }
 }
