@@ -1,11 +1,11 @@
 {
-  "scanned_at": "2026-09-11T18:56:46+00:00",
+  "scanned_at": "2026-09-11T21:32:50+00:00",
   "strategies": [
     {
       "strategy": "favorites",
       "run_id": 2,
-      "markets_scored": 33,
-      "trade_signals": 1,
+      "markets_scored": 32,
+      "trade_signals": 0,
       "pass_signals": 32,
       "settlements": {
         "tickers_checked": 62,
@@ -14,43 +14,9 @@
       },
       "errors": [],
       "stats": {
-        "total_signals": 49443,
+        "total_signals": 49508,
         "trade_signals": 621,
-        "pass_signals": 48822,
-        "settled": 535,
-        "open_trades": 86,
-        "wins": 497,
-        "losses": 38,
-        "win_rate": 0.9289719626168225,
-        "paper_pnl": 24.479999999999997
-      },
-      "top_trades": [
-        {
-          "ticker": "KXNASDAQDUD-26SEP11H1600-T29103.51",
-          "action": "BUY_YES",
-          "series": "KXNASDAQDUD",
-          "mid": 0.9550000000000001,
-          "edge": 0.45500000000000007,
-          "reason": "Favorite YES: mid 0.955 >= 0.90"
-        }
-      ]
-    },
-    {
-      "strategy": "high_profit",
-      "run_id": 3,
-      "markets_scored": 33,
-      "trade_signals": 0,
-      "pass_signals": 33,
-      "settlements": {
-        "tickers_checked": 62,
-        "settlements_upserted": 0,
-        "signals_updated": 0
-      },
-      "errors": [],
-      "stats": {
-        "total_signals": 49476,
-        "trade_signals": 621,
-        "pass_signals": 48855,
+        "pass_signals": 48887,
         "settled": 535,
         "open_trades": 86,
         "wins": 497,
@@ -59,6 +25,40 @@
         "paper_pnl": 24.479999999999997
       },
       "top_trades": []
+    },
+    {
+      "strategy": "high_profit",
+      "run_id": 3,
+      "markets_scored": 32,
+      "trade_signals": 1,
+      "pass_signals": 31,
+      "settlements": {
+        "tickers_checked": 63,
+        "settlements_upserted": 0,
+        "signals_updated": 0
+      },
+      "errors": [],
+      "stats": {
+        "total_signals": 49540,
+        "trade_signals": 622,
+        "pass_signals": 48918,
+        "settled": 535,
+        "open_trades": 87,
+        "wins": 497,
+        "losses": 38,
+        "win_rate": 0.9289719626168225,
+        "paper_pnl": 24.479999999999997
+      },
+      "top_trades": [
+        {
+          "ticker": "KXAAAGASD-26SEP12-4.3150",
+          "action": "BUY_NO",
+          "series": "KXAAAGASD",
+          "mid": 0.05500000000000001,
+          "edge": 0.445,
+          "reason": "Favorite NO: mid 0.055 <= 0.10"
+        }
+      ]
     }
   ],
   "alert": {
