@@ -1,24 +1,24 @@
 {
-  "scanned_at": "2026-09-10T23:18:58+00:00",
+  "scanned_at": "2026-09-11T01:18:42+00:00",
   "strategies": [
     {
       "strategy": "favorites",
       "run_id": 2,
-      "markets_scored": 67,
+      "markets_scored": 68,
       "trade_signals": 1,
-      "pass_signals": 66,
+      "pass_signals": 67,
       "settlements": {
-        "tickers_checked": 87,
+        "tickers_checked": 88,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 49077,
-        "trade_signals": 617,
-        "pass_signals": 48460,
+        "total_signals": 49187,
+        "trade_signals": 618,
+        "pass_signals": 48569,
         "settled": 506,
-        "open_trades": 111,
+        "open_trades": 112,
         "wins": 469,
         "losses": 37,
         "win_rate": 0.9268774703557312,
@@ -26,33 +26,33 @@
       },
       "top_trades": [
         {
-          "ticker": "KXCPINDEX-26SEP11-T334.650",
-          "action": "BUY_YES",
-          "series": "KXCPINDEX",
-          "mid": 0.905,
-          "edge": 0.405,
-          "reason": "Favorite YES: mid 0.905 >= 0.90"
+          "ticker": "KXAAAGASD-26SEP11-4.3200",
+          "action": "BUY_NO",
+          "series": "KXAAAGASD",
+          "mid": 0.04,
+          "edge": 0.46,
+          "reason": "Favorite NO: mid 0.040 <= 0.10"
         }
       ]
     },
     {
       "strategy": "high_profit",
       "run_id": 3,
-      "markets_scored": 42,
+      "markets_scored": 43,
       "trade_signals": 0,
-      "pass_signals": 42,
+      "pass_signals": 43,
       "settlements": {
-        "tickers_checked": 87,
+        "tickers_checked": 88,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 49119,
-        "trade_signals": 617,
-        "pass_signals": 48502,
+        "total_signals": 49230,
+        "trade_signals": 618,
+        "pass_signals": 48612,
         "settled": 506,
-        "open_trades": 111,
+        "open_trades": 112,
         "wins": 469,
         "losses": 37,
         "win_rate": 0.9268774703557312,
