@@ -1,39 +1,30 @@
 {
-  "scanned_at": "2026-09-13T17:52:52+00:00",
+  "scanned_at": "2026-09-13T20:11:47+00:00",
   "strategies": [
     {
       "strategy": "favorites",
       "run_id": 2,
       "markets_scored": 56,
-      "trade_signals": 1,
-      "pass_signals": 55,
+      "trade_signals": 0,
+      "pass_signals": 56,
       "settlements": {
-        "tickers_checked": 68,
+        "tickers_checked": 69,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 50526,
-        "trade_signals": 637,
-        "pass_signals": 49889,
+        "total_signals": 50615,
+        "trade_signals": 638,
+        "pass_signals": 49977,
         "settled": 545,
-        "open_trades": 92,
+        "open_trades": 93,
         "wins": 507,
         "losses": 38,
         "win_rate": 0.9302752293577982,
         "paper_pnl": 25.379999999999995
       },
-      "top_trades": [
-        {
-          "ticker": "KXEURUSD-26SEP1410-B1.165",
-          "action": "BUY_NO",
-          "series": "KXEURUSD",
-          "mid": 0.075,
-          "edge": 0.425,
-          "reason": "Favorite NO: mid 0.075 <= 0.10"
-        }
-      ]
+      "top_trades": []
     },
     {
       "strategy": "high_profit",
@@ -42,17 +33,17 @@
       "trade_signals": 1,
       "pass_signals": 32,
       "settlements": {
-        "tickers_checked": 69,
+        "tickers_checked": 70,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 50559,
-        "trade_signals": 638,
-        "pass_signals": 49921,
+        "total_signals": 50648,
+        "trade_signals": 639,
+        "pass_signals": 50009,
         "settled": 545,
-        "open_trades": 93,
+        "open_trades": 94,
         "wins": 507,
         "losses": 38,
         "win_rate": 0.9302752293577982,
@@ -60,12 +51,12 @@
       },
       "top_trades": [
         {
-          "ticker": "KXEURUSD-26SEP1410-B1.159",
+          "ticker": "KXNASDAQDUD-26SEP14H1600-T29368.44",
           "action": "BUY_NO",
-          "series": "KXEURUSD",
-          "mid": 0.295,
-          "edge": 0.20500000000000002,
-          "reason": "Favorite NO: mid 0.295 <= 0.30"
+          "series": "KXNASDAQDUD",
+          "mid": 0.24,
+          "edge": 0.26,
+          "reason": "Favorite NO: mid 0.240 <= 0.25"
         }
       ]
     }
