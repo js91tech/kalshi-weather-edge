@@ -1,12 +1,12 @@
 {
-  "scanned_at": "2026-09-14T05:41:52+00:00",
+  "scanned_at": "2026-09-14T11:35:21+00:00",
   "strategies": [
     {
       "strategy": "favorites",
       "run_id": 2,
       "markets_scored": 39,
-      "trade_signals": 1,
-      "pass_signals": 38,
+      "trade_signals": 0,
+      "pass_signals": 39,
       "settlements": {
         "tickers_checked": 74,
         "settlements_upserted": 0,
@@ -14,9 +14,9 @@
       },
       "errors": [],
       "stats": {
-        "total_signals": 50865,
+        "total_signals": 50920,
         "trade_signals": 643,
-        "pass_signals": 50222,
+        "pass_signals": 50277,
         "settled": 545,
         "open_trades": 98,
         "wins": 507,
@@ -24,16 +24,7 @@
         "win_rate": 0.9302752293577982,
         "paper_pnl": 25.379999999999995
       },
-      "top_trades": [
-        {
-          "ticker": "KXEURUSD-26SEP1410-B1.161",
-          "action": "BUY_NO",
-          "series": "KXEURUSD",
-          "mid": 0.095,
-          "edge": 0.405,
-          "reason": "Favorite NO: mid 0.095 <= 0.10"
-        }
-      ]
+      "top_trades": []
     },
     {
       "strategy": "high_profit",
@@ -48,9 +39,9 @@
       },
       "errors": [],
       "stats": {
-        "total_signals": 50881,
+        "total_signals": 50936,
         "trade_signals": 643,
-        "pass_signals": 50238,
+        "pass_signals": 50293,
         "settled": 545,
         "open_trades": 98,
         "wins": 507,
@@ -62,9 +53,9 @@
     }
   ],
   "alert": {
-    "ok": false,
+    "ok": true,
     "skipped": true,
-    "reason": "ALERT_WEBHOOK_URL not set",
-    "n": 1
+    "reason": "no signals above alert threshold",
+    "n": 0
   }
 }
