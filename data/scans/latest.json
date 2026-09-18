@@ -1,24 +1,24 @@
 {
-  "scanned_at": "2026-09-17T23:51:39+00:00",
+  "scanned_at": "2026-09-18T02:51:54+00:00",
   "strategies": [
     {
       "strategy": "favorites",
       "run_id": 2,
-      "markets_scored": 75,
+      "markets_scored": 76,
       "trade_signals": 1,
-      "pass_signals": 74,
+      "pass_signals": 75,
       "settlements": {
-        "tickers_checked": 72,
+        "tickers_checked": 73,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 53083,
-        "trade_signals": 696,
-        "pass_signals": 52387,
+        "total_signals": 53201,
+        "trade_signals": 697,
+        "pass_signals": 52504,
         "settled": 600,
-        "open_trades": 96,
+        "open_trades": 97,
         "wins": 557,
         "losses": 43,
         "win_rate": 0.9283333333333333,
@@ -26,33 +26,33 @@
       },
       "top_trades": [
         {
-          "ticker": "KXAAAGASD-26SEP18-4.4900",
+          "ticker": "KXAAAGASD-26SEP18-4.4850",
           "action": "BUY_NO",
           "series": "KXAAAGASD",
-          "mid": 0.07,
-          "edge": 0.43,
-          "reason": "Favorite NO: mid 0.070 <= 0.10"
+          "mid": 0.095,
+          "edge": 0.405,
+          "reason": "Favorite NO: mid 0.095 <= 0.10"
         }
       ]
     },
     {
       "strategy": "high_profit",
       "run_id": 3,
-      "markets_scored": 42,
+      "markets_scored": 43,
       "trade_signals": 0,
-      "pass_signals": 42,
+      "pass_signals": 43,
       "settlements": {
-        "tickers_checked": 72,
+        "tickers_checked": 73,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 53125,
-        "trade_signals": 696,
-        "pass_signals": 52429,
+        "total_signals": 53244,
+        "trade_signals": 697,
+        "pass_signals": 52547,
         "settled": 600,
-        "open_trades": 96,
+        "open_trades": 97,
         "wins": 557,
         "losses": 43,
         "win_rate": 0.9283333333333333,
