@@ -1,24 +1,24 @@
 {
-  "scanned_at": "2026-09-18T19:24:29+00:00",
+  "scanned_at": "2026-09-18T21:46:13+00:00",
   "strategies": [
     {
       "strategy": "favorites",
       "run_id": 2,
-      "markets_scored": 66,
+      "markets_scored": 65,
       "trade_signals": 1,
-      "pass_signals": 65,
+      "pass_signals": 64,
       "settlements": {
-        "tickers_checked": 63,
+        "tickers_checked": 64,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 53573,
-        "trade_signals": 701,
-        "pass_signals": 52872,
+        "total_signals": 53671,
+        "trade_signals": 702,
+        "pass_signals": 52969,
         "settled": 614,
-        "open_trades": 87,
+        "open_trades": 88,
         "wins": 568,
         "losses": 46,
         "win_rate": 0.9250814332247557,
@@ -26,33 +26,33 @@
       },
       "top_trades": [
         {
-          "ticker": "KXAAAGASD-26SEP19-4.4900",
+          "ticker": "KXAAAGASD-26SEP19-4.4850",
           "action": "BUY_NO",
           "series": "KXAAAGASD",
-          "mid": 0.05,
-          "edge": 0.45,
-          "reason": "Favorite NO: mid 0.050 <= 0.10"
+          "mid": 0.060000000000000005,
+          "edge": 0.44,
+          "reason": "Favorite NO: mid 0.060 <= 0.10"
         }
       ]
     },
     {
       "strategy": "high_profit",
       "run_id": 3,
-      "markets_scored": 33,
+      "markets_scored": 32,
       "trade_signals": 0,
-      "pass_signals": 33,
+      "pass_signals": 32,
       "settlements": {
-        "tickers_checked": 63,
+        "tickers_checked": 64,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 53606,
-        "trade_signals": 701,
-        "pass_signals": 52905,
+        "total_signals": 53703,
+        "trade_signals": 702,
+        "pass_signals": 53001,
         "settled": 614,
-        "open_trades": 87,
+        "open_trades": 88,
         "wins": 568,
         "losses": 46,
         "win_rate": 0.9250814332247557,
