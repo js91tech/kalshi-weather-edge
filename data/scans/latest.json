@@ -1,61 +1,119 @@
 {
-  "scanned_at": "2026-09-20T11:58:37+00:00",
+  "scanned_at": "2026-09-20T15:42:48+00:00",
   "strategies": [
     {
       "strategy": "favorites",
       "run_id": 2,
-      "markets_scored": 49,
-      "trade_signals": 0,
-      "pass_signals": 49,
+      "markets_scored": 66,
+      "trade_signals": 5,
+      "pass_signals": 61,
       "settlements": {
-        "tickers_checked": 67,
-        "settlements_upserted": 8,
-        "signals_updated": 8
-      },
-      "errors": [],
-      "stats": {
-        "total_signals": 54676,
-        "trade_signals": 711,
-        "pass_signals": 53965,
-        "settled": 628,
-        "open_trades": 83,
-        "wins": 582,
-        "losses": 46,
-        "win_rate": 0.9267515923566879,
-        "paper_pnl": 27.789999999999996
-      },
-      "top_trades": []
-    },
-    {
-      "strategy": "high_profit",
-      "run_id": 3,
-      "markets_scored": 16,
-      "trade_signals": 0,
-      "pass_signals": 16,
-      "settlements": {
-        "tickers_checked": 59,
+        "tickers_checked": 64,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 54692,
-        "trade_signals": 711,
-        "pass_signals": 53981,
+        "total_signals": 54758,
+        "trade_signals": 716,
+        "pass_signals": 54042,
         "settled": 628,
-        "open_trades": 83,
+        "open_trades": 88,
         "wins": 582,
         "losses": 46,
         "win_rate": 0.9267515923566879,
         "paper_pnl": 27.789999999999996
       },
-      "top_trades": []
+      "top_trades": [
+        {
+          "ticker": "KXAAAGASD-26SEP21-4.4550",
+          "action": "BUY_YES",
+          "series": "KXAAAGASD",
+          "mid": 0.9650000000000001,
+          "edge": 0.4650000000000001,
+          "reason": "Favorite YES: mid 0.965 >= 0.90"
+        },
+        {
+          "ticker": "KXAAAGASD-26SEP21-4.4500",
+          "action": "BUY_YES",
+          "series": "KXAAAGASD",
+          "mid": 0.9650000000000001,
+          "edge": 0.4650000000000001,
+          "reason": "Favorite YES: mid 0.965 >= 0.90"
+        },
+        {
+          "ticker": "KXEURUSD-26SEP2110-B1.145",
+          "action": "BUY_NO",
+          "series": "KXEURUSD",
+          "mid": 0.07,
+          "edge": 0.43,
+          "reason": "Favorite NO: mid 0.070 <= 0.10"
+        },
+        {
+          "ticker": "KXAAAGASD-26SEP21-4.4900",
+          "action": "BUY_NO",
+          "series": "KXAAAGASD",
+          "mid": 0.075,
+          "edge": 0.425,
+          "reason": "Favorite NO: mid 0.075 <= 0.10"
+        },
+        {
+          "ticker": "KXEURUSD-26SEP2110-B1.153",
+          "action": "BUY_NO",
+          "series": "KXEURUSD",
+          "mid": 0.095,
+          "edge": 0.405,
+          "reason": "Favorite NO: mid 0.095 <= 0.10"
+        }
+      ]
+    },
+    {
+      "strategy": "high_profit",
+      "run_id": 3,
+      "markets_scored": 33,
+      "trade_signals": 2,
+      "pass_signals": 31,
+      "settlements": {
+        "tickers_checked": 66,
+        "settlements_upserted": 0,
+        "signals_updated": 0
+      },
+      "errors": [],
+      "stats": {
+        "total_signals": 54791,
+        "trade_signals": 718,
+        "pass_signals": 54073,
+        "settled": 628,
+        "open_trades": 90,
+        "wins": 582,
+        "losses": 46,
+        "win_rate": 0.9267515923566879,
+        "paper_pnl": 27.789999999999996
+      },
+      "top_trades": [
+        {
+          "ticker": "KXEURUSD-26SEP2110-B1.147",
+          "action": "BUY_NO",
+          "series": "KXEURUSD",
+          "mid": 0.195,
+          "edge": 0.305,
+          "reason": "Favorite NO: mid 0.195 <= 0.30"
+        },
+        {
+          "ticker": "KXEURUSD-26SEP2110-B1.151",
+          "action": "BUY_NO",
+          "series": "KXEURUSD",
+          "mid": 0.22999999999999998,
+          "edge": 0.27,
+          "reason": "Favorite NO: mid 0.230 <= 0.30"
+        }
+      ]
     }
   ],
   "alert": {
-    "ok": true,
+    "ok": false,
     "skipped": true,
-    "reason": "no signals above alert threshold",
-    "n": 0
+    "reason": "ALERT_WEBHOOK_URL not set",
+    "n": 2
   }
 }
