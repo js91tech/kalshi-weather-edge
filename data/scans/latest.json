@@ -1,22 +1,22 @@
 {
-  "scanned_at": "2026-09-22T01:23:58+00:00",
+  "scanned_at": "2026-09-22T06:31:17+00:00",
   "strategies": [
     {
       "strategy": "favorites",
       "run_id": 2,
-      "markets_scored": 66,
+      "markets_scored": 49,
       "trade_signals": 0,
-      "pass_signals": 66,
+      "pass_signals": 49,
       "settlements": {
-        "tickers_checked": 73,
-        "settlements_upserted": 1,
-        "signals_updated": 1
+        "tickers_checked": 72,
+        "settlements_upserted": 0,
+        "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 55613,
+        "total_signals": 55695,
         "trade_signals": 733,
-        "pass_signals": 54880,
+        "pass_signals": 54962,
         "settled": 637,
         "open_trades": 96,
         "wins": 590,
@@ -29,9 +29,9 @@
     {
       "strategy": "high_profit",
       "run_id": 3,
-      "markets_scored": 33,
+      "markets_scored": 16,
       "trade_signals": 0,
-      "pass_signals": 33,
+      "pass_signals": 16,
       "settlements": {
         "tickers_checked": 72,
         "settlements_upserted": 0,
@@ -39,9 +39,9 @@
       },
       "errors": [],
       "stats": {
-        "total_signals": 55646,
+        "total_signals": 55711,
         "trade_signals": 733,
-        "pass_signals": 54913,
+        "pass_signals": 54978,
         "settled": 637,
         "open_trades": 96,
         "wins": 590,
