@@ -1,49 +1,58 @@
 {
-  "scanned_at": "2026-09-23T23:32:44+00:00",
+  "scanned_at": "2026-09-24T02:50:34+00:00",
   "strategies": [
     {
       "strategy": "favorites",
       "run_id": 2,
-      "markets_scored": 65,
-      "trade_signals": 0,
+      "markets_scored": 66,
+      "trade_signals": 1,
       "pass_signals": 65,
       "settlements": {
-        "tickers_checked": 69,
+        "tickers_checked": 70,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 56627,
-        "trade_signals": 753,
-        "pass_signals": 55874,
+        "total_signals": 56725,
+        "trade_signals": 754,
+        "pass_signals": 55971,
         "settled": 660,
-        "open_trades": 93,
+        "open_trades": 94,
         "wins": 611,
         "losses": 49,
         "win_rate": 0.9257575757575758,
         "paper_pnl": 28.949999999999996
       },
-      "top_trades": []
+      "top_trades": [
+        {
+          "ticker": "KXAAAGASD-26SEP24-4.4850",
+          "action": "BUY_NO",
+          "series": "KXAAAGASD",
+          "mid": 0.07,
+          "edge": 0.43,
+          "reason": "Favorite NO: mid 0.070 <= 0.10"
+        }
+      ]
     },
     {
       "strategy": "high_profit",
       "run_id": 3,
-      "markets_scored": 32,
+      "markets_scored": 33,
       "trade_signals": 0,
-      "pass_signals": 32,
+      "pass_signals": 33,
       "settlements": {
-        "tickers_checked": 69,
+        "tickers_checked": 70,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 56659,
-        "trade_signals": 753,
-        "pass_signals": 55906,
+        "total_signals": 56758,
+        "trade_signals": 754,
+        "pass_signals": 56004,
         "settled": 660,
-        "open_trades": 93,
+        "open_trades": 94,
         "wins": 611,
         "losses": 49,
         "win_rate": 0.9257575757575758,
@@ -53,9 +62,9 @@
     }
   ],
   "alert": {
-    "ok": true,
+    "ok": false,
     "skipped": true,
-    "reason": "no signals above alert threshold",
-    "n": 0
+    "reason": "ALERT_WEBHOOK_URL not set",
+    "n": 1
   }
 }
