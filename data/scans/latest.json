@@ -1,12 +1,12 @@
 {
-  "scanned_at": "2026-09-26T01:08:27+00:00",
+  "scanned_at": "2026-09-26T06:20:45+00:00",
   "strategies": [
     {
       "strategy": "favorites",
       "run_id": 2,
-      "markets_scored": 66,
-      "trade_signals": 1,
-      "pass_signals": 65,
+      "markets_scored": 49,
+      "trade_signals": 0,
+      "pass_signals": 49,
       "settlements": {
         "tickers_checked": 61,
         "settlements_upserted": 0,
@@ -14,9 +14,9 @@
       },
       "errors": [],
       "stats": {
-        "total_signals": 57708,
+        "total_signals": 57790,
         "trade_signals": 770,
-        "pass_signals": 56938,
+        "pass_signals": 57020,
         "settled": 685,
         "open_trades": 85,
         "wins": 633,
@@ -24,23 +24,14 @@
         "win_rate": 0.9240875912408759,
         "paper_pnl": 29.339999999999996
       },
-      "top_trades": [
-        {
-          "ticker": "KXAAAGASD-26SEP26-4.4850",
-          "action": "BUY_YES",
-          "series": "KXAAAGASD",
-          "mid": 0.905,
-          "edge": 0.405,
-          "reason": "Favorite YES: mid 0.905 >= 0.90"
-        }
-      ]
+      "top_trades": []
     },
     {
       "strategy": "high_profit",
       "run_id": 3,
-      "markets_scored": 33,
+      "markets_scored": 16,
       "trade_signals": 0,
-      "pass_signals": 33,
+      "pass_signals": 16,
       "settlements": {
         "tickers_checked": 61,
         "settlements_upserted": 0,
@@ -48,9 +39,9 @@
       },
       "errors": [],
       "stats": {
-        "total_signals": 57741,
+        "total_signals": 57806,
         "trade_signals": 770,
-        "pass_signals": 56971,
+        "pass_signals": 57036,
         "settled": 685,
         "open_trades": 85,
         "wins": 633,
@@ -62,9 +53,9 @@
     }
   ],
   "alert": {
-    "ok": false,
+    "ok": true,
     "skipped": true,
-    "reason": "ALERT_WEBHOOK_URL not set",
-    "n": 1
+    "reason": "no signals above alert threshold",
+    "n": 0
   }
 }
