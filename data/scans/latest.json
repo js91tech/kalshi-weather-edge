@@ -1,12 +1,12 @@
 {
-  "scanned_at": "2026-09-28T01:04:09+00:00",
+  "scanned_at": "2026-09-28T07:15:06+00:00",
   "strategies": [
     {
       "strategy": "favorites",
       "run_id": 2,
-      "markets_scored": 66,
+      "markets_scored": 49,
       "trade_signals": 0,
-      "pass_signals": 66,
+      "pass_signals": 49,
       "settlements": {
         "tickers_checked": 75,
         "settlements_upserted": 0,
@@ -14,9 +14,9 @@
       },
       "errors": [],
       "stats": {
-        "total_signals": 58760,
+        "total_signals": 58842,
         "trade_signals": 786,
-        "pass_signals": 57974,
+        "pass_signals": 58056,
         "settled": 687,
         "open_trades": 99,
         "wins": 635,
@@ -29,33 +29,42 @@
     {
       "strategy": "high_profit",
       "run_id": 3,
-      "markets_scored": 33,
-      "trade_signals": 0,
-      "pass_signals": 33,
+      "markets_scored": 16,
+      "trade_signals": 1,
+      "pass_signals": 15,
       "settlements": {
-        "tickers_checked": 75,
+        "tickers_checked": 76,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 58793,
-        "trade_signals": 786,
-        "pass_signals": 58007,
+        "total_signals": 58858,
+        "trade_signals": 787,
+        "pass_signals": 58071,
         "settled": 687,
-        "open_trades": 99,
+        "open_trades": 100,
         "wins": 635,
         "losses": 52,
         "win_rate": 0.9243085880640466,
         "paper_pnl": 29.509999999999994
       },
-      "top_trades": []
+      "top_trades": [
+        {
+          "ticker": "KXNASDAQDUD-26SEP28H1600-T30608.13",
+          "action": "BUY_NO",
+          "series": "KXNASDAQDUD",
+          "mid": 0.14,
+          "edge": 0.36,
+          "reason": "Favorite NO: mid 0.140 <= 0.25"
+        }
+      ]
     }
   ],
   "alert": {
-    "ok": true,
+    "ok": false,
     "skipped": true,
-    "reason": "no signals above alert threshold",
-    "n": 0
+    "reason": "ALERT_WEBHOOK_URL not set",
+    "n": 1
   }
 }
