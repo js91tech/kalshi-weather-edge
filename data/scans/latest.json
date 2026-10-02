@@ -1,30 +1,39 @@
 {
-  "scanned_at": "2026-10-02T20:03:14+00:00",
+  "scanned_at": "2026-10-02T23:55:19+00:00",
   "strategies": [
     {
       "strategy": "favorites",
       "run_id": 2,
       "markets_scored": 65,
-      "trade_signals": 0,
-      "pass_signals": 65,
+      "trade_signals": 1,
+      "pass_signals": 64,
       "settlements": {
-        "tickers_checked": 59,
+        "tickers_checked": 60,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 60660,
-        "trade_signals": 838,
-        "pass_signals": 59822,
+        "total_signals": 60757,
+        "trade_signals": 839,
+        "pass_signals": 59918,
         "settled": 755,
-        "open_trades": 83,
+        "open_trades": 84,
         "wins": 698,
         "losses": 57,
         "win_rate": 0.9245033112582781,
         "paper_pnl": 32.879999999999995
       },
-      "top_trades": []
+      "top_trades": [
+        {
+          "ticker": "KXAAAGASD-26OCT03-4.3850",
+          "action": "BUY_NO",
+          "series": "KXAAAGASD",
+          "mid": 0.095,
+          "edge": 0.405,
+          "reason": "Favorite NO: mid 0.095 <= 0.10"
+        }
+      ]
     },
     {
       "strategy": "high_profit",
@@ -33,17 +42,17 @@
       "trade_signals": 0,
       "pass_signals": 32,
       "settlements": {
-        "tickers_checked": 59,
+        "tickers_checked": 60,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 60692,
-        "trade_signals": 838,
-        "pass_signals": 59854,
+        "total_signals": 60789,
+        "trade_signals": 839,
+        "pass_signals": 59950,
         "settled": 755,
-        "open_trades": 83,
+        "open_trades": 84,
         "wins": 698,
         "losses": 57,
         "win_rate": 0.9245033112582781,
@@ -53,9 +62,9 @@
     }
   ],
   "alert": {
-    "ok": true,
+    "ok": false,
     "skipped": true,
-    "reason": "no signals above alert threshold",
-    "n": 0
+    "reason": "ALERT_WEBHOOK_URL not set",
+    "n": 1
   }
 }
