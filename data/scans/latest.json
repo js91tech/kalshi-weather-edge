@@ -1,12 +1,12 @@
 {
-  "scanned_at": "2026-10-03T21:37:40+00:00",
+  "scanned_at": "2026-10-04T00:19:46+00:00",
   "strategies": [
     {
       "strategy": "favorites",
       "run_id": 2,
       "markets_scored": 66,
-      "trade_signals": 1,
-      "pass_signals": 65,
+      "trade_signals": 0,
+      "pass_signals": 66,
       "settlements": {
         "tickers_checked": 61,
         "settlements_upserted": 0,
@@ -14,9 +14,9 @@
       },
       "errors": [],
       "stats": {
-        "total_signals": 61217,
+        "total_signals": 61316,
         "trade_signals": 841,
-        "pass_signals": 60376,
+        "pass_signals": 60475,
         "settled": 756,
         "open_trades": 85,
         "wins": 699,
@@ -24,16 +24,7 @@
         "win_rate": 0.9246031746031746,
         "paper_pnl": 32.98
       },
-      "top_trades": [
-        {
-          "ticker": "KXAAAGASD-26OCT04-4.3650",
-          "action": "BUY_YES",
-          "series": "KXAAAGASD",
-          "mid": 0.925,
-          "edge": 0.42500000000000004,
-          "reason": "Favorite YES: mid 0.925 >= 0.90"
-        }
-      ]
+      "top_trades": []
     },
     {
       "strategy": "high_profit",
@@ -48,9 +39,9 @@
       },
       "errors": [],
       "stats": {
-        "total_signals": 61250,
+        "total_signals": 61349,
         "trade_signals": 841,
-        "pass_signals": 60409,
+        "pass_signals": 60508,
         "settled": 756,
         "open_trades": 85,
         "wins": 699,
@@ -62,9 +53,9 @@
     }
   ],
   "alert": {
-    "ok": false,
+    "ok": true,
     "skipped": true,
-    "reason": "ALERT_WEBHOOK_URL not set",
-    "n": 1
+    "reason": "no signals above alert threshold",
+    "n": 0
   }
 }
