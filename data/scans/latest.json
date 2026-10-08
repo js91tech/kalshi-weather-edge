@@ -1,22 +1,22 @@
 {
-  "scanned_at": "2026-10-08T02:25:15+00:00",
+  "scanned_at": "2026-10-08T09:17:33+00:00",
   "strategies": [
     {
       "strategy": "favorites",
       "run_id": 2,
-      "markets_scored": 66,
+      "markets_scored": 49,
       "trade_signals": 0,
-      "pass_signals": 66,
+      "pass_signals": 49,
       "settlements": {
-        "tickers_checked": 73,
-        "settlements_upserted": 2,
-        "signals_updated": 2
+        "tickers_checked": 71,
+        "settlements_upserted": 0,
+        "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 62958,
+        "total_signals": 63040,
         "trade_signals": 896,
-        "pass_signals": 62062,
+        "pass_signals": 62144,
         "settled": 801,
         "open_trades": 95,
         "wins": 741,
@@ -29,33 +29,42 @@
     {
       "strategy": "high_profit",
       "run_id": 3,
-      "markets_scored": 33,
-      "trade_signals": 0,
-      "pass_signals": 33,
+      "markets_scored": 16,
+      "trade_signals": 1,
+      "pass_signals": 15,
       "settlements": {
-        "tickers_checked": 71,
+        "tickers_checked": 72,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 62991,
-        "trade_signals": 896,
-        "pass_signals": 62095,
+        "total_signals": 63056,
+        "trade_signals": 897,
+        "pass_signals": 62159,
         "settled": 801,
-        "open_trades": 95,
+        "open_trades": 96,
         "wins": 741,
         "losses": 60,
         "win_rate": 0.9250936329588015,
         "paper_pnl": 35.82999999999999
       },
-      "top_trades": []
+      "top_trades": [
+        {
+          "ticker": "KXNASDAQDUD-26OCT08H1600-T31160.08",
+          "action": "BUY_NO",
+          "series": "KXNASDAQDUD",
+          "mid": 0.245,
+          "edge": 0.255,
+          "reason": "Favorite NO: mid 0.245 <= 0.25"
+        }
+      ]
     }
   ],
   "alert": {
-    "ok": true,
+    "ok": false,
     "skipped": true,
-    "reason": "no signals above alert threshold",
-    "n": 0
+    "reason": "ALERT_WEBHOOK_URL not set",
+    "n": 1
   }
 }
