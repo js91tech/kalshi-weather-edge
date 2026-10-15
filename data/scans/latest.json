@@ -1,46 +1,12 @@
 {
-  "scanned_at": "2026-10-15T05:30:21+00:00",
+  "scanned_at": "2026-10-15T10:15:00+00:00",
   "strategies": [
     {
       "strategy": "favorites",
       "run_id": 2,
       "markets_scored": 16,
-      "trade_signals": 1,
-      "pass_signals": 15,
-      "settlements": {
-        "tickers_checked": 72,
-        "settlements_upserted": 0,
-        "signals_updated": 0
-      },
-      "errors": [],
-      "stats": {
-        "total_signals": 65336,
-        "trade_signals": 959,
-        "pass_signals": 64377,
-        "settled": 863,
-        "open_trades": 96,
-        "wins": 799,
-        "losses": 64,
-        "win_rate": 0.9258400926998841,
-        "paper_pnl": 40.199999999999996
-      },
-      "top_trades": [
-        {
-          "ticker": "KXEURUSD-26OCT1510-B1.127",
-          "action": "BUY_NO",
-          "series": "KXEURUSD",
-          "mid": 0.09,
-          "edge": 0.41000000000000003,
-          "reason": "Favorite NO: mid 0.090 <= 0.10"
-        }
-      ]
-    },
-    {
-      "strategy": "high_profit",
-      "run_id": 3,
-      "markets_scored": 16,
-      "trade_signals": 2,
-      "pass_signals": 14,
+      "trade_signals": 0,
+      "pass_signals": 16,
       "settlements": {
         "tickers_checked": 74,
         "settlements_upserted": 0,
@@ -48,9 +14,9 @@
       },
       "errors": [],
       "stats": {
-        "total_signals": 65352,
+        "total_signals": 65368,
         "trade_signals": 961,
-        "pass_signals": 64391,
+        "pass_signals": 64407,
         "settled": 863,
         "open_trades": 98,
         "wins": 799,
@@ -58,30 +24,38 @@
         "win_rate": 0.9258400926998841,
         "paper_pnl": 40.199999999999996
       },
-      "top_trades": [
-        {
-          "ticker": "KXEURUSD-26OCT1510-B1.125",
-          "action": "BUY_NO",
-          "series": "KXEURUSD",
-          "mid": 0.125,
-          "edge": 0.375,
-          "reason": "Favorite NO: mid 0.125 <= 0.30"
-        },
-        {
-          "ticker": "KXNASDAQDUD-26OCT15H1600-T29950.82",
-          "action": "BUY_NO",
-          "series": "KXNASDAQDUD",
-          "mid": 0.235,
-          "edge": 0.265,
-          "reason": "Favorite NO: mid 0.235 <= 0.25"
-        }
-      ]
+      "top_trades": []
+    },
+    {
+      "strategy": "high_profit",
+      "run_id": 3,
+      "markets_scored": 16,
+      "trade_signals": 0,
+      "pass_signals": 16,
+      "settlements": {
+        "tickers_checked": 74,
+        "settlements_upserted": 0,
+        "signals_updated": 0
+      },
+      "errors": [],
+      "stats": {
+        "total_signals": 65384,
+        "trade_signals": 961,
+        "pass_signals": 64423,
+        "settled": 863,
+        "open_trades": 98,
+        "wins": 799,
+        "losses": 64,
+        "win_rate": 0.9258400926998841,
+        "paper_pnl": 40.199999999999996
+      },
+      "top_trades": []
     }
   ],
   "alert": {
-    "ok": false,
+    "ok": true,
     "skipped": true,
-    "reason": "ALERT_WEBHOOK_URL not set",
-    "n": 2
+    "reason": "no signals above alert threshold",
+    "n": 0
   }
 }
