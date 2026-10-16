@@ -1,70 +1,61 @@
 {
-  "scanned_at": "2026-10-16T10:33:17+00:00",
+  "scanned_at": "2026-10-16T15:08:24+00:00",
   "strategies": [
     {
       "strategy": "favorites",
       "run_id": 2,
-      "markets_scored": 41,
+      "markets_scored": 58,
       "trade_signals": 0,
-      "pass_signals": 41,
+      "pass_signals": 58,
       "settlements": {
-        "tickers_checked": 68,
-        "settlements_upserted": 0,
-        "signals_updated": 0
+        "tickers_checked": 69,
+        "settlements_upserted": 9,
+        "signals_updated": 9
       },
       "errors": [],
       "stats": {
-        "total_signals": 65794,
-        "trade_signals": 969,
-        "pass_signals": 64825,
-        "settled": 877,
-        "open_trades": 92,
-        "wins": 812,
-        "losses": 65,
-        "win_rate": 0.9258836944127709,
-        "paper_pnl": 41.16
+        "total_signals": 65868,
+        "trade_signals": 970,
+        "pass_signals": 64898,
+        "settled": 886,
+        "open_trades": 84,
+        "wins": 820,
+        "losses": 66,
+        "win_rate": 0.9255079006772009,
+        "paper_pnl": 41.48
       },
       "top_trades": []
     },
     {
       "strategy": "high_profit",
       "run_id": 3,
-      "markets_scored": 16,
-      "trade_signals": 1,
-      "pass_signals": 15,
+      "markets_scored": 33,
+      "trade_signals": 0,
+      "pass_signals": 33,
       "settlements": {
-        "tickers_checked": 69,
+        "tickers_checked": 60,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 65810,
+        "total_signals": 65901,
         "trade_signals": 970,
-        "pass_signals": 64840,
-        "settled": 877,
-        "open_trades": 93,
-        "wins": 812,
-        "losses": 65,
-        "win_rate": 0.9258836944127709,
-        "paper_pnl": 41.16
+        "pass_signals": 64931,
+        "settled": 886,
+        "open_trades": 84,
+        "wins": 820,
+        "losses": 66,
+        "win_rate": 0.9255079006772009,
+        "paper_pnl": 41.48
       },
-      "top_trades": [
-        {
-          "ticker": "KXEURUSD-26OCT1610-B1.129",
-          "action": "BUY_NO",
-          "series": "KXEURUSD",
-          "mid": 0.185,
-          "edge": 0.315,
-          "reason": "Favorite NO: mid 0.185 <= 0.30"
-        }
-      ]
+      "top_trades": []
     }
   ],
   "alert": {
-    "ok": false,
+    "ok": true,
     "skipped": true,
-    "reason": "ALERT_WEBHOOK_URL not set",
-    "n": 1
+    "reason": "no signals above alert threshold",
+    "n": 0
   }
 }
