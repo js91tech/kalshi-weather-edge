@@ -1,5 +1,5 @@
 {
-  "scanned_at": "2026-10-18T06:17:03+00:00",
+  "scanned_at": "2026-10-18T11:31:21+00:00",
   "strategies": [
     {
       "strategy": "favorites",
@@ -9,20 +9,20 @@
       "pass_signals": 51,
       "settlements": {
         "tickers_checked": 60,
-        "settlements_upserted": 0,
-        "signals_updated": 0
+        "settlements_upserted": 1,
+        "signals_updated": 1
       },
       "errors": [],
       "stats": {
-        "total_signals": 66993,
+        "total_signals": 67060,
         "trade_signals": 971,
-        "pass_signals": 66022,
-        "settled": 887,
-        "open_trades": 84,
-        "wins": 821,
+        "pass_signals": 66089,
+        "settled": 888,
+        "open_trades": 83,
+        "wins": 822,
         "losses": 66,
-        "win_rate": 0.9255918827508456,
-        "paper_pnl": 41.73
+        "win_rate": 0.9256756756756757,
+        "paper_pnl": 41.839999999999996
       },
       "top_trades": []
     },
@@ -33,21 +33,21 @@
       "trade_signals": 0,
       "pass_signals": 16,
       "settlements": {
-        "tickers_checked": 60,
+        "tickers_checked": 59,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 67009,
+        "total_signals": 67076,
         "trade_signals": 971,
-        "pass_signals": 66038,
-        "settled": 887,
-        "open_trades": 84,
-        "wins": 821,
+        "pass_signals": 66105,
+        "settled": 888,
+        "open_trades": 83,
+        "wins": 822,
         "losses": 66,
-        "win_rate": 0.9255918827508456,
-        "paper_pnl": 41.73
+        "win_rate": 0.9256756756756757,
+        "paper_pnl": 41.839999999999996
       },
       "top_trades": []
     }
