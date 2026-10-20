@@ -1,24 +1,24 @@
 {
-  "scanned_at": "2026-10-19T22:32:48+00:00",
+  "scanned_at": "2026-10-20T01:29:38+00:00",
   "strategies": [
     {
       "strategy": "favorites",
       "run_id": 2,
-      "markets_scored": 67,
+      "markets_scored": 68,
       "trade_signals": 1,
-      "pass_signals": 66,
+      "pass_signals": 67,
       "settlements": {
-        "tickers_checked": 66,
+        "tickers_checked": 68,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 67883,
-        "trade_signals": 994,
-        "pass_signals": 66889,
+        "total_signals": 67983,
+        "trade_signals": 996,
+        "pass_signals": 66987,
         "settled": 904,
-        "open_trades": 90,
+        "open_trades": 92,
         "wins": 837,
         "losses": 67,
         "win_rate": 0.9258849557522124,
@@ -26,48 +26,39 @@
       },
       "top_trades": [
         {
-          "ticker": "KXEURUSD-26OCT2010-B1.115",
+          "ticker": "KXAAAGASD-26OCT20-4.2850",
           "action": "BUY_NO",
-          "series": "KXEURUSD",
-          "mid": 0.07,
-          "edge": 0.43,
-          "reason": "Favorite NO: mid 0.070 <= 0.10"
+          "series": "KXAAAGASD",
+          "mid": 0.065,
+          "edge": 0.435,
+          "reason": "Favorite NO: mid 0.065 <= 0.10"
         }
       ]
     },
     {
       "strategy": "high_profit",
       "run_id": 3,
-      "markets_scored": 32,
-      "trade_signals": 1,
-      "pass_signals": 31,
+      "markets_scored": 33,
+      "trade_signals": 0,
+      "pass_signals": 33,
       "settlements": {
-        "tickers_checked": 67,
+        "tickers_checked": 68,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 67915,
-        "trade_signals": 995,
-        "pass_signals": 66920,
+        "total_signals": 68016,
+        "trade_signals": 996,
+        "pass_signals": 67020,
         "settled": 904,
-        "open_trades": 91,
+        "open_trades": 92,
         "wins": 837,
         "losses": 67,
         "win_rate": 0.9258849557522124,
         "paper_pnl": 43.16
       },
-      "top_trades": [
-        {
-          "ticker": "KXEURUSD-26OCT2010-B1.123",
-          "action": "BUY_NO",
-          "series": "KXEURUSD",
-          "mid": 0.295,
-          "edge": 0.20500000000000002,
-          "reason": "Favorite NO: mid 0.295 <= 0.30"
-        }
-      ]
+      "top_trades": []
     }
   ],
   "alert": {
