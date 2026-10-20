@@ -1,39 +1,30 @@
 {
-  "scanned_at": "2026-10-20T06:26:11+00:00",
+  "scanned_at": "2026-10-20T11:56:35+00:00",
   "strategies": [
     {
       "strategy": "favorites",
       "run_id": 2,
       "markets_scored": 51,
-      "trade_signals": 1,
-      "pass_signals": 50,
+      "trade_signals": 0,
+      "pass_signals": 51,
       "settlements": {
         "tickers_checked": 69,
-        "settlements_upserted": 0,
-        "signals_updated": 0
+        "settlements_upserted": 1,
+        "signals_updated": 1
       },
       "errors": [],
       "stats": {
-        "total_signals": 68067,
+        "total_signals": 68134,
         "trade_signals": 997,
-        "pass_signals": 67070,
-        "settled": 904,
-        "open_trades": 93,
-        "wins": 837,
+        "pass_signals": 67137,
+        "settled": 905,
+        "open_trades": 92,
+        "wins": 838,
         "losses": 67,
-        "win_rate": 0.9258849557522124,
-        "paper_pnl": 43.16
+        "win_rate": 0.9259668508287293,
+        "paper_pnl": 43.23
       },
-      "top_trades": [
-        {
-          "ticker": "KXEURUSD-26OCT2010-B1.111",
-          "action": "BUY_NO",
-          "series": "KXEURUSD",
-          "mid": 0.05,
-          "edge": 0.45,
-          "reason": "Favorite NO: mid 0.050 <= 0.10"
-        }
-      ]
+      "top_trades": []
     },
     {
       "strategy": "high_profit",
@@ -42,29 +33,29 @@
       "trade_signals": 0,
       "pass_signals": 16,
       "settlements": {
-        "tickers_checked": 69,
+        "tickers_checked": 68,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 68083,
+        "total_signals": 68150,
         "trade_signals": 997,
-        "pass_signals": 67086,
-        "settled": 904,
-        "open_trades": 93,
-        "wins": 837,
+        "pass_signals": 67153,
+        "settled": 905,
+        "open_trades": 92,
+        "wins": 838,
         "losses": 67,
-        "win_rate": 0.9258849557522124,
-        "paper_pnl": 43.16
+        "win_rate": 0.9259668508287293,
+        "paper_pnl": 43.23
       },
       "top_trades": []
     }
   ],
   "alert": {
-    "ok": false,
+    "ok": true,
     "skipped": true,
-    "reason": "ALERT_WEBHOOK_URL not set",
-    "n": 1
+    "reason": "no signals above alert threshold",
+    "n": 0
   }
 }
