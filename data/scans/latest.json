@@ -1,24 +1,24 @@
 {
-  "scanned_at": "2026-10-23T16:20:17+00:00",
+  "scanned_at": "2026-10-23T20:01:14+00:00",
   "strategies": [
     {
       "strategy": "favorites",
       "run_id": 2,
-      "markets_scored": 68,
+      "markets_scored": 67,
       "trade_signals": 1,
-      "pass_signals": 67,
+      "pass_signals": 66,
       "settlements": {
-        "tickers_checked": 69,
-        "settlements_upserted": 9,
-        "signals_updated": 9
+        "tickers_checked": 61,
+        "settlements_upserted": 0,
+        "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 69757,
-        "trade_signals": 1029,
-        "pass_signals": 68728,
+        "total_signals": 69857,
+        "trade_signals": 1030,
+        "pass_signals": 68827,
         "settled": 945,
-        "open_trades": 84,
+        "open_trades": 85,
         "wins": 874,
         "losses": 71,
         "win_rate": 0.9248677248677248,
@@ -26,33 +26,33 @@
       },
       "top_trades": [
         {
-          "ticker": "KXAAAGASD-26OCT24-4.2950",
-          "action": "BUY_YES",
+          "ticker": "KXAAAGASD-26OCT24-4.3050",
+          "action": "BUY_NO",
           "series": "KXAAAGASD",
-          "mid": 0.925,
-          "edge": 0.42500000000000004,
-          "reason": "Favorite YES: mid 0.925 >= 0.90"
+          "mid": 0.060000000000000005,
+          "edge": 0.44,
+          "reason": "Favorite NO: mid 0.060 <= 0.10"
         }
       ]
     },
     {
       "strategy": "high_profit",
       "run_id": 3,
-      "markets_scored": 33,
+      "markets_scored": 32,
       "trade_signals": 0,
-      "pass_signals": 33,
+      "pass_signals": 32,
       "settlements": {
-        "tickers_checked": 60,
+        "tickers_checked": 61,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 69790,
-        "trade_signals": 1029,
-        "pass_signals": 68761,
+        "total_signals": 69889,
+        "trade_signals": 1030,
+        "pass_signals": 68859,
         "settled": 945,
-        "open_trades": 84,
+        "open_trades": 85,
         "wins": 874,
         "losses": 71,
         "win_rate": 0.9248677248677248,
