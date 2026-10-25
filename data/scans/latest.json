@@ -1,24 +1,24 @@
 {
-  "scanned_at": "2026-10-25T16:57:20+00:00",
+  "scanned_at": "2026-10-25T19:27:42+00:00",
   "strategies": [
     {
       "strategy": "favorites",
       "run_id": 2,
       "markets_scored": 68,
-      "trade_signals": 4,
-      "pass_signals": 64,
+      "trade_signals": 3,
+      "pass_signals": 65,
       "settlements": {
-        "tickers_checked": 63,
+        "tickers_checked": 69,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 70964,
-        "trade_signals": 1036,
-        "pass_signals": 69928,
+        "total_signals": 71065,
+        "trade_signals": 1042,
+        "pass_signals": 70023,
         "settled": 949,
-        "open_trades": 87,
+        "open_trades": 93,
         "wins": 878,
         "losses": 71,
         "win_rate": 0.9251844046364595,
@@ -26,36 +26,28 @@
       },
       "top_trades": [
         {
-          "ticker": "KXEURUSD-26OCT2610-B1.127",
+          "ticker": "KXEURUSD-26OCT2610-B1.131",
           "action": "BUY_NO",
           "series": "KXEURUSD",
-          "mid": 0.06,
-          "edge": 0.44,
-          "reason": "Favorite NO: mid 0.060 <= 0.10"
+          "mid": 0.045,
+          "edge": 0.455,
+          "reason": "Favorite NO: mid 0.045 <= 0.10"
         },
         {
-          "ticker": "KXEURUSD-26OCT2610-B1.125",
+          "ticker": "KXEURUSD-26OCT2610-B1.109",
           "action": "BUY_NO",
           "series": "KXEURUSD",
-          "mid": 0.065,
-          "edge": 0.435,
-          "reason": "Favorite NO: mid 0.065 <= 0.10"
+          "mid": 0.045,
+          "edge": 0.455,
+          "reason": "Favorite NO: mid 0.045 <= 0.10"
         },
         {
-          "ticker": "KXEURUSD-26OCT2610-B1.115",
+          "ticker": "KXEURUSD-26OCT2610-B1.107",
           "action": "BUY_NO",
           "series": "KXEURUSD",
-          "mid": 0.065,
-          "edge": 0.435,
-          "reason": "Favorite NO: mid 0.065 <= 0.10"
-        },
-        {
-          "ticker": "KXAAAGASD-26OCT26-4.2900",
-          "action": "BUY_NO",
-          "series": "KXAAAGASD",
-          "mid": 0.07500000000000001,
-          "edge": 0.425,
-          "reason": "Favorite NO: mid 0.075 <= 0.10"
+          "mid": 0.045,
+          "edge": 0.455,
+          "reason": "Favorite NO: mid 0.045 <= 0.10"
         }
       ]
     },
@@ -63,20 +55,20 @@
       "strategy": "high_profit",
       "run_id": 3,
       "markets_scored": 33,
-      "trade_signals": 3,
-      "pass_signals": 30,
+      "trade_signals": 2,
+      "pass_signals": 31,
       "settlements": {
-        "tickers_checked": 66,
+        "tickers_checked": 71,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 70997,
-        "trade_signals": 1039,
-        "pass_signals": 69958,
+        "total_signals": 71098,
+        "trade_signals": 1044,
+        "pass_signals": 70054,
         "settled": 949,
-        "open_trades": 90,
+        "open_trades": 95,
         "wins": 878,
         "losses": 71,
         "win_rate": 0.9251844046364595,
@@ -84,28 +76,20 @@
       },
       "top_trades": [
         {
-          "ticker": "KXEURUSD-26OCT2610-B1.117",
+          "ticker": "KXEURUSD-26OCT2610-B1.129",
           "action": "BUY_NO",
           "series": "KXEURUSD",
-          "mid": 0.145,
-          "edge": 0.355,
-          "reason": "Favorite NO: mid 0.145 <= 0.30"
+          "mid": 0.05,
+          "edge": 0.45,
+          "reason": "Favorite NO: mid 0.050 <= 0.30"
         },
         {
-          "ticker": "KXEURUSD-26OCT2610-B1.119",
+          "ticker": "KXEURUSD-26OCT2610-B1.113",
           "action": "BUY_NO",
           "series": "KXEURUSD",
-          "mid": 0.255,
-          "edge": 0.245,
-          "reason": "Favorite NO: mid 0.255 <= 0.30"
-        },
-        {
-          "ticker": "KXEURUSD-26OCT2610-B1.121",
-          "action": "BUY_NO",
-          "series": "KXEURUSD",
-          "mid": 0.3,
-          "edge": 0.2,
-          "reason": "Favorite NO: mid 0.300 <= 0.30"
+          "mid": 0.05,
+          "edge": 0.45,
+          "reason": "Favorite NO: mid 0.050 <= 0.30"
         }
       ]
     }
@@ -114,6 +98,6 @@
     "ok": false,
     "skipped": true,
     "reason": "ALERT_WEBHOOK_URL not set",
-    "n": 3
+    "n": 2
   }
 }
