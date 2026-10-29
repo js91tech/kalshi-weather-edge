@@ -1,24 +1,24 @@
 {
-  "scanned_at": "2026-10-29T02:37:29+00:00",
+  "scanned_at": "2026-10-29T09:15:07+00:00",
   "strategies": [
     {
       "strategy": "favorites",
       "run_id": 2,
-      "markets_scored": 68,
+      "markets_scored": 51,
       "trade_signals": 0,
-      "pass_signals": 68,
+      "pass_signals": 51,
       "settlements": {
-        "tickers_checked": 68,
+        "tickers_checked": 70,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 72606,
-        "trade_signals": 1085,
-        "pass_signals": 71521,
+        "total_signals": 72690,
+        "trade_signals": 1087,
+        "pass_signals": 71603,
         "settled": 993,
-        "open_trades": 92,
+        "open_trades": 94,
         "wins": 919,
         "losses": 74,
         "win_rate": 0.9254783484390735,
@@ -29,9 +29,9 @@
     {
       "strategy": "high_profit",
       "run_id": 3,
-      "markets_scored": 33,
-      "trade_signals": 2,
-      "pass_signals": 31,
+      "markets_scored": 16,
+      "trade_signals": 0,
+      "pass_signals": 16,
       "settlements": {
         "tickers_checked": 70,
         "settlements_upserted": 0,
@@ -39,9 +39,9 @@
       },
       "errors": [],
       "stats": {
-        "total_signals": 72639,
+        "total_signals": 72706,
         "trade_signals": 1087,
-        "pass_signals": 71552,
+        "pass_signals": 71619,
         "settled": 993,
         "open_trades": 94,
         "wins": 919,
@@ -49,30 +49,13 @@
         "win_rate": 0.9254783484390735,
         "paper_pnl": 48.199999999999996
       },
-      "top_trades": [
-        {
-          "ticker": "KXNASDAQDUD-26OCT29H1600-T29813.16",
-          "action": "BUY_NO",
-          "series": "KXNASDAQDUD",
-          "mid": 0.11499999999999999,
-          "edge": 0.385,
-          "reason": "Favorite NO: mid 0.115 <= 0.25"
-        },
-        {
-          "ticker": "KXEURUSD-26OCT2910-B1.113",
-          "action": "BUY_NO",
-          "series": "KXEURUSD",
-          "mid": 0.18,
-          "edge": 0.32,
-          "reason": "Favorite NO: mid 0.180 <= 0.30"
-        }
-      ]
+      "top_trades": []
     }
   ],
   "alert": {
-    "ok": false,
+    "ok": true,
     "skipped": true,
-    "reason": "ALERT_WEBHOOK_URL not set",
-    "n": 2
+    "reason": "no signals above alert threshold",
+    "n": 0
   }
 }
