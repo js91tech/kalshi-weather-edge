@@ -1,53 +1,53 @@
 {
-  "scanned_at": "2026-10-31T09:13:02+00:00",
+  "scanned_at": "2026-10-31T15:27:17+00:00",
   "strategies": [
     {
       "strategy": "favorites",
       "run_id": 2,
-      "markets_scored": 51,
+      "markets_scored": 68,
       "trade_signals": 0,
-      "pass_signals": 51,
+      "pass_signals": 68,
       "settlements": {
         "tickers_checked": 61,
-        "settlements_upserted": 0,
-        "signals_updated": 0
+        "settlements_upserted": 2,
+        "signals_updated": 2
       },
       "errors": [],
       "stats": {
-        "total_signals": 73527,
+        "total_signals": 73611,
         "trade_signals": 1105,
-        "pass_signals": 72422,
-        "settled": 1020,
-        "open_trades": 85,
-        "wins": 944,
+        "pass_signals": 72506,
+        "settled": 1022,
+        "open_trades": 83,
+        "wins": 946,
         "losses": 76,
-        "win_rate": 0.9254901960784314,
-        "paper_pnl": 50.379999999999995
+        "win_rate": 0.9256360078277887,
+        "paper_pnl": 50.559999999999995
       },
       "top_trades": []
     },
     {
       "strategy": "high_profit",
       "run_id": 3,
-      "markets_scored": 16,
+      "markets_scored": 33,
       "trade_signals": 0,
-      "pass_signals": 16,
+      "pass_signals": 33,
       "settlements": {
-        "tickers_checked": 61,
+        "tickers_checked": 59,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 73543,
+        "total_signals": 73644,
         "trade_signals": 1105,
-        "pass_signals": 72438,
-        "settled": 1020,
-        "open_trades": 85,
-        "wins": 944,
+        "pass_signals": 72539,
+        "settled": 1022,
+        "open_trades": 83,
+        "wins": 946,
         "losses": 76,
-        "win_rate": 0.9254901960784314,
-        "paper_pnl": 50.379999999999995
+        "win_rate": 0.9256360078277887,
+        "paper_pnl": 50.559999999999995
       },
       "top_trades": []
     }
