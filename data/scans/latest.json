@@ -1,5 +1,5 @@
 {
-  "scanned_at": "2026-11-01T23:44:28+00:00",
+  "scanned_at": "2026-11-02T04:00:49+00:00",
   "strategies": [
     {
       "strategy": "favorites",
@@ -8,17 +8,17 @@
       "trade_signals": 0,
       "pass_signals": 68,
       "settlements": {
-        "tickers_checked": 73,
+        "tickers_checked": 75,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 74284,
-        "trade_signals": 1121,
-        "pass_signals": 73163,
+        "total_signals": 74385,
+        "trade_signals": 1123,
+        "pass_signals": 73262,
         "settled": 1024,
-        "open_trades": 97,
+        "open_trades": 99,
         "wins": 948,
         "losses": 76,
         "win_rate": 0.92578125,
@@ -30,8 +30,8 @@
       "strategy": "high_profit",
       "run_id": 3,
       "markets_scored": 33,
-      "trade_signals": 2,
-      "pass_signals": 31,
+      "trade_signals": 0,
+      "pass_signals": 33,
       "settlements": {
         "tickers_checked": 75,
         "settlements_upserted": 0,
@@ -39,9 +39,9 @@
       },
       "errors": [],
       "stats": {
-        "total_signals": 74317,
+        "total_signals": 74418,
         "trade_signals": 1123,
-        "pass_signals": 73194,
+        "pass_signals": 73295,
         "settled": 1024,
         "open_trades": 99,
         "wins": 948,
@@ -49,30 +49,13 @@
         "win_rate": 0.92578125,
         "paper_pnl": 50.71999999999999
       },
-      "top_trades": [
-        {
-          "ticker": "KXEURUSD-26NOV0210-B1.119",
-          "action": "BUY_NO",
-          "series": "KXEURUSD",
-          "mid": 0.195,
-          "edge": 0.305,
-          "reason": "Favorite NO: mid 0.195 <= 0.30"
-        },
-        {
-          "ticker": "KXEURUSD-26NOV0210-B1.117",
-          "action": "BUY_NO",
-          "series": "KXEURUSD",
-          "mid": 0.27,
-          "edge": 0.22999999999999998,
-          "reason": "Favorite NO: mid 0.270 <= 0.30"
-        }
-      ]
+      "top_trades": []
     }
   ],
   "alert": {
-    "ok": false,
+    "ok": true,
     "skipped": true,
-    "reason": "ALERT_WEBHOOK_URL not set",
-    "n": 2
+    "reason": "no signals above alert threshold",
+    "n": 0
   }
 }
