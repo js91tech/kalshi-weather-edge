@@ -1,61 +1,103 @@
 {
-  "scanned_at": "2026-11-04T12:44:57+00:00",
+  "scanned_at": "2026-11-04T20:14:43+00:00",
   "strategies": [
     {
       "strategy": "favorites",
       "run_id": 2,
-      "markets_scored": 51,
-      "trade_signals": 0,
-      "pass_signals": 51,
+      "markets_scored": 68,
+      "trade_signals": 3,
+      "pass_signals": 65,
       "settlements": {
-        "tickers_checked": 75,
-        "settlements_upserted": 2,
-        "signals_updated": 2
+        "tickers_checked": 76,
+        "settlements_upserted": 13,
+        "signals_updated": 13
       },
       "errors": [],
       "stats": {
-        "total_signals": 75104,
-        "trade_signals": 1147,
-        "pass_signals": 73957,
-        "settled": 1050,
-        "open_trades": 97,
-        "wins": 972,
-        "losses": 78,
-        "win_rate": 0.9257142857142857,
-        "paper_pnl": 52.67999999999999
+        "total_signals": 75188,
+        "trade_signals": 1150,
+        "pass_signals": 74038,
+        "settled": 1063,
+        "open_trades": 87,
+        "wins": 984,
+        "losses": 79,
+        "win_rate": 0.9256820319849483,
+        "paper_pnl": 53.47999999999999
       },
-      "top_trades": []
+      "top_trades": [
+        {
+          "ticker": "KXEURUSD-26NOV0510-B1.115",
+          "action": "BUY_NO",
+          "series": "KXEURUSD",
+          "mid": 0.04,
+          "edge": 0.46,
+          "reason": "Favorite NO: mid 0.040 <= 0.10"
+        },
+        {
+          "ticker": "KXEURUSD-26NOV0510-B1.129",
+          "action": "BUY_NO",
+          "series": "KXEURUSD",
+          "mid": 0.07,
+          "edge": 0.43,
+          "reason": "Favorite NO: mid 0.070 <= 0.10"
+        },
+        {
+          "ticker": "KXEURUSD-26NOV0510-B1.117",
+          "action": "BUY_NO",
+          "series": "KXEURUSD",
+          "mid": 0.075,
+          "edge": 0.425,
+          "reason": "Favorite NO: mid 0.075 <= 0.10"
+        }
+      ]
     },
     {
       "strategy": "high_profit",
       "run_id": 3,
-      "markets_scored": 16,
-      "trade_signals": 0,
-      "pass_signals": 16,
+      "markets_scored": 33,
+      "trade_signals": 2,
+      "pass_signals": 31,
       "settlements": {
-        "tickers_checked": 73,
+        "tickers_checked": 65,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 75120,
-        "trade_signals": 1147,
-        "pass_signals": 73973,
-        "settled": 1050,
-        "open_trades": 97,
-        "wins": 972,
-        "losses": 78,
-        "win_rate": 0.9257142857142857,
-        "paper_pnl": 52.67999999999999
+        "total_signals": 75221,
+        "trade_signals": 1152,
+        "pass_signals": 74069,
+        "settled": 1063,
+        "open_trades": 89,
+        "wins": 984,
+        "losses": 79,
+        "win_rate": 0.9256820319849483,
+        "paper_pnl": 53.47999999999999
       },
-      "top_trades": []
+      "top_trades": [
+        {
+          "ticker": "KXEURUSD-26NOV0510-B1.127",
+          "action": "BUY_NO",
+          "series": "KXEURUSD",
+          "mid": 0.125,
+          "edge": 0.375,
+          "reason": "Favorite NO: mid 0.125 <= 0.30"
+        },
+        {
+          "ticker": "KXEURUSD-26NOV0510-B1.119",
+          "action": "BUY_NO",
+          "series": "KXEURUSD",
+          "mid": 0.135,
+          "edge": 0.365,
+          "reason": "Favorite NO: mid 0.135 <= 0.30"
+        }
+      ]
     }
   ],
   "alert": {
-    "ok": true,
+    "ok": false,
     "skipped": true,
-    "reason": "no signals above alert threshold",
-    "n": 0
+    "reason": "ALERT_WEBHOOK_URL not set",
+    "n": 2
   }
 }
