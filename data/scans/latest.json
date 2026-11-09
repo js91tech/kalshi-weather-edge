@@ -1,61 +1,79 @@
 {
-  "scanned_at": "2026-11-09T01:05:21+00:00",
+  "scanned_at": "2026-11-09T08:21:25+00:00",
   "strategies": [
     {
       "strategy": "favorites",
       "run_id": 2,
-      "markets_scored": 68,
-      "trade_signals": 0,
-      "pass_signals": 68,
+      "markets_scored": 51,
+      "trade_signals": 1,
+      "pass_signals": 50,
       "settlements": {
-        "tickers_checked": 71,
+        "tickers_checked": 72,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 76888,
-        "trade_signals": 1185,
-        "pass_signals": 75703,
+        "total_signals": 76972,
+        "trade_signals": 1186,
+        "pass_signals": 75786,
         "settled": 1090,
-        "open_trades": 95,
+        "open_trades": 96,
         "wins": 1008,
         "losses": 82,
         "win_rate": 0.9247706422018349,
         "paper_pnl": 54.53999999999999
       },
-      "top_trades": []
+      "top_trades": [
+        {
+          "ticker": "KXEURUSD-26NOV0910-B1.113",
+          "action": "BUY_NO",
+          "series": "KXEURUSD",
+          "mid": 0.055,
+          "edge": 0.445,
+          "reason": "Favorite NO: mid 0.055 <= 0.10"
+        }
+      ]
     },
     {
       "strategy": "high_profit",
       "run_id": 3,
-      "markets_scored": 33,
-      "trade_signals": 0,
-      "pass_signals": 33,
+      "markets_scored": 16,
+      "trade_signals": 1,
+      "pass_signals": 15,
       "settlements": {
-        "tickers_checked": 71,
+        "tickers_checked": 73,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 76921,
-        "trade_signals": 1185,
-        "pass_signals": 75736,
+        "total_signals": 76988,
+        "trade_signals": 1187,
+        "pass_signals": 75801,
         "settled": 1090,
-        "open_trades": 95,
+        "open_trades": 97,
         "wins": 1008,
         "losses": 82,
         "win_rate": 0.9247706422018349,
         "paper_pnl": 54.53999999999999
       },
-      "top_trades": []
+      "top_trades": [
+        {
+          "ticker": "KXEURUSD-26NOV0910-B1.115",
+          "action": "BUY_NO",
+          "series": "KXEURUSD",
+          "mid": 0.16,
+          "edge": 0.33999999999999997,
+          "reason": "Favorite NO: mid 0.160 <= 0.30"
+        }
+      ]
     }
   ],
   "alert": {
-    "ok": true,
+    "ok": false,
     "skipped": true,
-    "reason": "no signals above alert threshold",
-    "n": 0
+    "reason": "ALERT_WEBHOOK_URL not set",
+    "n": 1
   }
 }
