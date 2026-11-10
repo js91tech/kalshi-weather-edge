@@ -1,24 +1,24 @@
 {
-  "scanned_at": "2026-11-10T01:56:59+00:00",
+  "scanned_at": "2026-11-10T09:16:54+00:00",
   "strategies": [
     {
       "strategy": "favorites",
       "run_id": 2,
-      "markets_scored": 68,
-      "trade_signals": 4,
-      "pass_signals": 64,
+      "markets_scored": 51,
+      "trade_signals": 2,
+      "pass_signals": 49,
       "settlements": {
-        "tickers_checked": 71,
+        "tickers_checked": 76,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 77157,
-        "trade_signals": 1199,
-        "pass_signals": 75958,
+        "total_signals": 77241,
+        "trade_signals": 1204,
+        "pass_signals": 76037,
         "settled": 1104,
-        "open_trades": 95,
+        "open_trades": 100,
         "wins": 1021,
         "losses": 83,
         "win_rate": 0.9248188405797102,
@@ -26,94 +26,53 @@
       },
       "top_trades": [
         {
-          "ticker": "KXCPINDEX-26NOV10-T336.600",
-          "action": "BUY_YES",
-          "series": "KXCPINDEX",
-          "mid": 0.9650000000000001,
-          "edge": 0.4650000000000001,
-          "reason": "Favorite YES: mid 0.965 >= 0.90"
-        },
-        {
-          "ticker": "KXAAAGASD-26NOV10-3.9800",
-          "action": "BUY_NO",
-          "series": "KXAAAGASD",
-          "mid": 0.060000000000000005,
-          "edge": 0.44,
-          "reason": "Favorite NO: mid 0.060 <= 0.10"
-        },
-        {
-          "ticker": "KXEURUSD-26NOV1010-B1.129",
+          "ticker": "KXEURUSD-26NOV1010-T1.13199",
           "action": "BUY_NO",
           "series": "KXEURUSD",
-          "mid": 0.060000000000000005,
-          "edge": 0.44,
-          "reason": "Favorite NO: mid 0.060 <= 0.10"
+          "mid": 0.04,
+          "edge": 0.46,
+          "reason": "Favorite NO: mid 0.040 <= 0.10"
         },
         {
-          "ticker": "KXCPINDEX-26NOV10-T337.600",
+          "ticker": "KXEURUSD-26NOV1010-B1.131",
           "action": "BUY_NO",
-          "series": "KXCPINDEX",
-          "mid": 0.08,
-          "edge": 0.42,
-          "reason": "Favorite NO: mid 0.080 <= 0.10"
+          "series": "KXEURUSD",
+          "mid": 0.05,
+          "edge": 0.45,
+          "reason": "Favorite NO: mid 0.050 <= 0.10"
         }
       ]
     },
     {
       "strategy": "high_profit",
       "run_id": 3,
-      "markets_scored": 33,
-      "trade_signals": 3,
-      "pass_signals": 30,
+      "markets_scored": 16,
+      "trade_signals": 0,
+      "pass_signals": 16,
       "settlements": {
-        "tickers_checked": 74,
+        "tickers_checked": 76,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 77190,
-        "trade_signals": 1202,
-        "pass_signals": 75988,
+        "total_signals": 77257,
+        "trade_signals": 1204,
+        "pass_signals": 76053,
         "settled": 1104,
-        "open_trades": 98,
+        "open_trades": 100,
         "wins": 1021,
         "losses": 83,
         "win_rate": 0.9248188405797102,
         "paper_pnl": 55.19999999999999
       },
-      "top_trades": [
-        {
-          "ticker": "KXEURUSD-26NOV1010-B1.119",
-          "action": "BUY_NO",
-          "series": "KXEURUSD",
-          "mid": 0.16499999999999998,
-          "edge": 0.335,
-          "reason": "Favorite NO: mid 0.165 <= 0.30"
-        },
-        {
-          "ticker": "KXEURUSD-26NOV1010-B1.123",
-          "action": "BUY_NO",
-          "series": "KXEURUSD",
-          "mid": 0.215,
-          "edge": 0.28500000000000003,
-          "reason": "Favorite NO: mid 0.215 <= 0.30"
-        },
-        {
-          "ticker": "KXEURUSD-26NOV1010-B1.121",
-          "action": "BUY_NO",
-          "series": "KXEURUSD",
-          "mid": 0.235,
-          "edge": 0.265,
-          "reason": "Favorite NO: mid 0.235 <= 0.30"
-        }
-      ]
+      "top_trades": []
     }
   ],
   "alert": {
     "ok": false,
     "skipped": true,
     "reason": "ALERT_WEBHOOK_URL not set",
-    "n": 3
+    "n": 2
   }
 }
