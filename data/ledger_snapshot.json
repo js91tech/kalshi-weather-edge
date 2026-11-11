@@ -1,10 +1,10 @@
 {
-  "exported_at": "2026-11-11T02:05:45+00:00",
+  "exported_at": "2026-11-11T09:41:39+00:00",
   "version": 1,
   "stats": {
-    "total_signals": 77423,
+    "total_signals": 77425,
     "trade_signals": 1207,
-    "pass_signals": 76216,
+    "pass_signals": 76218,
     "settled": 1122,
     "open_trades": 85,
     "wins": 1038,
@@ -1934190,7 +1934190,7 @@
     },
     {
       "id": 77368,
-      "run_id": 2,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:37+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-3.8900",
@@ -1934215,7 +1934215,7 @@
     },
     {
       "id": 77369,
-      "run_id": 2,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:37+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-3.8950",
@@ -1934240,7 +1934240,7 @@
     },
     {
       "id": 77370,
-      "run_id": 2,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:37+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-3.9000",
@@ -1934265,7 +1934265,7 @@
     },
     {
       "id": 77371,
-      "run_id": 2,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:37+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-3.9050",
@@ -1934290,7 +1934290,7 @@
     },
     {
       "id": 77372,
-      "run_id": 2,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:37+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-3.9100",
@@ -1934315,7 +1934315,7 @@
     },
     {
       "id": 77373,
-      "run_id": 2,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:37+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-3.9150",
@@ -1934340,7 +1934340,7 @@
     },
     {
       "id": 77374,
-      "run_id": 2,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:37+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-3.9200",
@@ -1934365,7 +1934365,7 @@
     },
     {
       "id": 77375,
-      "run_id": 2,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:37+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-3.9250",
@@ -1934390,7 +1934390,7 @@
     },
     {
       "id": 77376,
-      "run_id": 2,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:37+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-3.9300",
@@ -1934415,7 +1934415,7 @@
     },
     {
       "id": 77377,
-      "run_id": 2,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:37+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-3.9350",
@@ -1934440,7 +1934440,7 @@
     },
     {
       "id": 77378,
-      "run_id": 2,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:37+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-4.0200",
@@ -1934465,7 +1934465,7 @@
     },
     {
       "id": 77379,
-      "run_id": 2,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:37+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-4.0150",
@@ -1934490,7 +1934490,7 @@
     },
     {
       "id": 77380,
-      "run_id": 2,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:37+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-4.0100",
@@ -1934515,7 +1934515,7 @@
     },
     {
       "id": 77381,
-      "run_id": 2,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:37+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-4.0050",
@@ -1934540,7 +1934540,7 @@
     },
     {
       "id": 77382,
-      "run_id": 2,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:37+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-4.0000",
@@ -1934565,7 +1934565,7 @@
     },
     {
       "id": 77383,
-      "run_id": 2,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:37+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-3.9950",
@@ -1934590,7 +1934590,7 @@
     },
     {
       "id": 77384,
-      "run_id": 2,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:37+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-3.9900",
@@ -1934615,7 +1934615,7 @@
     },
     {
       "id": 77385,
-      "run_id": 2,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:37+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-3.9850",
@@ -1934640,7 +1934640,7 @@
     },
     {
       "id": 77386,
-      "run_id": 2,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:37+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-3.9800",
@@ -1934665,7 +1934665,7 @@
     },
     {
       "id": 77387,
-      "run_id": 2,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:37+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-3.9750",
@@ -1934690,7 +1934690,7 @@
     },
     {
       "id": 77388,
-      "run_id": 2,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:37+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-3.9700",
@@ -1934715,7 +1934715,7 @@
     },
     {
       "id": 77389,
-      "run_id": 2,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:37+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-3.9650",
@@ -1934740,7 +1934740,7 @@
     },
     {
       "id": 77390,
-      "run_id": 2,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:37+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-3.9600",
@@ -1934765,7 +1934765,7 @@
     },
     {
       "id": 77391,
-      "run_id": 2,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:37+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-3.9550",
@@ -1934790,7 +1934790,7 @@
     },
     {
       "id": 77392,
-      "run_id": 2,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:37+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-3.9500",
@@ -1934815,7 +1934815,7 @@
     },
     {
       "id": 77393,
-      "run_id": 2,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:37+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-3.9450",
@@ -1934840,7 +1934840,7 @@
     },
     {
       "id": 77394,
-      "run_id": 2,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:37+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-3.9400",
@@ -1934865,7 +1934865,7 @@
     },
     {
       "id": 77395,
-      "run_id": 2,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:37+00:00",
       "city_id": "KXNASDAQDUD",
       "ticker": "KXNASDAQDUD-26NOV11H1600-T27740.80",
@@ -1934890,7 +1934890,7 @@
     },
     {
       "id": 77396,
-      "run_id": 3,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:42+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-3.8900",
@@ -1934915,7 +1934915,7 @@
     },
     {
       "id": 77397,
-      "run_id": 3,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:42+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-3.8950",
@@ -1934940,7 +1934940,7 @@
     },
     {
       "id": 77398,
-      "run_id": 3,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:42+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-3.9000",
@@ -1934965,7 +1934965,7 @@
     },
     {
       "id": 77399,
-      "run_id": 3,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:42+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-3.9050",
@@ -1934990,7 +1934990,7 @@
     },
     {
       "id": 77400,
-      "run_id": 3,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:42+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-3.9100",
@@ -1935015,7 +1935015,7 @@
     },
     {
       "id": 77401,
-      "run_id": 3,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:42+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-3.9150",
@@ -1935040,7 +1935040,7 @@
     },
     {
       "id": 77402,
-      "run_id": 3,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:42+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-3.9200",
@@ -1935065,7 +1935065,7 @@
     },
     {
       "id": 77403,
-      "run_id": 3,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:42+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-3.9250",
@@ -1935090,7 +1935090,7 @@
     },
     {
       "id": 77404,
-      "run_id": 3,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:42+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-3.9300",
@@ -1935115,7 +1935115,7 @@
     },
     {
       "id": 77405,
-      "run_id": 3,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:42+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-3.9350",
@@ -1935140,7 +1935140,7 @@
     },
     {
       "id": 77406,
-      "run_id": 3,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:42+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-4.0200",
@@ -1935165,7 +1935165,7 @@
     },
     {
       "id": 77407,
-      "run_id": 3,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:42+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-4.0150",
@@ -1935190,7 +1935190,7 @@
     },
     {
       "id": 77408,
-      "run_id": 3,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:42+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-4.0100",
@@ -1935215,7 +1935215,7 @@
     },
     {
       "id": 77409,
-      "run_id": 3,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:42+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-4.0050",
@@ -1935240,7 +1935240,7 @@
     },
     {
       "id": 77410,
-      "run_id": 3,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:42+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-4.0000",
@@ -1935265,7 +1935265,7 @@
     },
     {
       "id": 77411,
-      "run_id": 3,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:42+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-3.9950",
@@ -1935290,7 +1935290,7 @@
     },
     {
       "id": 77412,
-      "run_id": 3,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:42+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-3.9900",
@@ -1935315,7 +1935315,7 @@
     },
     {
       "id": 77413,
-      "run_id": 3,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:42+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-3.9850",
@@ -1935340,7 +1935340,7 @@
     },
     {
       "id": 77414,
-      "run_id": 3,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:42+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-3.9800",
@@ -1935365,7 +1935365,7 @@
     },
     {
       "id": 77415,
-      "run_id": 3,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:42+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-3.9750",
@@ -1935390,7 +1935390,7 @@
     },
     {
       "id": 77416,
-      "run_id": 3,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:42+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-3.9700",
@@ -1935415,7 +1935415,7 @@
     },
     {
       "id": 77417,
-      "run_id": 3,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:42+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-3.9650",
@@ -1935440,7 +1935440,7 @@
     },
     {
       "id": 77418,
-      "run_id": 3,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:42+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-3.9600",
@@ -1935465,7 +1935465,7 @@
     },
     {
       "id": 77419,
-      "run_id": 3,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:42+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-3.9550",
@@ -1935490,7 +1935490,7 @@
     },
     {
       "id": 77420,
-      "run_id": 3,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:42+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-3.9500",
@@ -1935515,7 +1935515,7 @@
     },
     {
       "id": 77421,
-      "run_id": 3,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:42+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-3.9450",
@@ -1935540,7 +1935540,7 @@
     },
     {
       "id": 77422,
-      "run_id": 3,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:42+00:00",
       "city_id": "KXAAAGASD",
       "ticker": "KXAAAGASD-26NOV11-3.9400",
@@ -1935565,7 +1935565,7 @@
     },
     {
       "id": 77423,
-      "run_id": 3,
+      "run_id": 1,
       "created_at": "2026-11-11T02:05:42+00:00",
       "city_id": "KXNASDAQDUD",
       "ticker": "KXNASDAQDUD-26NOV11H1600-T27740.80",
@@ -1935583,6 +1935583,56 @@
       "edge": 0.0,
       "suggested_contracts": 0.0,
       "reason": "Mid 0.805 not extreme enough",
+      "meta_json": "{\"series\": \"KXNASDAQDUD\", \"strategy\": \"high_profit\", \"title\": \"Will the NASDAQ-100 be above 27740.80 on Nov 11, 2026 at 4pm EST?\", \"subtitle\": \"27,740.81 or above\", \"yes_threshold\": 0.9, \"no_threshold\": 0.25}",
+      "outcome": null,
+      "settled_at": null,
+      "pnl": null
+    },
+    {
+      "id": 77424,
+      "run_id": 2,
+      "created_at": "2026-11-11T09:41:33+00:00",
+      "city_id": "KXNASDAQDUD",
+      "ticker": "KXNASDAQDUD-26NOV11H1600-T27740.80",
+      "event_ticker": "KXNASDAQDUD-26NOV11H1600",
+      "target_date": null,
+      "action": "PASS",
+      "side": null,
+      "execution": "none",
+      "model_p": 0.895,
+      "market_mid": 0.895,
+      "yes_bid": 0.85,
+      "yes_ask": 0.94,
+      "spread": 0.044999999999999984,
+      "fee": 0.0,
+      "edge": 0.0,
+      "suggested_contracts": 0.0,
+      "reason": "Mid 0.895 not extreme enough",
+      "meta_json": "{\"series\": \"KXNASDAQDUD\", \"strategy\": \"favorites\", \"title\": \"Will the NASDAQ-100 be above 27740.80 on Nov 11, 2026 at 4pm EST?\", \"subtitle\": \"27,740.81 or above\", \"yes_threshold\": 0.9, \"no_threshold\": 0.1}",
+      "outcome": null,
+      "settled_at": null,
+      "pnl": null
+    },
+    {
+      "id": 77425,
+      "run_id": 3,
+      "created_at": "2026-11-11T09:41:38+00:00",
+      "city_id": "KXNASDAQDUD",
+      "ticker": "KXNASDAQDUD-26NOV11H1600-T27740.80",
+      "event_ticker": "KXNASDAQDUD-26NOV11H1600",
+      "target_date": null,
+      "action": "PASS",
+      "side": null,
+      "execution": "none",
+      "model_p": 0.895,
+      "market_mid": 0.895,
+      "yes_bid": 0.85,
+      "yes_ask": 0.94,
+      "spread": 0.044999999999999984,
+      "fee": 0.0,
+      "edge": 0.0,
+      "suggested_contracts": 0.0,
+      "reason": "Mid 0.895 not extreme enough",
       "meta_json": "{\"series\": \"KXNASDAQDUD\", \"strategy\": \"high_profit\", \"title\": \"Will the NASDAQ-100 be above 27740.80 on Nov 11, 2026 at 4pm EST?\", \"subtitle\": \"27,740.81 or above\", \"yes_threshold\": 0.9, \"no_threshold\": 0.25}",
       "outcome": null,
       "settled_at": null,
