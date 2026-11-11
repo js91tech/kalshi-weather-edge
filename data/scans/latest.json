@@ -1,61 +1,119 @@
 {
-  "scanned_at": "2026-11-11T09:41:41+00:00",
+  "scanned_at": "2026-11-11T17:39:33+00:00",
   "strategies": [
     {
       "strategy": "favorites",
       "run_id": 2,
-      "markets_scored": 1,
-      "trade_signals": 0,
-      "pass_signals": 1,
+      "markets_scored": 43,
+      "trade_signals": 4,
+      "pass_signals": 39,
       "settlements": {
-        "tickers_checked": 61,
-        "settlements_upserted": 0,
-        "signals_updated": 0
+        "tickers_checked": 65,
+        "settlements_upserted": 2,
+        "signals_updated": 2
       },
       "errors": [],
       "stats": {
-        "total_signals": 77424,
-        "trade_signals": 1207,
-        "pass_signals": 76217,
-        "settled": 1122,
-        "open_trades": 85,
-        "wins": 1038,
+        "total_signals": 77468,
+        "trade_signals": 1211,
+        "pass_signals": 76257,
+        "settled": 1124,
+        "open_trades": 87,
+        "wins": 1040,
         "losses": 84,
-        "win_rate": 0.9251336898395722,
-        "paper_pnl": 56.62999999999999
+        "win_rate": 0.9252669039145908,
+        "paper_pnl": 56.76999999999999
       },
-      "top_trades": []
+      "top_trades": [
+        {
+          "ticker": "KXEURUSD-26NOV1210-B1.117",
+          "action": "BUY_NO",
+          "series": "KXEURUSD",
+          "mid": 0.045,
+          "edge": 0.455,
+          "reason": "Favorite NO: mid 0.045 <= 0.10"
+        },
+        {
+          "ticker": "KXEURUSD-26NOV1210-B1.101",
+          "action": "BUY_NO",
+          "series": "KXEURUSD",
+          "mid": 0.045,
+          "edge": 0.455,
+          "reason": "Favorite NO: mid 0.045 <= 0.10"
+        },
+        {
+          "ticker": "KXAAAGASD-26NOV12-3.9100",
+          "action": "BUY_NO",
+          "series": "KXAAAGASD",
+          "mid": 0.07500000000000001,
+          "edge": 0.425,
+          "reason": "Favorite NO: mid 0.075 <= 0.10"
+        },
+        {
+          "ticker": "KXEURUSD-26NOV1210-B1.115",
+          "action": "BUY_NO",
+          "series": "KXEURUSD",
+          "mid": 0.08,
+          "edge": 0.42,
+          "reason": "Favorite NO: mid 0.080 <= 0.10"
+        }
+      ]
     },
     {
       "strategy": "high_profit",
       "run_id": 3,
-      "markets_scored": 1,
-      "trade_signals": 0,
-      "pass_signals": 1,
+      "markets_scored": 43,
+      "trade_signals": 3,
+      "pass_signals": 40,
       "settlements": {
-        "tickers_checked": 61,
+        "tickers_checked": 66,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 77425,
-        "trade_signals": 1207,
-        "pass_signals": 76218,
-        "settled": 1122,
-        "open_trades": 85,
-        "wins": 1038,
+        "total_signals": 77511,
+        "trade_signals": 1214,
+        "pass_signals": 76297,
+        "settled": 1124,
+        "open_trades": 90,
+        "wins": 1040,
         "losses": 84,
-        "win_rate": 0.9251336898395722,
-        "paper_pnl": 56.62999999999999
+        "win_rate": 0.9252669039145908,
+        "paper_pnl": 56.76999999999999
       },
-      "top_trades": []
+      "top_trades": [
+        {
+          "ticker": "KXEURUSD-26NOV1210-B1.103",
+          "action": "BUY_NO",
+          "series": "KXEURUSD",
+          "mid": 0.085,
+          "edge": 0.415,
+          "reason": "Favorite NO: mid 0.085 <= 0.30"
+        },
+        {
+          "ticker": "KXEURUSD-26NOV1210-B1.113",
+          "action": "BUY_NO",
+          "series": "KXEURUSD",
+          "mid": 0.14500000000000002,
+          "edge": 0.355,
+          "reason": "Favorite NO: mid 0.145 <= 0.30"
+        },
+        {
+          "ticker": "KXEURUSD-26NOV1210-B1.107",
+          "action": "BUY_NO",
+          "series": "KXEURUSD",
+          "mid": 0.175,
+          "edge": 0.325,
+          "reason": "Favorite NO: mid 0.175 <= 0.30"
+        }
+      ]
     }
   ],
   "alert": {
-    "ok": true,
+    "ok": false,
     "skipped": true,
-    "reason": "no signals above alert threshold",
-    "n": 0
+    "reason": "ALERT_WEBHOOK_URL not set",
+    "n": 3
   }
 }
