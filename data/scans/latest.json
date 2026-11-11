@@ -1,78 +1,61 @@
 {
-  "scanned_at": "2026-11-10T22:27:37+00:00",
+  "scanned_at": "2026-11-11T02:05:46+00:00",
   "strategies": [
     {
       "strategy": "favorites",
       "run_id": 2,
-      "markets_scored": 27,
-      "trade_signals": 2,
-      "pass_signals": 25,
+      "markets_scored": 28,
+      "trade_signals": 0,
+      "pass_signals": 28,
       "settlements": {
         "tickers_checked": 62,
-        "settlements_upserted": 0,
-        "signals_updated": 0
+        "settlements_upserted": 1,
+        "signals_updated": 1
       },
       "errors": [],
       "stats": {
-        "total_signals": 77340,
+        "total_signals": 77395,
         "trade_signals": 1207,
-        "pass_signals": 76133,
-        "settled": 1121,
-        "open_trades": 86,
-        "wins": 1037,
+        "pass_signals": 76188,
+        "settled": 1122,
+        "open_trades": 85,
+        "wins": 1038,
         "losses": 84,
-        "win_rate": 0.9250669045495094,
-        "paper_pnl": 56.559999999999995
+        "win_rate": 0.9251336898395722,
+        "paper_pnl": 56.62999999999999
       },
-      "top_trades": [
-        {
-          "ticker": "KXAAAGASD-26NOV11-3.9400",
-          "action": "BUY_YES",
-          "series": "KXAAAGASD",
-          "mid": 0.94,
-          "edge": 0.43999999999999995,
-          "reason": "Favorite YES: mid 0.940 >= 0.90"
-        },
-        {
-          "ticker": "KXAAAGASD-26NOV11-3.9450",
-          "action": "BUY_NO",
-          "series": "KXAAAGASD",
-          "mid": 0.065,
-          "edge": 0.435,
-          "reason": "Favorite NO: mid 0.065 <= 0.10"
-        }
-      ]
+      "top_trades": []
     },
     {
       "strategy": "high_profit",
       "run_id": 3,
-      "markets_scored": 27,
+      "markets_scored": 28,
       "trade_signals": 0,
-      "pass_signals": 27,
+      "pass_signals": 28,
       "settlements": {
-        "tickers_checked": 62,
+        "tickers_checked": 61,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 77367,
+        "total_signals": 77423,
         "trade_signals": 1207,
-        "pass_signals": 76160,
-        "settled": 1121,
-        "open_trades": 86,
-        "wins": 1037,
+        "pass_signals": 76216,
+        "settled": 1122,
+        "open_trades": 85,
+        "wins": 1038,
         "losses": 84,
-        "win_rate": 0.9250669045495094,
-        "paper_pnl": 56.559999999999995
+        "win_rate": 0.9251336898395722,
+        "paper_pnl": 56.62999999999999
       },
       "top_trades": []
     }
   ],
   "alert": {
-    "ok": false,
+    "ok": true,
     "skipped": true,
-    "reason": "ALERT_WEBHOOK_URL not set",
-    "n": 2
+    "reason": "no signals above alert threshold",
+    "n": 0
   }
 }
