@@ -1,62 +1,12 @@
 {
-  "scanned_at": "2026-11-19T15:07:27+00:00",
+  "scanned_at": "2026-11-19T22:43:42+00:00",
   "strategies": [
     {
       "strategy": "favorites",
       "run_id": 2,
-      "markets_scored": 48,
-      "trade_signals": 3,
-      "pass_signals": 45,
-      "settlements": {
-        "tickers_checked": 70,
-        "settlements_upserted": 8,
-        "signals_updated": 8
-      },
-      "errors": [],
-      "stats": {
-        "total_signals": 79420,
-        "trade_signals": 1271,
-        "pass_signals": 78149,
-        "settled": 1185,
-        "open_trades": 86,
-        "wins": 1095,
-        "losses": 90,
-        "win_rate": 0.9240506329113924,
-        "paper_pnl": 59.62999999999999
-      },
-      "top_trades": [
-        {
-          "ticker": "KXEURUSD-26NOV2010-B1.107",
-          "action": "BUY_NO",
-          "series": "KXEURUSD",
-          "mid": 0.04,
-          "edge": 0.46,
-          "reason": "Favorite NO: mid 0.040 <= 0.10"
-        },
-        {
-          "ticker": "KXEURUSD-26NOV2010-B1.091",
-          "action": "BUY_NO",
-          "series": "KXEURUSD",
-          "mid": 0.04,
-          "edge": 0.46,
-          "reason": "Favorite NO: mid 0.040 <= 0.10"
-        },
-        {
-          "ticker": "KXEURUSD-26NOV2010-B1.093",
-          "action": "BUY_NO",
-          "series": "KXEURUSD",
-          "mid": 0.065,
-          "edge": 0.435,
-          "reason": "Favorite NO: mid 0.065 <= 0.10"
-        }
-      ]
-    },
-    {
-      "strategy": "high_profit",
-      "run_id": 3,
-      "markets_scored": 33,
-      "trade_signals": 3,
-      "pass_signals": 30,
+      "markets_scored": 47,
+      "trade_signals": 0,
+      "pass_signals": 47,
       "settlements": {
         "tickers_checked": 65,
         "settlements_upserted": 0,
@@ -64,9 +14,9 @@
       },
       "errors": [],
       "stats": {
-        "total_signals": 79453,
+        "total_signals": 79500,
         "trade_signals": 1274,
-        "pass_signals": 78179,
+        "pass_signals": 78226,
         "settled": 1185,
         "open_trades": 89,
         "wins": 1095,
@@ -74,17 +24,34 @@
         "win_rate": 0.9240506329113924,
         "paper_pnl": 59.62999999999999
       },
+      "top_trades": []
+    },
+    {
+      "strategy": "high_profit",
+      "run_id": 3,
+      "markets_scored": 32,
+      "trade_signals": 3,
+      "pass_signals": 29,
+      "settlements": {
+        "tickers_checked": 68,
+        "settlements_upserted": 0,
+        "signals_updated": 0
+      },
+      "errors": [],
+      "stats": {
+        "total_signals": 79532,
+        "trade_signals": 1277,
+        "pass_signals": 78255,
+        "settled": 1185,
+        "open_trades": 92,
+        "wins": 1095,
+        "losses": 90,
+        "win_rate": 0.9240506329113924,
+        "paper_pnl": 59.62999999999999
+      },
       "top_trades": [
         {
-          "ticker": "KXEURUSD-26NOV2010-B1.105",
-          "action": "BUY_NO",
-          "series": "KXEURUSD",
-          "mid": 0.075,
-          "edge": 0.425,
-          "reason": "Favorite NO: mid 0.075 <= 0.30"
-        },
-        {
-          "ticker": "KXEURUSD-26NOV2010-B1.095",
+          "ticker": "KXEURUSD-26NOV2010-B1.101",
           "action": "BUY_NO",
           "series": "KXEURUSD",
           "mid": 0.10500000000000001,
@@ -92,12 +59,20 @@
           "reason": "Favorite NO: mid 0.105 <= 0.30"
         },
         {
-          "ticker": "KXEURUSD-26NOV2010-B1.103",
+          "ticker": "KXEURUSD-26NOV2010-B1.099",
           "action": "BUY_NO",
           "series": "KXEURUSD",
-          "mid": 0.11000000000000001,
-          "edge": 0.39,
-          "reason": "Favorite NO: mid 0.110 <= 0.30"
+          "mid": 0.165,
+          "edge": 0.33499999999999996,
+          "reason": "Favorite NO: mid 0.165 <= 0.30"
+        },
+        {
+          "ticker": "KXEURUSD-26NOV2010-B1.097",
+          "action": "BUY_NO",
+          "series": "KXEURUSD",
+          "mid": 0.195,
+          "edge": 0.305,
+          "reason": "Favorite NO: mid 0.195 <= 0.30"
         }
       ]
     }
