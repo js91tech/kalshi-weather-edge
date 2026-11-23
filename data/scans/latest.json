@@ -1,49 +1,24 @@
 {
-  "scanned_at": "2026-11-23T03:53:05+00:00",
+  "scanned_at": "2026-11-23T13:58:04+00:00",
   "strategies": [
     {
       "strategy": "favorites",
       "run_id": 2,
       "markets_scored": 48,
-      "trade_signals": 0,
-      "pass_signals": 48,
-      "settlements": {
-        "tickers_checked": 67,
-        "settlements_upserted": 0,
-        "signals_updated": 0
-      },
-      "errors": [],
-      "stats": {
-        "total_signals": 80369,
-        "trade_signals": 1287,
-        "pass_signals": 79082,
-        "settled": 1196,
-        "open_trades": 91,
-        "wins": 1105,
-        "losses": 91,
-        "win_rate": 0.9239130434782609,
-        "paper_pnl": 60.19999999999999
-      },
-      "top_trades": []
-    },
-    {
-      "strategy": "high_profit",
-      "run_id": 3,
-      "markets_scored": 33,
       "trade_signals": 1,
-      "pass_signals": 32,
+      "pass_signals": 47,
       "settlements": {
-        "tickers_checked": 68,
+        "tickers_checked": 69,
         "settlements_upserted": 0,
         "signals_updated": 0
       },
       "errors": [],
       "stats": {
-        "total_signals": 80402,
-        "trade_signals": 1288,
-        "pass_signals": 79114,
+        "total_signals": 80450,
+        "trade_signals": 1289,
+        "pass_signals": 79161,
         "settled": 1196,
-        "open_trades": 92,
+        "open_trades": 93,
         "wins": 1105,
         "losses": 91,
         "win_rate": 0.9239130434782609,
@@ -51,14 +26,39 @@
       },
       "top_trades": [
         {
-          "ticker": "KXEURUSD-26NOV2310-B1.097",
+          "ticker": "KXEURUSD-26NOV2310-B1.089",
           "action": "BUY_NO",
           "series": "KXEURUSD",
-          "mid": 0.215,
-          "edge": 0.28500000000000003,
-          "reason": "Favorite NO: mid 0.215 <= 0.30"
+          "mid": 0.04,
+          "edge": 0.46,
+          "reason": "Favorite NO: mid 0.040 <= 0.10"
         }
       ]
+    },
+    {
+      "strategy": "high_profit",
+      "run_id": 3,
+      "markets_scored": 33,
+      "trade_signals": 0,
+      "pass_signals": 33,
+      "settlements": {
+        "tickers_checked": 69,
+        "settlements_upserted": 0,
+        "signals_updated": 0
+      },
+      "errors": [],
+      "stats": {
+        "total_signals": 80483,
+        "trade_signals": 1289,
+        "pass_signals": 79194,
+        "settled": 1196,
+        "open_trades": 93,
+        "wins": 1105,
+        "losses": 91,
+        "win_rate": 0.9239130434782609,
+        "paper_pnl": 60.19999999999999
+      },
+      "top_trades": []
     }
   ],
   "alert": {
